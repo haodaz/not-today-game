@@ -61,60 +61,64 @@
 .title-credits-page .title-back{margin-top:24px}
 .title-page .settings-layer{position:absolute}
 
-/* The object drawer (object-drawer 2): a light page, one tone, like the rest of the title. A grid
-   of found objects; a cell opens large in the middle. Everything here is the original object. */
-.title-drawer-page{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1040px;max-width:92%;box-sizing:border-box;background:rgba(236,231,222,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:10px;padding:26px 34px 30px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
-.title-drawer-page h2{margin:0 0 20px;font-size:16px;letter-spacing:.3em;font-weight:400;color:#5b5346;text-align:center}
-.title-drawer-page .title-back{margin:22px auto 0;color:#1d2129;border-color:#2a2622}
-.title-drawer-page .title-back:hover,.title-drawer-page .title-back:focus-visible{background:#2a2622;color:#efe9df}
-.drawer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding:4px 2px}
-/* collection feel (author 2026-11-23): a card per object, paper on the shelf, a plaque for the name; a found one lifts on hover, a missing one is its shadow and a question mark */
-.drawer-cell{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;min-height:228px;padding:22px 12px 16px;border:1px solid rgba(138,127,112,.45);border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.25));box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 6px 14px rgba(40,30,20,.08);color:#1d2129;font:inherit;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
-.drawer-cell:hover,.drawer-cell:focus-visible{transform:translateY(-3px);border-color:#8a7f70;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 14px 24px rgba(40,30,20,.16);outline:none}
-.drawer-photo{width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.28))}
-.drawer-cell.kuro .drawer-photo{image-rendering:pixelated}
-.drawer-cell-name{font-size:14px;letter-spacing:.14em;padding:5px 14px;border-radius:999px;background:rgba(42,38,34,.08);color:#2a2622}
-.drawer-cell.locked{cursor:default;border-style:dashed;border-color:rgba(138,127,112,.4);background:rgba(255,255,255,.12);box-shadow:none}
-.drawer-cell.locked .drawer-photo{filter:brightness(0) opacity(.14)}
-.drawer-cell.locked .drawer-cell-name{background:none;color:rgba(91,83,70,.55);letter-spacing:.3em}
-.drawer-count{display:inline-flex;align-items:baseline;gap:4px;margin-left:16px;font-size:13px;letter-spacing:.1em;color:#8a7f70;vertical-align:1px}
-.drawer-count i{font-style:normal;color:#b7ad9f}
-/* device-games: 玩一局 under the calculator's and the 文曲星's cards */
-.drawer-card{display:flex;flex-direction:column;gap:8px}
-.drawer-card .drawer-cell{flex:1}
-.drawer-play{align-self:center;padding:5px 16px;border:1px solid rgba(29,33,41,.55);border-radius:14px;background:rgba(255,255,255,.55);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer}
-.drawer-play:hover,.drawer-play:focus-visible{background:#1d2129;color:#efe9df}
-/* An opened object in the middle. */
-.drawer-open{display:flex;flex-direction:column;align-items:center;gap:14px;min-height:0}
-.drawer-open .drawer-back{align-self:flex-start;width:auto;padding:8px 18px;border:1px solid #8a7f70;border-radius:4px;background:transparent;color:#1d2129;font:inherit;letter-spacing:.15em;cursor:pointer}
-.drawer-open .drawer-back:hover,.drawer-open .drawer-back:focus-visible{background:#2a2622;color:#efe9df}
-.drawer-stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
-.drawer-open-name{font-size:15px;letter-spacing:.12em;color:#5b5346}
-.drawer-photo-obj{display:flex;flex-direction:column;align-items:center;gap:12px}
-.drawer-big-photo{max-width:320px;max-height:300px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
+/* The object drawer (object-drawer 2) and 影集 (photo-album R2). game-menu (2026-11-26): both are the
+   in-game menu with no tabs (menu.ts menuShell, .game-menu.solo; its frame, veil and glass are
+   room.css's) — the room frosted behind, light words with the glow, bone hairlines, one dark red.
+   The pane is a little wider than 设置's and lays its page out as a column. */
+.game-menu.title-drawer-page .gm-pane{width:min(1000px,88%);display:flex;flex-direction:column}
+.game-menu.title-drawer-page .gm-pane>*{flex:none}
+.title-drawer-page .drawer-head{display:flex;justify-content:flex-end;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--gm-hair)}
+.title-drawer-page .drawer-count{display:inline-flex;align-items:baseline;gap:4px;font:15px var(--gm-num);letter-spacing:.2em;color:var(--gm-bone)}
+.title-drawer-page .drawer-count i{font-style:normal;color:var(--gm-bone3)}
+/* the shelf: numbered cases like 道具 in the game (.game-menu .items-panel .ip-row) */
+.title-drawer-page .drawer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-content:start}
+.title-drawer-page .drawer-cell{position:relative;display:grid;grid-template-rows:1fr auto;place-items:center;width:100%;aspect-ratio:4/5;box-sizing:border-box;padding:16px 10px 14px;border:1px solid var(--gm-hair2);border-radius:0;background:rgba(10,12,10,.28);color:var(--gm-bone);font:inherit;text-shadow:inherit;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s}
+.title-drawer-page button.drawer-cell:hover,.title-drawer-page button.drawer-cell:focus-visible{background:rgba(10,12,10,.4);border-color:var(--gm-bone);box-shadow:0 0 0 1px var(--gm-bone),0 0 18px rgba(192,55,46,.35);outline:none}
+.title-drawer-page button.drawer-cell:hover::before,.title-drawer-page button.drawer-cell:focus-visible::before{content:"";position:absolute;top:-5px;left:50%;width:8px;height:8px;margin-left:-4px;background:var(--gm-blood2);transform:rotate(45deg)}
+.title-drawer-page .drawer-photo{width:72%;height:100%;max-height:150px;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+.title-drawer-page .drawer-cell.kuro .drawer-photo{image-rendering:pixelated}
+.title-drawer-page .drawer-cell-name{padding-top:10px;font-size:15px;letter-spacing:.25em;text-indent:.25em;color:var(--gm-bone)}
+.title-drawer-page .drawer-no{position:absolute;left:6px;bottom:4px;font:11px var(--gm-num);font-style:normal;letter-spacing:.1em;color:var(--gm-bone3)}
+.title-drawer-page .drawer-cell.locked{cursor:default;background:rgba(10,12,10,.18);border-color:var(--gm-hair)}
+.title-drawer-page .drawer-rune{width:30px;height:30px;stroke:var(--gm-bone3);fill:none;stroke-width:1.2;opacity:.6}
+.title-drawer-page .drawer-cell.locked .drawer-cell-name{color:var(--gm-bone3);letter-spacing:.3em;text-indent:.3em}
+/* device-games: 玩一局 under the calculator's and the 文曲星's cases */
+.title-drawer-page .drawer-card{display:flex;flex-direction:column;gap:8px}
+.title-drawer-page .drawer-card .drawer-cell{flex:1}
+.title-drawer-page .drawer-play,.title-drawer-page .drawer-back,.title-drawer-page .album-step{border:1px solid var(--gm-hair2);border-radius:0;background:rgba(10,12,10,.25);color:var(--gm-bone);font:14px var(--gm-serif);letter-spacing:.25em;text-shadow:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.title-drawer-page .drawer-play{align-self:center;padding:5px 16px}
+.title-drawer-page .drawer-play:hover,.title-drawer-page .drawer-play:focus-visible,.title-drawer-page .drawer-back:hover,.title-drawer-page .drawer-back:focus-visible,.title-drawer-page .album-step:not(:disabled):hover,.title-drawer-page .album-step:not(:disabled):focus-visible{border-color:var(--gm-blood2);background:rgba(60,10,8,.35);color:#fff;outline:none}
+/* An opened object in the middle, on its own dark plinth. */
+.game-menu.title-drawer-page .gm-pane>.drawer-open{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.title-drawer-page .drawer-stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.title-drawer-page .drawer-open-name{font-size:20px;font-weight:600;letter-spacing:.3em;text-indent:.3em;color:#f6f1e6}
+.title-drawer-page .drawer-photo-obj{display:flex;flex-direction:column;align-items:center;gap:12px}
+.title-drawer-page .drawer-big-photo{max-width:320px;max-height:300px;object-fit:contain;filter:drop-shadow(0 18px 18px rgba(0,0,0,.45))}
 
-/* 影集 (photo-album R2): the drawer's light page. A count, then a row of four instant sheets per day
-   (scrolling); a collected sheet is its developed photo, an uncollected one blank white with its
-   label (the last day's just 「？」). Opened, one sheet large with ← →, the addition's text under it. */
-.title-album-page .album-count{text-align:center;margin:-10px 0 14px;font-size:13px;letter-spacing:.2em;color:#5b5346}
-.title-album-page .album-grid{max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:4px 6px}
-.title-album-page .album-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.title-album-page .album-cell{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:#1d2129}
+/* 影集: a count, then a row of four instant sheets per day (the pane scrolls); a collected sheet is its
+   developed photo, an uncollected one a dim empty sheet with its label (the last day's just 「？」).
+   Opened, one sheet large with ← →, the addition's text under it. The photos keep their own paper. */
+.title-album-page .album-count{margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--gm-hair);text-align:right;font-size:13px;letter-spacing:.2em;color:var(--gm-bone)}
+.title-album-page .album-grid{display:flex;flex-direction:column;gap:16px}
+.title-album-page .album-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;justify-items:center}
+.title-album-page .album-cell{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:var(--gm-bone);text-shadow:inherit}
 .title-album-page .album-cell.got{cursor:pointer}
-.title-album-page .album-sheet{display:block;width:150px;box-sizing:border-box;padding:7px 7px 26px;background:#FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.18);border-radius:2px}
-.title-album-page .album-cell.blank .album-sheet{height:182px;background:#FBFAF7}
+.title-album-page .album-sheet{display:block;width:150px;box-sizing:border-box;padding:7px 7px 26px;background:#efe9dc;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.title-album-page .album-cell.blank .album-sheet{height:182px;background:rgba(10,12,10,.28);border:1px solid var(--gm-hair2);box-shadow:none}
 .title-album-page .album-cell .ph-add{display:none}
-.title-album-page .album-cell.got:hover .album-sheet,.title-album-page .album-cell.got:focus-visible .album-sheet{box-shadow:0 4px 12px rgba(0,0,0,.28)}
-.title-album-page .album-label{font-size:12px;letter-spacing:.08em;color:#8a7f70}
-.title-album-page .album-cell.last .album-label{font-size:16px;color:#b3aa9c}
-.title-album-page .album-open{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:360px}
+.title-album-page .album-cell.got:hover .album-sheet,.title-album-page .album-cell.got:focus-visible .album-sheet{box-shadow:0 0 0 1px var(--gm-bone),0 0 18px rgba(192,55,46,.35)}
+.title-album-page .album-cell.got:focus-visible{outline:none}
+.title-album-page .album-label{font-size:12px;letter-spacing:.12em;color:var(--gm-bone2)}
+.title-album-page .album-cell.last .album-label{font-size:16px;color:var(--gm-bone3)}
+.title-album-page .album-open{display:flex;flex-direction:column;align-items:center;gap:12px}
+.title-album-page .album-open .drawer-back{align-self:flex-start;padding:8px 18px}
 .title-album-page .album-large{display:flex;align-items:center;gap:22px}
-.title-album-page .album-sheet.big{margin:0;width:340px;padding:12px 12px 52px;background:#FFFFFF;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.title-album-page .album-sheet.big{margin:0;width:340px;padding:12px 12px 52px;box-shadow:0 18px 30px rgba(0,0,0,.45)}
 .title-album-page .album-sheet.big .ph-add{display:none}
-.title-album-page .album-step{width:44px;height:44px;border:1px solid #8a7f70;border-radius:50%;background:transparent;color:#1d2129;font:inherit;font-size:18px;cursor:pointer}
+.title-album-page .album-step{width:44px;height:44px;padding:0;letter-spacing:0;font-size:18px}
 .title-album-page .album-step:disabled{opacity:.3;cursor:default}
-.title-album-page .album-cap{font-size:13px;letter-spacing:.12em;color:#5b5346}
-.title-album-page .album-text{margin:0;max-width:520px;text-align:center;font-size:14px;line-height:1.7;color:#1d2129}
+.title-album-page .album-cap{font-size:13px;letter-spacing:.2em;color:var(--gm-bone2)}
+.title-album-page .album-text{margin:0;max-width:520px;text-align:center;font-size:15px;line-height:1.85;color:var(--gm-bone)}
 
 /* opening R1: the name printed into a shipping label, a cardboard box rising behind it, the label
    stuck onto its side, a hold, the fade to black. 320 × 180 label, thin grey rules, the name in a
@@ -169,9 +173,6 @@
 /* Polish 2026-11-05 (Claude, from title shots): the logo hides behind an open panel instead of
    showing through it; the drawer keeps one size from the grid to every opened object (no jump). */
 .title-page.screen-drawer .title-name,.title-page.screen-album .title-name{opacity:0;transition:opacity 200ms}
-.title-drawer-page:not(.title-album-page){display:flex;flex-direction:column;height:min(730px,90vh)}
-.title-drawer-page:not(.title-album-page)>.drawer-grid,.title-drawer-page:not(.title-album-page)>.drawer-open{flex:1;min-height:0;overflow-y:auto}
-.title-drawer-page:not(.title-album-page)>.title-back{flex:none}
 /* login-first (author 2026-11-09): the gate card before the menu */
 .title-auth{width:520px}
 .title-auth h2{margin-bottom:4px}

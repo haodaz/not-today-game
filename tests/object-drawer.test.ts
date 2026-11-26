@@ -92,10 +92,14 @@ describe("the drawer page in content order", () => {
     expect(withoutKuro).not.toContain(`data-object="${KURO_ID}"`);
   });
 
-  it("the open page carries a stage for the object and one back control (the panel's own 返回 → the grid)", () => {
+  it("the open page carries a stage for the object and one way back (the menu's × and its frosted outside, both 返回 → the grid)", () => {
     const html = drawerPage(coll({ objects: ["chick"] }), "chick").value;
     expect(html).toContain('data-drawer-stage="chick"');
-    expect(html.match(/data-action="(title-back|drawer-grid)"/g)).toEqual(['data-action="title-back"']);
+    // game-menu (2026-11-26): the veil and the close medallion both run title-back; no other back control
+    expect(html.match(/data-action="(title-back|drawer-grid)"/g)).toEqual(['data-action="title-back"', 'data-action="title-back"']);
+    expect(html).toContain('<button type="button" class="settings-dim gm-veil" data-action="title-back"');
+    expect(html).toContain('<button type="button" class="gm-close med" data-action="title-back"');
+    expect(html).not.toContain('class="title-back"');
   });
 });
 

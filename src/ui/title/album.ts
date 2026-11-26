@@ -11,6 +11,7 @@ import { ON_THE_SPOT_DAY, photoAdds, photoKey, photosTable, type PhotosTable } f
 import { FACINGS, type Facing } from "@world/room/facings";
 import { photoPicture, photoPlace } from "@world/desktop/files/album";
 import type { Collection } from "@world/room/collection";
+import { menuShell } from "@world/room/menu";
 
 /** 影集 is offered once the camera has been found in any run (R2). */
 export const hasAlbum = (c: Collection): boolean => c.objects.includes("camera");
@@ -79,5 +80,7 @@ export function albumPage(c: Collection, open: string | null = null, table: Phot
     const rows = days.map((day) => html`<div class="album-day" data-day="${day}"><div class="album-row">${cells.filter((x) => x.day === day).map((x) => cellHtml(x, table))}</div></div>`);
     body = html`<div class="album-grid">${rows}</div>`;
   }
-  return html`<section class="title-drawer-page title-album-page" aria-labelledby="title-album-h"><h2 id="title-album-h">${title}</h2>${count}${body}<button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
+  // game-menu (2026-11-26): the in-game menu with no tabs, as the drawer; the × medallion and the
+  // frosted outside are the old 返回 (`title-back`: from an opened photo to the grid, then the title)
+  return menuShell({ active: "items", day: null, title: title ?? html``, rune: "album", tabs: [], close: "title-back", body: html`${count}${body}`, pane: "album", id: "title-album-h", extra: "title-drawer-page title-album-page" });
 }

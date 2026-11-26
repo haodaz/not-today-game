@@ -130,6 +130,10 @@ describe("R2 · the 影集 on the title page", () => {
     const page = albumPage(coll({ photos: ["10:window", "3:bed"] })).value;
     expect([...page.matchAll(/class="album-day" data-day="(\d+)"/g)].map((m) => Number(m[1]))).toEqual(Array.from({ length: 16 }, (_, i) => i + 3));
     expect(page).toContain(`<div class="album-count">${t("album.count", { n: 2, total: 64 })}</div>`);
+    // game-menu (2026-11-26): the in-game menu with no tabs, the closed eye; the × medallion is the way back
+    expect(page).toContain('class="settings-layer game-menu solo title-drawer-page title-album-page" data-band="tech"');
+    expect(page).toContain('class="gm-close med" data-action="title-back"');
+    expect(page).not.toContain('class="title-back"');
   });
 
   it("collected cells are the developed photo; uncollected are labelled blank sheets; day 18's are unlabelled", () => {

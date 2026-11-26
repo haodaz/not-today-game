@@ -20,6 +20,8 @@ import { paintFrame, systemRaster } from "@world/objects/paint";
 import { playSfx } from "@world/loop/sfx";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
+import { menuShell } from "@world/room/menu";
+import { rune } from "@world/room/runes";
 
 /** The Kurogotchi's cell id (not a `content/objects.json` object; its own idle pose photo). */
 export const KURO_ID = "kurogotchi";
@@ -51,11 +53,14 @@ export const ALL_IDS = (): string[] => [...recogniseTable.keys()];
  */
 export function drawerGrid(c: Collection): SafeHtml {
   const ids = c.kurogotchi ? [...ALL_IDS(), KURO_ID] : ALL_IDS();
-  const cells = ids.map((id) => {
+  const cells = ids.map((id, i) => {
     const found = id === KURO_ID || c.objects.includes(id);
-    if (!found) return html`<div class="drawer-cell locked" aria-label="${t("title.drawer.unknown")}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${tr("title.drawer.unknown")}</span></div>`;
+    // game-menu (2026-11-26): numbered cases like 道具 in the game; the Kurogotchi is a secret, not a numbered slot
+    const no = id === KURO_ID ? null : html`<i class="drawer-no">${String(i + 1).padStart(2, "0")}</i>`;
+    // a missing one is the empty case of the 人物 page: its dim rune and ？？？
+    if (!found) return html`<div class="drawer-cell locked" aria-label="${t("title.drawer.unknown")}">${rune("who", "drawer-rune")}<span class="drawer-cell-name">${tr("title.drawer.unknown")}</span>${no}</div>`;
     const name = hasString(`obj.name.${id}`) ? tr(`obj.name.${id}`) : null;
-    const cell = html`<button type="button" class="${cls("drawer-cell", id === KURO_ID && "kuro")}" data-action="drawer-open" data-object="${id}" aria-label="${t(`obj.name.${id}`)}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${name}</span></button>`;
+    const cell = html`<button type="button" class="${cls("drawer-cell", id === KURO_ID && "kuro")}" data-action="drawer-open" data-object="${id}" aria-label="${t(`obj.name.${id}`)}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${name}</span>${no}</button>`;
     // device-games: 玩一局 under the card opens the device in its game (only these two, only when collected)
     if (!GAME_IDS.includes(id) || !hasString("objbar.play")) return cell;
     return html`<div class="drawer-card" data-object="${id}">${cell}<button type="button" class="drawer-play" data-action="drawer-play" data-object="${id}">${tr("objbar.play")}</button></div>`;
@@ -63,13 +68,18 @@ export function drawerGrid(c: Collection): SafeHtml {
   return html`<div class="drawer-grid">${cells}</div>`;
 }
 
-/** The page: the grid, or an opened object in the middle (its body filled by the controller). */
+/**
+ * The page: the grid, or an opened object in the middle (its body filled by the controller).
+ * game-menu (2026-11-26): the in-game menu with no tabs, as the title's 设置 — the room frosted
+ * behind, the frame with its closed eye, the page on glass. The × medallion and the frosted outside
+ * are the old 返回 (`title-back`: from an opened object to the grid, from the grid to the title).
+ */
 export function drawerPage(c: Collection, open: string | null): SafeHtml {
-  const title = hasString("title.drawer") ? tr("title.drawer") : null;
+  const title = hasString("title.drawer") ? tr("title.drawer") : html``;
   const found = ALL_IDS().filter((id) => c.objects.includes(id)).length;
-  const count = open ? null : html`<span class="drawer-count" aria-label="${t("title.drawer.count", { n: found, total: ALL_IDS().length })}">${found}<i>/</i>${ALL_IDS().length}</span>`;
-  const body = open ? html`<div class="drawer-open" data-object="${open}"><div class="drawer-stage" data-drawer-stage="${open}"></div><div class="drawer-open-name">${hasString(`obj.name.${open}`) ? tr(`obj.name.${open}`) : null}</div></div>` : drawerGrid(c);
-  return html`<section class="title-drawer-page" aria-labelledby="title-drawer-h"><h2 id="title-drawer-h">${title}${count}</h2>${body}<button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
+  const count = open ? null : html`<div class="drawer-head"><span class="drawer-count" aria-label="${t("title.drawer.count", { n: found, total: ALL_IDS().length })}">${found}<i>/</i>${ALL_IDS().length}</span></div>`;
+  const body = open ? html`<div class="drawer-open" data-object="${open}"><div class="drawer-stage" data-drawer-stage="${open}"></div><div class="drawer-open-name">${hasString(`obj.name.${open}`) ? tr(`obj.name.${open}`) : null}</div></div>` : html`${count}${drawerGrid(c)}`;
+  return menuShell({ active: "items", day: null, title, rune: "egg", tabs: [], close: "title-back", body, pane: "drawer", id: "title-drawer-h", extra: "title-drawer-page" });
 }
 
 // ——— the opened object: a store-free preview ———

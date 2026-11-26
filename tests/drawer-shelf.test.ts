@@ -11,8 +11,16 @@ describe("the drawer shelf", () => {
     expect(grid.match(/class="drawer-cell locked"/g)).toHaveLength(6);
     expect(grid.match(/data-action="drawer-open"/g)).toHaveLength(2);
     expect(grid).toContain('data-object="chick"');
-    expect(grid).not.toContain('data-object="camera"'); // not found: no button, only its shadow
-    expect(grid).toContain("/objects/camera_front.png");
+    expect(grid).not.toContain('data-object="camera"'); // not found: no button
+    // game-menu (2026-11-26): a missing one is the empty case's dim rune and ？？？, never its photo
+    expect(grid).not.toContain("/objects/camera_front.png");
+    expect(grid.match(/<div class="drawer-cell locked"[^>]*><svg class="drawer-rune"/g)).toHaveLength(6);
+    // numbered cases in content order, the found ones and the missing ones alike
+    expect([...grid.matchAll(/<i class="drawer-no">(\d\d)<\/i>/g)].map((m) => m[1])).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"]);
+    // the page is the in-game menu with no tabs: the frame's closed eye, the close medallion
+    const page = drawerPage(c, null).value;
+    expect(page).toContain('class="settings-layer game-menu solo title-drawer-page" data-band="tech"');
+    expect(page).toContain('class="gm-close med" data-action="title-back"');
     expect(drawerPage(c, null).value).toContain('<span class="drawer-count"');
     expect(drawerPage(c, null).value).toContain(">2<i>/</i>8<");
     expect(drawerPage(c, "chick").value).not.toContain("drawer-count"); // an opened object: no count
