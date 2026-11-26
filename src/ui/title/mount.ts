@@ -459,6 +459,10 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       const mode = el.dataset.mode;
       if (model.account?.kind === "gate" && (mode === "login" || mode === "register")) set({ ...model, account: gate({ mode, status: "idle" }) });
     },
+    // game-menu (author 2026-11-25): the identity card of somebody not signed in opens the login card
+    "auth-open": () => {
+      if (model.account?.kind === "none") openGate("stay");
+    },
     "auth-submit": () => void authSubmit(),
     "auth-guest": () => {
       if (!deps.account || model.account?.kind !== "gate") return;

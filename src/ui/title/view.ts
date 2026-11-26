@@ -2,7 +2,8 @@
 // title-questions.html). Pure: the model in, markup out. The world fills the screen; the menu is a
 // short column of outlined words laid on it. Every text is a string (`title.*`, `settings.*`) or
 // content; the game's name is the one constant.
-import { cls, html, type SafeHtml } from "@world/html";
+import { cls, html, raw, type SafeHtml } from "@world/html";
+import { medal, type Rune } from "@world/room/runes";
 import { getLocale, t, tr } from "@world/i18n";
 import { bookReader, bookUrl, figureCard, figuresLayer, shelfBook, titleBookDays } from "@world/room/collection";
 import { settingsPanel } from "@world/room/hud";
@@ -48,12 +49,23 @@ function menu(m: TitleModel): SafeHtml {
     : html`<button type="button" data-action="title-new">${tr("title.new")}</button>`;
   // It fades out during the push to the desk, and back in during the pull-back.
   const fade = m.moving ? (m.screen === "questions" ? "leaving" : "arriving") : null;
-  // 道具 sits between 设置 and 制作, only once the drawer has something in it (object-drawer 2).
-  const drawer = hasDrawer(m.collection) ? html`<button type="button" data-action="title-drawer">${tr("title.drawer")}</button>` : null;
-  // 影集 beside it, once the camera has been found in any run (photo-album R2).
-  const album = hasAlbum(m.collection) ? html`<button type="button" data-action="title-album">${tr("title.album")}</button>` : null;
-  const inert = m.screen === "questions" || m.badgeOpen;
-  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("title.settings")}"${inert ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button>${drawer}${album}<button type="button" data-action="title-credits">${tr("title.credits")}</button>${badge(m)}</nav>`;
+  // game-menu (author 2026-11-25, #84): 设置 / 老物件 / 影集 are the rune medallions at the bottom
+  // right; the column keeps 继续 or 新游戏, 制作 and, last, who you are (the identity card).
+  const inert = m.screen === "questions" || m.badgeOpen || !pastGate(m.account);
+  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("hud.menu")}"${inert ? html` inert` : null}>${first}<button type="button" data-action="title-credits">${tr("title.credits")}</button>${badge(m)}</nav>`;
+}
+
+/**
+ * game-menu (#84, #86): the title's medallions, bottom right — 老物件 (once the drawer has something,
+ * object-drawer 2), 影集 (once the camera was found in any run, photo-album R2), 设置. No words.
+ */
+function titleDock(m: TitleModel): SafeHtml | null {
+  if (m.screen !== "menu") return null;
+  const med = (action: string, name: Rune, word: string, extra = "") => html`<button type="button" class="med" data-action="${action}" title="${word}" aria-label="${word}"${raw(extra)}>${medal(name)}</button>`;
+  const drawer = hasDrawer(m.collection) ? med("title-drawer", "egg", t("title.drawer")) : null;
+  const album = hasAlbum(m.collection) ? med("title-album", "album", t("title.album")) : null;
+  const inert = m.badgeOpen || !pastGate(m.account);
+  return html`<nav class="title-dock hud-tiles" aria-label="${t("title.settings")}"${inert ? html` inert` : null}>${drawer}${album}${med("title-settings", "set", t("title.settings"), ' aria-haspopup="dialog"')}</nav>`;
 }
 
 /** title-badge: who wears the badge — a user or a guest; nobody else has one. */
@@ -73,7 +85,11 @@ function badgeName(a: Wearer): SafeHtml {
  */
 function badge(m: TitleModel): SafeHtml | null {
   const a = wearer(m.account);
-  if (!a) return null;
+  // game-menu (author 2026-11-25): nobody signed in has the card too — 未登录, and a click is the login
+  if (!a) {
+    if (m.account?.kind !== "none" && m.account?.kind !== "gate") return null;
+    return html`<button type="button" class="title-badge none" data-action="auth-open" aria-haspopup="dialog" aria-label="${t("badge.signIn")}"><span class="lanyard" aria-hidden="true"></span><span class="face"><img src="/player/${PORTRAIT_FILES[m.look]}.png" alt="" draggable="false"></span><span class="who"><span class="name">${tr("badge.none")}</span><span class="co">${tr("badge.signIn")}</span></span></button>`;
+  }
   return html`<button type="button" class="${cls("title-badge", a.kind)}" data-action="badge-open" aria-haspopup="dialog" aria-label="${t("badge.open")}"><span class="lanyard" aria-hidden="true"></span><span class="face"><img src="/player/${PORTRAIT_FILES[m.look]}.png" alt="" draggable="false"></span><span class="who"><span class="name">${badgeName(a)}</span><span class="co">${tr("badge.company")}</span></span></button>`;
 }
 
@@ -163,11 +179,10 @@ export function renderTitle(m: TitleModel): SafeHtml {
   // login-first: on the menu screen, the gate card stands where the menu would be until the
   // player has an account or chose 游客; while the session is read, only the room.
   const gated = m.screen === "menu" && !pastGate(m.account);
-  const middle = gated
-    ? m.account?.kind === "gate"
-      ? gateCard(m.account)
-      : null
-    : m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
+  // game-menu (author 2026-11-25): the login card opens over the menu (from the identity card, or
+  // 新游戏 / 继续 with nobody signed in); the menu stays behind it
+  const gate = gated && m.account?.kind === "gate" ? html`<button type="button" class="title-badge-dim" data-action="auth-cancel" tabindex="-1" aria-label="${t("settings.cancel")}"></button>${gateCard(m.account)}` : null;
+  const middle = m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
   const badgeOpen = gated ? null : badgeCard(m);
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated", badgeOpen && "badge-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${badgeOpen}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated", badgeOpen && "badge-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${titleDock(m)}${gate}${badgeOpen}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

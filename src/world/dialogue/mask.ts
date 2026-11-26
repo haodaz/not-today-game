@@ -27,6 +27,11 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-close",
   "status-open",
   "status-close",
+  // game-menu (2026-11-25): 人物 · 道具 · 设置 are one menu — its tabs, 道具 and 道具's own tabs and picks
+  "menu-tab",
+  "items-toggle",
+  "items-tab",
+  "items-pick",
   "settings-email-send",
   "settings-lang",
   "settings-home",

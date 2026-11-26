@@ -1,5 +1,8 @@
 # The character panel and the three game buttons (author 2026-11-15)
 
+> **Superseded in part (2026-11-25):** the buttons and the panels are now `game-menu` (rune medallions, one glass menu with tabs). See `.kiro/specs/game-menu/requirements.md`.
+
+
 The room's HUD gets a **人物** button beside 道具 and 设置; the three become one strip of game
 buttons, each an icon with its word under it. 人物 opens the character panel: who you are, what
 day it is, the three meters, what you have collected. The author's words: 「加上人物状态按钮，点击

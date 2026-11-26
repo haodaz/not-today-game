@@ -195,6 +195,10 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "bed",
   "sleep",
   "items-toggle",
+  // game-menu (2026-11-25): the menu's tabs and 道具's own tabs and picks, like opening it
+  "menu-tab",
+  "items-tab",
+  "items-pick",
   "loop-hold",
   "loop-put-down",
   "dock-peek",

@@ -1,5 +1,8 @@
 # day-loop — requirements
 
+> **Superseded in part (2026-11-25):** the buttons and the panels are now `game-menu` (rune medallions, one glass menu with tabs). See `.kiro/specs/game-menu/requirements.md`.
+
+
 What drives the player through a day and makes them finish it. Author decision 2026-11-01: a progressive checklist in the room/desk views (never the whole day at once) plus one RPG-style dialogue box for narration, inner voice, sounds and choices. Data: `content/days/day-NN.json` (Claude writes; day-01 is the format sample).
 
 ## FR1. The checklist (今日)

@@ -104,7 +104,8 @@ describe("the gate", () => {
     expect(h).toContain('data-input="auth-password"');
     expect(h).toContain('data-action="auth-submit"');
     expect(h).toContain('data-action="auth-guest"');
-    expect(h).not.toContain('data-action="title-new"');
+    // game-menu (author 2026-11-25): the card comes over the menu; the menu stays behind it, inert
+    expect(h).toMatch(/<nav class="title-menu"[^>]*inert(="")?>/);
     expect(h).toContain("注册账号");
     expect(h).toContain("保存游戏存档与成就");
   });
@@ -220,7 +221,11 @@ describe("the gate", () => {
     expect(calls).toContain("signOut");
     expect(t.model().account).toEqual({ kind: "none" });
     expect(t.model().badgeOpen).toBe(false);
-    expect(t.html()).not.toContain("title-badge");
+    // game-menu (author 2026-11-25): nobody signed in wears the 未登录 card, whose click is the login
+    expect(t.html()).not.toContain("title-badge user");
+    expect(t.html()).toContain('class="title-badge none" data-action="auth-open"');
+    t.click('[data-action="auth-open"]');
+    expect(t.model().account).toEqual(gateFor("stay"));
 
     // An old anonymous session alone is nobody yet (the card still comes on 新游戏); a chosen guest is a guest.
     setSupabaseForTests(fakeClient({ id: "anon-2", is_anonymous: true }).c);
@@ -251,9 +256,10 @@ describe("the gate", () => {
 // changes the profile's look and logs out. The top-right chip is gone.
 describe("the staff badge", () => {
   const user = { ...initialTitle(null, EMPTY_COLLECTION), account: { kind: "user", email: "kiro.w@b.co" } } as const;
-  const lastInMenu = (h: string) => /<nav class="title-menu"[^>]*>.*<\/nav>/.exec(h)?.[0] ?? "";
+  // the column only (game-menu: the medallions are a nav of their own after it)
+  const lastInMenu = (h: string) => /<nav class="title-menu"[^>]*>.*?<\/nav>/.exec(h)?.[0] ?? "";
 
-  it("ends the menu for a user (the email's local part) and a guest (游客); none, checking, offline and gate wear none", () => {
+  it("ends the menu for a user (the email's local part) and a guest (游客); none and gate wear the 未登录 card; checking and offline none", () => {
     const u = lastInMenu(renderTitle(user).value);
     expect(u).toMatch(/data-action="title-credits">制作<\/button><button type="button" class="title-badge user" data-action="badge-open"[^>]*aria-label="工牌">.*<\/button><\/nav>$/);
     expect(u).toContain('<span class="name">kiro.w</span><span class="co">未来智能</span>');
@@ -261,9 +267,14 @@ describe("the staff badge", () => {
     const g = renderTitle({ ...user, account: { kind: "guest" } }).value;
     expect(g).toContain('class="title-badge guest"');
     expect(g).toContain('<span class="name">游客</span>');
-    for (const account of [{ kind: "none" }, { kind: "checking" }, { kind: "offline" }, gateFor("new")] as const) {
+    for (const account of [{ kind: "checking" }, { kind: "offline" }] as const) {
       const h = renderTitle({ ...user, account } as never).value;
       expect(h).not.toContain("title-badge");
+    }
+    // game-menu (author 2026-11-25): 「身份卡在左边菜单，点击登陆」
+    for (const account of [{ kind: "none" }, gateFor("new")] as const) {
+      const h = lastInMenu(renderTitle({ ...user, account } as never).value);
+      expect(h).toMatch(/<button type="button" class="title-badge none" data-action="auth-open"[^>]*>.*<span class="name">未登录<\/span><span class="co">点击登录<\/span><\/span><\/button><\/nav>$/);
     }
     expect(renderTitle(initialTitle(null, EMPTY_COLLECTION)).value).not.toContain("title-badge");
     expect(renderTitle(user).value).not.toContain("title-account");

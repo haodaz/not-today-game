@@ -43,9 +43,13 @@ describe("FR5 checklist snapshots", () => {
   });
 
   it("day 1 after lunch arrives", () => {
-    const out = list(storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch, step("delivery:arrives:lunch", "12:04")]));
-    // Item text is content's (day-loop rule 2026-11-01): read from the day file.
-    expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "pickup")!.text);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch, step("delivery:arrives:lunch", "12:04")]);
+    const out = list(store);
+    // Item text is content's (day-loop rule 2026-11-01): read from the day file. game-menu (author
+    // 2026-11-25, #82): the card draws the current line only; the open pickup is in the view.
+    const view = checklist(loopContext(store.getState(), store.getEvents())!);
+    expect(view.lines.find((l) => l.id === "pickup")?.text).toBe(dayFiles.get(1)!.items.find((it) => it.id === "pickup")!.text);
+    expect((out.match(/class="it /g) ?? []).length).toBe(1);
     expect(out).toMatchSnapshot();
   });
 

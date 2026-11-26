@@ -148,14 +148,14 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day, PORTRAIT_FILES[state.names.portrait])}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day, PORTRAIT_FILES[state.names.portrait])}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   // camera-viewfinder R1: the box is never opened over the viewfinder (what is queued waits for it).
   const dlg = session.viewfinder ? null : dialogueBox(state, events, session, nowMs);
-  const settings = session.viewfinder ? null : html`${settingsPanel(session)}${statusPanel(state, events, session)}`;
+  const settings = session.viewfinder ? null : html`${settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${statusPanel(state, events, session)}`;
   return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session), true, state.day, PORTRAIT_FILES[state.names.portrait])}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
@@ -2051,6 +2051,17 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.statusOpen = false;
     ctx.rerender();
   },
+  // game-menu (2026-11-25): 人物 · 道具 · 设置 are tabs of one menu; a tab opens its page, the others close
+  "menu-tab"(ctx, data) {
+    const tab = data.tab;
+    if (tab !== "status" && tab !== "items" && tab !== "settings") return;
+    if (tab === "items" && ctx.store.getState().found.length === 0) return;
+    ctx.session.statusOpen = tab === "status";
+    ctx.session.itemsOpen = tab === "items";
+    ctx.session.settingsOpen = tab === "settings";
+    ctx.session.settingsConfirm = null;
+    ctx.rerender();
+  },
   // desk-prints R3: the pile up close, newest first; ← / → page; Esc, × or outside closes. No event.
   "prints-open"(ctx) {
     if (ctx.session.view !== "desk" || printsOnDesk(ctx.store.getState().day, ctx.store.getEvents()).length === 0) return;
@@ -2555,6 +2566,18 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   if (e.key === "Escape" && ctx.session.statusOpen) {
     loopActions["status-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // game-menu: Tab walks the menu's tabs (Shift+Tab back); Esc closes 道具 as it closes the others
+  const menuOn = ctx.session.statusOpen ? "status" : ctx.session.itemsOpen ? "items" : ctx.session.settingsOpen && !ctx.session.settingsConfirm ? "settings" : null;
+  if (e.key === "Tab" && menuOn && ctx.session.view !== "desktop") {
+    const tabs = ["status", ...(ctx.store.getState().found.length > 0 ? ["items"] : []), "settings"];
+    const i = tabs.indexOf(menuOn);
+    loopActions["menu-tab"]!(ctx, { tab: tabs[(i + (e.shiftKey ? tabs.length - 1 : 1)) % tabs.length] } as unknown as DOMStringMap, null as never);
+    return true;
+  }
+  if (e.key === "Escape" && ctx.session.itemsOpen) {
+    loopActions["items-toggle"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   if (e.key === "Escape" && ctx.session.settingsOpen) {

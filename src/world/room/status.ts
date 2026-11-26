@@ -1,5 +1,5 @@
-// status-panel (author 2026-11-15): the HUD's three game buttons 人物 · 道具 · 设置 (pixel tiles, an
-// icon over its word), and the character panel 人物 opens: the portrait and the name, the day, 理智,
+// status-panel (author 2026-11-15; game-menu 2026-11-25): the HUD's three game buttons 人物 · 道具 ·
+// 设置 (rune medallions, no words), and the character panel 人物 opens: the portrait and the name, the day, 理智,
 // 克总 as hearts, 同化, the old things, the chats. Numbers only; it explains nothing. Pure view.
 import { sanBand } from "@state/endings";
 import { hungerNumbers } from "@state/hunger";
@@ -11,6 +11,9 @@ import type { Session } from "@world/desktop/model";
 import { playerPortraitSrc } from "@world/dialogue/box";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
+import { iconSrc, iconStateOf } from "@world/desktop/workbench/objbar";
+import { menuShell, roomTabs } from "./menu";
+import { lensRing, medal, rune, sanTrace, type Rune } from "./runes";
 
 /** A 16 × 16 pixel icon from rows of '#'/'.'; crisp edges, one path of unit squares. */
 function pixelIcon(rows: readonly string[], cls_: string): SafeHtml {
@@ -19,24 +22,6 @@ function pixelIcon(rows: readonly string[], cls_: string): SafeHtml {
   return html`<svg class="${cls_}" viewBox="0 0 16 16" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg>`;
 }
 
-/* prettier-ignore */
-const PERSON = [
-  "................", "......####......", ".....######.....", "....########....", "....########....", "....########....",
-  ".....######.....", "......####......", "................", "....########....", "..############..", ".##############.",
-  ".##############.", ".##############.", ".##############.", "................",
-];
-/* prettier-ignore */
-const CARTON = [
-  "................", ".##..........##.", "..##........##..", "...##......##...", "....##....##....", "..############..",
-  "..#..........#..", "..#..........#..", "..#....##....#..", "..#..........#..", "..#..........#..", "..#..........#..",
-  "..#..........#..", "..############..", "................", "................",
-];
-/* prettier-ignore */
-const GEAR = [
-  "................", ".......##.......", "...##..##..##...", "...##########...", "....########....", "..####....####..",
-  "..###......###..", ".####......####.", ".####......####.", "..###......###..", "..####....####..", "....########....",
-  "...##########...", "...##..##..##...", ".......##.......", "................",
-];
 /* prettier-ignore */
 const HEART = [
   "................", "..####....####..", ".######..######.", "################", "################", "################",
@@ -56,24 +41,25 @@ function heartIcon(kind: "full" | "half" | "empty"): SafeHtml {
   return kind === "half" ? html`${edge}${pixelIcon(HEART_LEFT, "heart-ic left")}` : edge;
 }
 
-/** One tile: the icon over its word; `on` while its panel is open. */
 /** How long the floated number stays (ms). */
 export const FLOAT_MS = 2200;
-const tile = (klass: string, on: boolean, attrs: string, icon: readonly string[], word: string): SafeHtml =>
-  html`<button type="button" class="${cls(klass, on && "on")}" ${raw(attrs)}>${pixelIcon(icon, "tile-ic")}<span class="tile-w">${word}</span></button>`;
+/** One medallion (game-menu #78, #86): the rune alone, its name only as the tooltip and for screen readers. */
+const tile = (klass: string, on: boolean, attrs: string, name: Rune, word: string): SafeHtml =>
+  html`<button type="button" class="${cls("med", klass, on && "on")}" ${raw(attrs)} title="${word}" aria-label="${word}">${medal(name)}</button>`;
 
 /**
- * The strip of game buttons, bottom-left: 人物 · 道具 · 设置. 道具 only once something is found (gates
- * R4); 设置 where it is a floating button (the room; on 屏幕 it is the dock's tile).
+ * The game's buttons (game-menu #78, 2026-11-25): three rune medallions, top right in the room —
+ * 人物 · 道具 · 设置. 道具 only once something is found (gates R4); 设置 where it is a floating button
+ * (the room; on 屏幕 it is the dock's tile).
  */
 export function hudTiles(session: Pick<Session, "statusOpen" | "itemsOpen" | "settingsOpen"> & Partial<Pick<Session, "fullnessFloat">>, state: Pick<State, "found">, opts: { readonly settings: boolean; readonly nowMs?: number }): SafeHtml {
   // hunger (author 2026-11-20): with the card closed, the change floats off the tile for a moment
   const f = session.fullnessFloat;
   const floatOn = !!f && !session.statusOpen && (opts.nowMs ?? 0) > 0 && (opts.nowMs ?? 0) - f.at < FLOAT_MS;
   const float = floatOn ? html`<i class="st-float" data-at="${String(f!.at)}">${f!.delta > 0 ? "+" : ""}${String(f!.delta)}</i>` : null;
-  const status = html`<span class="tile-wrap">${tile("status-btn", session.statusOpen, `data-action="${session.statusOpen ? "status-close" : "status-open"}" aria-haspopup="dialog" aria-expanded="${session.statusOpen ? "true" : "false"}"`, PERSON, tr("hud.status").value)}${float}</span>`;
-  const items = state.found.length === 0 ? null : tile("items-btn", session.itemsOpen, `data-action="items-toggle" aria-expanded="${session.itemsOpen ? "true" : "false"}" aria-controls="items-panel"`, CARTON, tr("hud.items").value);
-  const settings = opts.settings ? tile("settings-btn", session.settingsOpen, `data-action="settings-open" aria-haspopup="dialog"`, GEAR, tr("settings.button").value) : null;
+  const status = html`<span class="tile-wrap">${tile("status-btn", session.statusOpen, `data-action="${session.statusOpen ? "status-close" : "status-open"}" aria-haspopup="dialog" aria-expanded="${session.statusOpen ? "true" : "false"}"`, "who", t("hud.status"))}${float}</span>`;
+  const items = state.found.length === 0 ? null : tile("items-btn", session.itemsOpen, `data-action="items-toggle" aria-expanded="${session.itemsOpen ? "true" : "false"}" aria-controls="items-panel"`, "bag", t("hud.items"));
+  const settings = opts.settings ? tile("settings-btn", session.settingsOpen, `data-action="settings-open" aria-haspopup="dialog"`, "set", t("settings.button")) : null;
   return html`<div class="hud-tiles">${status}${items}${settings}</div>`;
 }
 
@@ -106,18 +92,31 @@ export function statusNumbers(state: State, events: readonly GameEvent[]) {
   };
 }
 
-/** The character panel (null when closed): the settings layer's size and paper; outside or 关上 closes. */
+/**
+ * 人物 (game-menu #80, 2026-11-25): the portrait in a lens, the name and the day; 理智 as a trace,
+ * 饱食度 as ten cells, 克总 as hearts, 同化 as a line with its marker (and, from day 10, what grows
+ * from it); the old things as numbered cases; the chats. Numbers only; it explains nothing.
+ */
 export function statusPanel(state: State, events: readonly GameEvent[], session: Pick<Session, "statusOpen" | "clock" | "reducedMotion">): SafeHtml | null {
   if (!session.statusOpen) return null;
   const n = statusNumbers(state, events);
   const name = state.names.login.trim();
-  const who = html`<div class="st-who"><img class="st-face" src="${playerPortraitSrc(state.names.portrait, false)}" alt="" draggable="false"><div><b class="st-name">${name}</b><span class="st-day">${tr("status.day", { n: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</span></div></div>`;
-  const san = html`<div class="st-meter"><span class="st-k">${tr("status.san")}</span><span class="${cls("st-bar", "san", `band-${n.band}`, n.san < 30 && !session.reducedMotion && "low")}"><b style="width:${String(n.sanPct)}%"></b></span><span class="st-v">${String(n.san)}</span></div>`;
-  // hunger (author 2026-11-20): 饱食度, a plain bar; low = below what work or sleep needs
-  const full = html`<div class="st-meter"><span class="st-k">${tr("status.fullness")}</span><span class="${cls("st-bar", "full", n.fullness < hungerNumbers().needWork && "hungry")}"><b style="width:${String(n.fullPct)}%"></b></span><span class="st-v">${String(n.fullness)}</span></div>`;
+  const who = html`<div class="gm-who"><div class="gm-lens"><div class="pic"><img class="st-face" src="${playerPortraitSrc(state.names.portrait, false)}" alt="" draggable="false"></div>${lensRing()}</div><div class="gm-name"><b class="st-name">${name}</b><span class="st-day">${tr("status.day", { n: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</span></div></div>`;
+  const san = html`<div class="st-meter"><span class="st-k">${tr("status.san")}</span><span class="${cls("st-bar", "san", `band-${n.band}`, n.san < 30 && !session.reducedMotion && "low")}">${sanTrace(n.san)}</span><span class="${cls("st-v", n.san < 30 && "warn")}">${String(n.san)}</span></div>`;
+  // hunger (author 2026-11-20): 饱食度; low = below what work or sleep needs
+  const hungry = n.fullness < hungerNumbers().needWork;
+  const lit = Math.round(n.fullPct / 10);
+  const full = html`<div class="st-meter"><span class="st-k">${tr("status.fullness")}</span><span class="${cls("st-bar", "full", hungry && "hungry")}">${Array.from({ length: 10 }, (_, i) => html`<i class="${i < lit ? "f" : ""}"></i>`)}</span><span class="${cls("st-v", hungry && "warn")}">${String(n.fullness)}${hungry ? html`<em>${tr("status.hungry")}</em>` : null}</span></div>`;
   const kuro = html`<div class="st-meter"><span class="st-k">${tr("status.kuro")}</span><span class="st-hearts">${n.hearts.map((h) => html`<span class="${cls("st-heart", h)}">${heartIcon(h)}</span>`)}</span></div>`;
-  const assim = html`<div class="st-meter"><span class="st-k">${tr("status.assim")}</span><span class="st-bar assim"><b style="width:${String(n.assimPct)}%"></b><i class="st-tick" style="left:${String(n.goodPct)}%"></i></span></div>`;
-  const objects = html`<p class="st-line">${tr("status.objects", { n: n.objects, total: n.total })}${n.upgraded >= 1 ? html` · ${tr("status.upgraded", { n: n.upgraded })}` : null}</p>`;
+  const assim = html`<div class="st-meter"><span class="st-k">${tr("status.assim")}</span><span class="st-bar assim"><b style="width:${String(n.assimPct)}%"></b><i class="st-tick" style="left:${String(n.goodPct)}%"></i><i class="st-mark" style="left:${String(n.assimPct)}%"></i></span></div>`;
+  const ids = state.found as string[];
+  const cases = Array.from({ length: n.total }, (_, i) => {
+    const id = ids[i];
+    const no = String(i + 1).padStart(2, "0");
+    return id ? html`<span class="st-case"><img src="${iconSrc(id, iconStateOf(id, state, events))}" alt=""><i>${no}</i></span>` : html`<span class="st-case empty">${rune("who", "st-case-rune")}<i>${no}</i></span>`;
+  });
+  const objects = html`<p class="st-line st-cap">${tr("status.objects", { n: n.objects, total: n.total })}${n.upgraded >= 1 ? html` · ${tr("status.upgraded", { n: n.upgraded })}` : null}</p><div class="st-cases">${cases}</div>`;
   const chats = html`<p class="st-line">${tr("status.chats", { n: n.chats })}</p>`;
-  return html`<div class="settings-layer status-layer"><button type="button" class="settings-dim" data-action="status-close" aria-label="${t("status.close")}"></button><div class="settings status" role="dialog" aria-modal="true" aria-labelledby="status-title"><h3 id="status-title">${tr("status.title")}</h3>${who}${san}${full}${kuro}${assim}${objects}${chats}<button type="button" class="st-close" data-action="status-close">${tr("status.close")}</button></div></div>`;
+  const body = html`${who}<div class="gm-read"><p class="st-cap">${tr("status.state")}</p>${san}${full}${kuro}${assim}${objects}${chats}</div>`;
+  return menuShell({ active: "status", day: state.day, title: tr("status.title"), rune: "who", tabs: roomTabs(state.found.length), close: "status-close", body, pane: "status", id: "status-title", extra: "status-layer" });
 }

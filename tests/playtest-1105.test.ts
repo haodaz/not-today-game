@@ -423,13 +423,13 @@ describe("R8 · settings: restart this run, and (title) clear everything", () =>
     const r = rig(booted());
     r.act("settings-open");
     let out = r.out();
-    expect(out).toContain(`data-action="settings-restart">${escapeHtml(t("settings.restart"))}</button>`);
+    expect(out).toContain(`data-action="settings-restart"><span>${escapeHtml(t("settings.restart"))}</span></button>`);
     expect(out).not.toContain("settings-clear-all");
     r.act("settings-restart");
     out = r.out();
     expect(out).toContain(escapeHtml(t("settings.restartConfirm")));
-    expect(out).toContain(`data-action="settings-confirm" data-what="restart">${escapeHtml(t("settings.confirm"))}</button>`);
-    expect(out).toContain(`data-action="settings-confirm-cancel">${escapeHtml(t("settings.cancel"))}</button>`);
+    expect(out).toContain(`data-action="settings-confirm" data-what="restart"><span>${escapeHtml(t("settings.confirm"))}</span></button>`);
+    expect(out).toContain(`data-action="settings-confirm-cancel"><span>${escapeHtml(t("settings.cancel"))}</span></button>`);
     r.act("settings-confirm-cancel");
     expect(r.session.settingsConfirm).toBeNull();
     expect(r.session.settingsOpen).toBe(true);
@@ -455,7 +455,7 @@ describe("R8 · settings: restart this run, and (title) clear everything", () =>
     const m = { ...initialTitle({ day: 3 }, readCollection({ getItem: () => null, setItem: () => {}, removeItem: () => {} })), settingsOpen: true };
     const out = renderTitle(m).value;
     expect(out).toContain('data-action="settings-restart"');
-    expect(out).toContain(`data-action="settings-clear-all">${escapeHtml(t("settings.clearAll"))}</button>`);
+    expect(out).toContain(`data-action="settings-clear-all"><span>${escapeHtml(t("settings.clearAll"))}</span></button>`);
     expect(renderTitle({ ...m, settingsConfirm: "clearAll" }).value).toContain(escapeHtml(t("settings.clearAllConfirm")));
     expect(renderTitle({ ...m, settingsConfirm: "clearAll" }).value).toContain('data-what="clearAll"');
   });

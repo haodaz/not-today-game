@@ -108,7 +108,8 @@ describe("the checklist", () => {
   it("one item open: one line under the heading, with the marker, nothing else (no done line)", () => {
     const store = storeAt(1, [step("rise"), step("boot")]);
     const out = html(store);
-    expect(out).toBe(`<div class="list"><div class="h">${t("hud.today")}</div><div class="it now" data-id="msgs"><i class="mark" aria-hidden="true">▸</i><span class="txt">${dayFiles.get(1)!.items.find((i) => i.id === "msgs")!.text}<button type="button" class="go" data-action="go-item" data-id="msgs">${t("checklist.go")}<i aria-hidden="true">›</i></button></span></div></div>`); // #30: 前往; #70: a link at the end of the text
+    // game-menu (2026-11-25, #79, #82): the day heads the card; the list is the current line alone
+    expect(out).toBe(`<div class="list" aria-label="${t("hud.today")}"><div class="it now" data-id="msgs"><i class="mark" aria-hidden="true">▸</i><span class="txt">${dayFiles.get(1)!.items.find((i) => i.id === "msgs")!.text}<button type="button" class="go" data-action="go-item" data-id="msgs">${t("checklist.go")}<i aria-hidden="true">›</i></button></span></div></div>`); // #30: 前往; #70: a link at the end of the text
     expect(out).not.toContain('class="done"');
     expect(out).not.toContain(t("hud.done", { n: 1 }));
     expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(2);

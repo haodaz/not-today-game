@@ -249,9 +249,11 @@ describe("the collapse is in the photos", () => {
       expect(existsSync(resolve(__dirname, "../public/room/fx/pores.jpg"))).toBe(true);
     });
 
-    it("nothing in src refers to the veins any more", () => {
+    // game-menu (2026-11-25): the menu frame's own drawn veins (runes.ts, .gm-vein) are chrome, not the
+    // photo overlay this guards against; the photos' veins.png stays gone.
+    it("nothing in src refers to the photos' veins overlay any more", () => {
       const walk = (dir: string): string[] => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)]));
-      const hits = walk(resolve(__dirname, "../src")).filter((f) => /\.(ts|css)$/.test(f) && /veins/i.test(readFileSync(f, "utf8")));
+      const hits = walk(resolve(__dirname, "../src")).filter((f) => /\.(ts|css)$/.test(f) && /veins\.(png|jpg|webp)|fx-veins?\b/i.test(readFileSync(f, "utf8")));
       expect(hits).toEqual([]);
     });
   });

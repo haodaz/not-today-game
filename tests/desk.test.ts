@@ -160,14 +160,15 @@ describe("道具: the strip as a panel", () => {
     for (const view of ["room", "desk", "door", "desktop"] as const) {
       const ctx = ctxOf(store, view);
       const before = render(ctx);
-      expect(before, view).toMatch(new RegExp(`class="items-btn" data-action="items-toggle" aria-expanded="false" aria-controls="items-panel"><svg[^]*?<span class="tile-w">${t("hud.items")}</span></button>`));
+      // game-menu (2026-11-25, #78, #86): a rune medallion, its name the tooltip
+      expect(before, view).toContain(`class="med items-btn" data-action="items-toggle" aria-expanded="false" aria-controls="items-panel" title="${t("hud.items")}" aria-label="${t("hud.items")}"><span class="disc"`);
       expect(before).not.toContain('class="items-panel"');
       act(ctx, "items-toggle");
       const open = render(ctx);
-      // author 2026-11-24 (#49): a big centred card — tabs, the list, the chosen thing large with 拿起来
-      expect(open).toContain(`<div class="items-panel big" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="ip-head">`);
-      // status-panel: the tile keeps its word and is inverted while open
-      expect(open).toContain('class="items-btn on" data-action="items-toggle" aria-expanded="true" aria-controls="items-panel">');
+      // author 2026-11-24 (#49): tabs, the list, the chosen thing large with 拿起来 — game-menu: the 道具 page of the one menu
+      expect(open).toContain('<div class="gm-pane pane-items" role="dialog" aria-modal="true" aria-labelledby="items-title">');
+      expect(open).toContain('<div class="items-panel big" id="items-panel"><div class="ip-head">');
+      expect(open).toContain('class="med items-btn on" data-action="items-toggle" aria-expanded="true" aria-controls="items-panel"');
       const card = open.slice(open.indexOf('class="items-panel big"'));
       for (const a of ['data-action="items-pick" data-pick="pager"', 'data-action="loop-hold" data-object="pager"', 'data-action="items-tab" data-tab="photos"']) expect(card, view).toContain(a);
       // The box is in 房间, not a thing to carry (2026-11-02); the phone is the desk's, not a 道具.
@@ -211,7 +212,7 @@ describe("道具: the strip as a panel", () => {
 describe("the tabletop's things are photos (day-loop correction 2026-11-01)", () => {
   const PHOTOS = ["cup", "phone", "box", "slip"] as const;
   const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
-  const tabletopOf = (out: string) => out.slice(out.indexOf('<div class="desk-things">'), out.indexOf('<div class="list">'));
+  const tabletopOf = (out: string) => out.slice(out.indexOf('<div class="desk-things">'), out.indexOf('<div class="hud-left">')); // the task card follows the tabletop
   /** The `<img>` inside the placed wrapper `name`. */
   const photoIn = (out: string, name: string) => new RegExp(`data-at="${name}" style="[^"]+">[^]*?<img class="desk-photo( cup)?" src="(/room/desk/[a-z]+\\.png)" alt="" aria-hidden="true">`).exec(out)?.[2] ?? null;
 

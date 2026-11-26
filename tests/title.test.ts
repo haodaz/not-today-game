@@ -60,7 +60,9 @@ describe("the title page (FR1–FR3)", () => {
   it("snapshot: without a save — 新游戏 · 设置 · 制作", () => {
     const out = page(initialTitle(null, EMPTY_COLLECTION));
     const menu = [...out.matchAll(/<nav class="title-menu"[^>]*>(.*?)<\/nav>/g)][0]![1]!;
-    expect([...menu.matchAll(/data-action="(title-[a-z]+)"/g)].map((m) => m[1])).toEqual(["title-new", "title-settings", "title-credits"]);
+    expect([...menu.matchAll(/data-action="(title-[a-z]+)"/g)].map((m) => m[1])).toEqual(["title-new", "title-credits"]);
+    // game-menu (author 2026-11-25, #84): 设置 is a rune medallion at the bottom right, not in the column
+    expect(out).toMatch(/<nav class="title-dock hud-tiles"[^>]*><button type="button" class="med" data-action="title-settings"/);
     expect(out).toContain("NOT TODAY");
     // The stage's screen class never borrows a child's rule (the nav is `.title-menu`).
     expect(out).toMatch(/^<div class="stage title-page screen-menu" data-screen="menu">/);
@@ -95,7 +97,9 @@ describe("the title page (FR1–FR3)", () => {
   it("settings opens the same panel as in game, without 返回首页; 制作 is a page with a back button", () => {
     const m = { ...initialTitle(null, EMPTY_COLLECTION), settingsOpen: true };
     const out = page(m);
-    expect(out).toContain('class="settings" role="dialog"');
+    // game-menu (2026-11-25): the one menu, alone (no tabs) on the title
+    expect(out).toContain('class="settings-layer game-menu solo"');
+    expect(out).toContain('<div class="gm-pane pane-settings" role="dialog"');
     expect(out).not.toContain('data-action="settings-home"');
     const credits = page({ ...initialTitle(null, EMPTY_COLLECTION), screen: "credits" });
     expect(credits).toContain('data-action="title-back"');
@@ -136,7 +140,7 @@ describe("the title page (FR1–FR3)", () => {
         const m: TitleModel = { ...initialTitle(day === null ? null : { day }, collected(2, { bad: 1, good: 1 })), screen: screen as TitleModel["screen"], settingsOpen };
         const out = page(m).replace(/<div class="row reset">.*?<\/div>/, "");
         expect(out).not.toMatch(restart);
-        if (settingsOpen) expect(page(m)).toContain('<div class="row reset"><button type="button" data-action="settings-restart">');
+        if (settingsOpen) expect(page(m)).toContain('<div class="row reset"><button type="button" class="gm-btn danger" data-action="settings-restart">');
       }),
     );
   });

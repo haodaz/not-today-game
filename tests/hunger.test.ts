@@ -102,7 +102,9 @@ describe("the card and the tile", () => {
   it("the status card has the bar; the number floats off the tile only while the card is closed and the clock runs", () => {
     const store = createStore({ startDay: 1 });
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "room"), statusOpen: true };
-    expect(statusPanel(store.getState(), [], session)!.value).toContain(`<span class="st-k">${t("status.fullness")}</span><span class="st-bar full hungry"><b style="width:10%"></b></span><span class="st-v">10</span>`);
+    // game-menu (2026-11-25): ten cells, one lit at 10, marked hungry with its word
+    expect(statusPanel(store.getState(), [], session)!.value).toContain(`<span class="st-k">${t("status.fullness")}</span><span class="st-bar full hungry"><i class="f"></i><i class=""></i>`);
+    expect(statusPanel(store.getState(), [], session)!.value).toContain(`<span class="st-v warn">10<em>${t("status.hungry")}</em></span>`);
     const s = { ...initialSession(DEFAULT_CLOCK, "left", "room"), fullnessFloat: { delta: 40, at: 1000 } };
     expect(hudTiles(s, store.getState(), { settings: true, nowMs: 1500 }).value).toContain('<i class="st-float" data-at="1000">+40</i>');
     expect(hudTiles(s, store.getState(), { settings: true, nowMs: 9000 }).value).not.toContain("st-float");

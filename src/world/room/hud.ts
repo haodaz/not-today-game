@@ -31,6 +31,11 @@ import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
 import { hudTiles, statusPanel } from "./status";
+import { menuShell, roomTabs } from "./menu";
+import { dayRuler, dial, plinthRing, rune } from "./runes";
+
+/** The slow dial in the settings page's corner. */
+const dialMarkup = (): string => `${dial(200, 184, 72, ["who", "bag", "set", "egg", "album", "day"])}<circle r="120"/><circle r="60"/>`;
 import { STARE_JOLT_MS, stareBpm, stareProgress } from "./stare";
 import { bookReader, bookUrl, daysLived, figureCard, figuresLayer, shelfBook } from "./collection";
 import { knows } from "@state/recognise";
@@ -108,8 +113,9 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
   // navigation-polish (author's playtest 2026-11-16): no done count; the current line carries the
   // marker in full ink, every other open line is dimmed (`later`) with no marker.
   // author 2026-11-24 (#30): the current line carries 前往 — one click lands where that step is done
-  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}<span class="txt">${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}${l.state === "now" && hasString("checklist.go") ? html`<button type="button" class="go" data-action="go-item" data-id="${l.id}">${tr("checklist.go")}<i aria-hidden="true">›</i></button>` : null}</span></div>`);
-  return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${lines}</div>`;
+  // game-menu (author 2026-11-25, #82): only the current line; the lines still to come are not shown
+  const lines = view.lines.filter((l) => l.state === "now").map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}<span class="txt">${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}${l.state === "now" && hasString("checklist.go") ? html`<button type="button" class="go" data-action="go-item" data-id="${l.id}">${tr("checklist.go")}<i aria-hidden="true">›</i></button>` : null}</span></div>`);
+  return lines.length ? html`<div class="list" aria-label="${t(view.heading === "tonight" ? "hud.tonight" : "hud.today")}">${lines}</div>` : html``;
 }
 
 /** mm:ss of a wait, never below 00:00. */
@@ -125,12 +131,14 @@ export const countdownText = (ms: number): string => {
  */
 export function waitCard(view: ChecklistView, session: Session, nowMs: number): SafeHtml | null {
   if (!view.waiting) return null;
+  // author 2026-11-25 (#77): while the meal is on its way the card says what to do meanwhile (no 前往)
+  const idle = view.lines.some((l) => l.state === "now") ? null : html`<div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${tr("checklist.waitIdle")}</span></div>`;
   let left: number | null = null;
   for (const o of session.loop?.orders.values() ?? []) {
     const l = o.atMs + o.waitMs - nowMs;
     if (nowMs > 0 && (left === null || l < left)) left = l;
   }
-  return html`<div class="wait-card"><div class="h">${tr("checklist.wait.head")}</div><div class="it"><span>${tr("checklist.wait.text")}</span>${left === null ? null : html`<b class="count">${countdownText(left)}</b>`}</div></div>`;
+  return html`<div class="wait-card">${idle}<div class="wait-row"><span>${tr("checklist.wait.text")}</span>${left === null ? null : html`<b class="count">${countdownText(left)}</b>`}</div></div>`;
 }
 
 function dayCorner(state: State, session: Session, nowMs = 0): SafeHtml {
@@ -140,7 +148,8 @@ function dayCorner(state: State, session: Session, nowMs = 0): SafeHtml {
   const jolt = session.stareJolt !== null && nowMs - session.stareJolt >= 0 && nowMs - session.stareJolt < STARE_JOLT_MS;
   const rate = progress !== null ? stareBpm(state.san, progress) : heartRate(state.san);
   const hr = state.day >= HEART_RATE_FROM_DAY || progress !== null ? html`<div class="${cls("hr", progress !== null && "staring", jolt && "jolt")}"><i></i>${tr("hud.hr", { bpm: rate })}</div>` : null;
-  return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b></div>${hr}`;
+  // game-menu (author 2026-11-25, #79): the day heads the task card: its rune, 第 N 天, the beat and the time
+  return html`<div class="day">${rune("day", "day-rune")}<b>${tr("shell.day", { day: state.day })}</b><small><em>${tr(beatLabelKey(session.clock.beat))}</em>${session.clock.time}</small>${hr}</div>`;
 }
 
 /**
@@ -464,7 +473,8 @@ export function itemsPanel(state: State, events: readonly GameEvent[], session: 
       const st = iconStateOf(id, state, events);
       const day = objectsFoundOnDay[id];
       const name = hasString(`obj.name.${id}`) ? t(`obj.name.${id}`) : id;
-      return html`<button type="button" class="${cls("ip-row", pick === id && "on", !knows(id, state, events) && "unknown")}" data-action="items-pick" data-pick="${id}"><img src="${iconSrc(id, st)}" alt=""><span class="ip-name">${knows(id, state, events) ? name : tr("items.unknownName")}</span>${day !== undefined ? html`<span class="ip-day">${tr("items.foundDay", { day: String(day) })}</span>` : null}</button>`;
+      const shown = knows(id, state, events) ? name : t("items.unknownName");
+      return html`<button type="button" class="${cls("ip-row", pick === id && "on", !knows(id, state, events) && "unknown")}" data-action="items-pick" data-pick="${id}" title="${shown}" aria-label="${shown}"><img src="${iconSrc(id, st)}" alt=""><i class="ip-no">${String(found.indexOf(id) + 1).padStart(2, "0")}</i></button>`;
     });
     let detail: SafeHtml = html`<p class="ip-empty">${tr("items.empty")}</p>`;
     if (pick) {
@@ -479,7 +489,8 @@ export function itemsPanel(state: State, events: readonly GameEvent[], session: 
       const blurb = known && hasString(`credits.obj.${pick}`) ? html`<p class="ip-blurb">${tr(`credits.obj.${pick}`)}</p>` : null;
       const word = known && hasString(`kuro.tutor.${pick}`) ? html`<p class="ip-kuro"><b>${tr("kuro.name")}</b>${tr(`kuro.tutor.${pick}`)}</p>` : null;
       const hold = session.holding === pick ? null : html`<button type="button" class="ip-hold" data-action="loop-hold" data-object="${pick}">${tr("items.hold")}</button>`;
-      detail = html`<div class="ip-big"><img src="${iconSrc(pick, st)}" alt=""></div><h3 class="ip-title">${name}</h3><div class="ip-meta">${day !== undefined ? html`<span>${tr("items.foundDay", { day: String(day) })}</span>` : null}${chips}</div>${blurb}${word}<div class="ip-actions">${hold}</div>`;
+      // game-menu: the thing large on its plinth, its catalogue card beside it
+      detail = html`<div class="ip-big">${plinthRing()}<img src="${iconSrc(pick, st)}" alt=""></div><div class="ip-card"><span class="ip-no">No. ${String(found.indexOf(pick) + 1).padStart(2, "0")}</span><h3 class="ip-title">${name}</h3><div class="ip-meta">${day !== undefined ? html`<span>${tr("items.foundDay", { day: String(day) })}</span>` : null}${chips}</div>${blurb}${word}<div class="ip-actions">${hold}</div></div>`;
     }
     body = html`<div class="ip-list" role="list">${rows.length ? rows : html`<p class="ip-empty">${tr("items.empty")}</p>`}</div><div class="ip-detail">${detail}</div>`;
   } else if (tab === "photos") {
@@ -495,7 +506,9 @@ export function itemsPanel(state: State, events: readonly GameEvent[], session: 
   } else {
     body = html`<div class="ip-got">${got.length ? got : html`<p class="ip-empty">${tr("items.nothingGot")}</p>`}</div>`;
   }
-  return html`<div class="items-panel big" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="ip-head"><b class="ip-h">${tr("hud.items")}</b><nav class="ip-tabs">${tabs}</nav><button type="button" class="ip-close" data-action="items-toggle" aria-label="${t("hud.itemsClose")}">×</button></div><div class="${cls("ip-body", `tab-${tab}`)}">${body}</div></div>`;
+  // game-menu (2026-11-25): 道具 is a page of the one menu; its own three tabs sit over its page
+  const page = html`<div class="items-panel big" id="items-panel"><div class="ip-head"><nav class="ip-tabs">${tabs}</nav></div><div class="${cls("ip-body", `tab-${tab}`)}">${body}</div></div>`;
+  return menuShell({ active: "items", day: state.day, title: tr("hud.items"), rune: "bag", tabs: roomTabs(state.found.length), close: "items-toggle", body: page, pane: "items", id: "items-title" });
 }
 
 /**
@@ -556,23 +569,27 @@ function hintsRow(on: boolean | undefined): SafeHtml | null {
 
 export function settingsPanel(
   session: Pick<Session, "settingsOpen" | "muted"> & { readonly settingsConfirm?: SettingsConfirm | null; readonly hintsOn?: boolean },
-  opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean } = { home: true },
+  opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean; readonly room?: { readonly day: number; readonly found: number } } = { home: true },
 ): SafeHtml | null {
   if (!session.settingsOpen) return null;
+  // game-menu (2026-11-25): a page of the one menu in the room (with its tabs); alone on the title
+  const shell = (body: SafeHtml, close: string) =>
+    menuShell({ active: "settings", day: opts.room?.day ?? null, title: tr("settings.title"), rune: "set", tabs: opts.room ? roomTabs(opts.room.found) : [], close, body, pane: "settings", id: "settings-title" });
   // playtest-1105 R8: 重新开始这一局 / 清除全部 ask first, in the same panel: the question, 确定 · 取消.
   const asking = session.settingsConfirm ?? null;
   if (asking) {
     const q = asking === "restart" ? "settings.restartConfirm" : "settings.clearAllConfirm";
-    return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-confirm-cancel" aria-label="${t("settings.cancel")}"></button><div class="settings confirm" role="alertdialog" aria-modal="true" aria-labelledby="settings-ask" data-confirm="${asking}"><p id="settings-ask">${tr(q)}</p><div class="actions"><button type="button" class="danger" data-action="settings-confirm" data-what="${asking}">${tr("settings.confirm")}</button><button type="button" data-action="settings-confirm-cancel">${tr("settings.cancel")}</button></div></div></div>`;
+    return shell(html`<div class="settings confirm" role="alertdialog" aria-labelledby="settings-ask" data-confirm="${asking}"><p id="settings-ask">${tr(q)}</p><div class="actions"><button type="button" class="gm-btn danger" data-action="settings-confirm" data-what="${asking}"><span>${tr("settings.confirm")}</span></button><button type="button" class="gm-btn ghost" data-action="settings-confirm-cancel"><span>${tr("settings.cancel")}</span></button></div></div>`, "settings-confirm-cancel");
   }
-  const reset = html`<div class="row reset"><button type="button" data-action="settings-restart">${tr("settings.restart")}</button>${opts.clearAll ? html`<button type="button" data-action="settings-clear-all">${tr("settings.clearAll")}</button>` : null}</div>`;
+  const reset = html`<div class="row reset"><button type="button" class="gm-btn danger" data-action="settings-restart"><span>${tr("settings.restart")}</span></button>${opts.clearAll ? html`<button type="button" class="gm-btn danger" data-action="settings-clear-all"><span>${tr("settings.clearAll")}</span></button>` : null}</div>`;
   const email = emailRowHtml(opts.email ?? emailRow());
   const sound = !session.muted;
   // The title page has no 返回首页: it is the home (title-page FR2).
-  const home = opts.home ? html`<button type="button" data-action="settings-home">${tr("settings.home")}</button>` : null;
+  const home = opts.home ? html`<button type="button" class="gm-btn ghost" data-action="settings-home"><span>${tr("settings.home")}</span></button>` : null;
   const lang = (l: Locale) =>
     html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
-  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${hintsRow(session.hintsOn)}${email}${reset}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
+  const body = html`<div class="settings"><p class="st-cap">${tr("settings.title")}</p><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${hintsRow(session.hintsOn)}${email}${reset}<div class="actions">${home}</div><svg class="gm-dial" viewBox="-210 -210 420 420" aria-hidden="true">${raw(dialMarkup())}</svg></div>`;
+  return shell(body, "settings-close");
 }
 
 /**
@@ -777,7 +794,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const lc = loopContext(state, events);
   const listView = lc ? checklistNow(lc, state, events, session) : null;
   // An empty list (nothing open: the meal ordered, the rest still locked) draws no card; the delivery card stands alone.
-  const list = listView ? html`<div class="hud-left">${listView.lines.length ? renderChecklist(listView) : null}${waitCard(listView, session, model.nowMs ?? 0)}</div>` : null;
+  // game-menu (2026-11-25): one glass card, top left — the day, a ruler, the current line, the wait
+  const list = html`<div class="hud-left">${dayCorner(state, session, model.nowMs ?? 0)}${dayRuler()}${listView && listView.lines.length ? renderChecklist(listView) : null}${listView ? waitCard(listView, session, model.nowMs ?? 0) : null}</div>`;
   // The four facings and 桌子 (屏幕 is the desktop's own render).
   // lying-view R2: and the ceiling from the bed.
   const view = isFacing(session.view) || session.view === "desk" || session.view === "table" || session.view === "lying" ? session.view : "room";
@@ -831,7 +849,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const nobox = !arrived && (view === "room" || view === "bed");
   // room-light-switch R3: by day the ceiling light makes the photo a little brighter (room.css, the backdrop only)
   const ceilDay = !dream && !desk3d && !isEvening(session.clock) && ceilLit(session);
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${edgeLeads(view, "back") && !dream ? backPill() : null}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${edgeLeads(view, "back") && !dream ? backPill() : null}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
 }
 
 export { raidShowing };

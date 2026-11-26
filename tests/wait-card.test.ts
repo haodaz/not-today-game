@@ -46,7 +46,9 @@ describe("the card", () => {
     expect(view.waiting).toBe(true);
     expect(view.lines.some((l) => l.state === "wait")).toBe(false);
     const out = waitCard(view, session, 40_000)!.value;
-    expect(out).toContain(`<div class="h">${t("checklist.wait.head")}</div>`);
+    // author 2026-11-25 (#77): with nothing else current, what to do meanwhile — no 前往 on it
+    expect(out).toContain(`<div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${t("checklist.waitIdle")}</span></div>`);
+    expect(out).not.toContain("go-item");
     expect(out).toContain(`<span>${t("checklist.wait.text")}</span><b class="count">01:00</b>`);
     expect(waitCard(view, session, 0)!.value).not.toContain("count"); // no clock given: the text alone
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));

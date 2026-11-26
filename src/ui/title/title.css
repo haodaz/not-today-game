@@ -249,3 +249,56 @@
   .title-room .amb.daylight{animation:none;opacity:.11}
   .title-room .amb.daylight.b{opacity:.055}
 }
+
+/* ===================================================================================================
+   game-menu (author 2026-11-25, #84–#87): the title is not dark — the room at its own light, a soft
+   shadow only behind the words, the words light with a glow; the column is words with diamonds; who
+   you are is a glass card at its end; 老物件 / 影集 / 设置 are runes at the bottom right; the login
+   card is glass and comes only when asked for.
+   =================================================================================================== */
+.title-page{font-family:var(--gm-serif)}
+.title-photo{filter:saturate(.88) brightness(.95)}
+.title-page .idle.chair{filter:saturate(.88) brightness(.95)}
+.title-vig{background:radial-gradient(38% 60% at 20% 42%,rgba(10,11,10,.55),rgba(10,11,10,0) 100%),radial-gradient(26% 26% at 8% 96%,rgba(10,11,10,.4),rgba(10,11,10,0))}
+.title-logo{filter:drop-shadow(0 0 14px rgba(255,244,228,.45)) drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.title-menu{gap:4px;text-shadow:var(--gm-glow)}
+.title-menu>button:not(.title-badge){position:relative;display:flex;align-items:center;gap:16px;width:auto;padding:10px 0;border:0;background:none;text-align:left;text-indent:0;font:21px var(--gm-serif);letter-spacing:.5em;color:#ece6d8;text-shadow:inherit}
+.title-menu>button:not(.title-badge)::before{content:"";flex:none;width:8px;height:8px;border:1px solid var(--gm-bone2);transform:rotate(45deg);transition:all .2s}
+.title-menu>button:not(.title-badge)::after{content:"";position:absolute;left:24px;bottom:4px;width:180px;height:1px;background:linear-gradient(90deg,var(--gm-bone2),transparent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.title-menu>button:not(.title-badge):hover,.title-menu>button:not(.title-badge):focus-visible{background:none;color:#fff;outline:none}
+.title-menu>button:not(.title-badge):hover::before,.title-menu>button:not(.title-badge):focus-visible::before{background:var(--gm-blood2);border-color:var(--gm-blood2);box-shadow:0 0 8px rgba(192,55,46,.8)}
+.title-menu>button:not(.title-badge):hover::after,.title-menu>button:not(.title-badge):focus-visible::after{transform:scaleX(1)}
+.title-ver{color:var(--gm-bone);text-shadow:var(--gm-glow)}
+/* the identity card */
+.title-menu .title-badge{margin-top:34px;width:300px;padding:12px 14px;border:1px solid var(--gm-edge);border-radius:2px;background:var(--gm-glass);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);color:var(--gm-bone);box-shadow:0 10px 30px rgba(0,0,0,.2);text-shadow:var(--gm-glow);font-family:var(--gm-serif)}
+.title-menu .title-badge:hover,.title-menu .title-badge:focus-visible{background:rgba(22,24,22,.45);color:#fff;transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.3)}
+.title-badge .lanyard::before,.title-badge .lanyard::after{background:rgba(236,230,216,.7)}
+.title-badge .face{border-radius:50%;background:rgba(0,0,0,.2);box-shadow:0 0 0 1px var(--gm-hair2),0 0 0 4px rgba(22,24,22,.3)}
+.title-badge .face img{filter:grayscale(.5) sepia(.2)}
+.title-badge .who{border-left:1px solid var(--gm-hair2)}
+.title-badge .co{color:var(--gm-bone2)}
+.title-badge.none .co{color:#f0c7c1;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--gm-blood2)}
+.title-badge.none .face img{opacity:.55}
+/* the medallions */
+.title-dock{position:absolute;right:44px;bottom:40px;left:auto;top:auto;display:flex;gap:16px;z-index:5}
+.title-dock .med{width:54px;height:54px;padding:0;border:0;background:none;color:var(--gm-bone);cursor:pointer}
+/* the cards (login, the questions, the badge open): glass, light words */
+.title-badge-dim{background:rgba(20,22,20,.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.title-card{background:rgba(20,22,20,.55);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);border:1px solid var(--gm-edge);border-radius:2px;color:var(--gm-bone);text-shadow:var(--gm-glow);box-shadow:0 20px 50px rgba(0,0,0,.3);font-family:var(--gm-serif)}
+.title-card h2{letter-spacing:.35em;font-weight:600;color:#f6f1e6}
+.title-card .row label,.title-card .row>span:first-child{color:var(--gm-bone2);letter-spacing:.2em}
+.title-card .row input{color:var(--gm-bone);border-bottom-color:var(--gm-hair2);font-family:var(--gm-serif)}
+.title-card .row input:focus{border-bottom-color:var(--gm-bone)}
+.title-card .row .d,.title-card .row .g button{border-color:var(--gm-hair2);color:var(--gm-bone);border-radius:0}
+.title-card .row .g button.on{background:rgba(220,213,196,.15);border-color:var(--gm-bone);color:#fff}
+.title-card .title-start,.title-auth .title-start{border:0;border-radius:0;background:var(--gm-bone);color:#121411;text-shadow:none;letter-spacing:.35em;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}
+.title-card .title-start.ready:hover,.title-card .title-start.ready:focus-visible{background:#fff;color:#121411}
+.title-card .title-start:disabled{opacity:.35}
+.title-auth .auth-sub,.title-auth .auth-status,.title-auth .auth-status.hint,.title-auth .auth-guest-hint{color:var(--gm-bone2)}
+.title-auth .auth-status.error{color:#ff8f85}
+.title-auth .auth-switch,.title-auth .auth-guest,.title-badge-card .auth-logout{color:var(--gm-bone);text-decoration-color:var(--gm-blood2)}
+.title-card .title-cancel,.title-card .title-back,.title-auth .auth-cancel{color:var(--gm-bone);border-color:var(--gm-hair2)}
+.title-badge-card .badge-co,.title-badge-card .badge-who{color:var(--gm-bone2)}
+.title-page .title-pick .pick-title,.title-page .title-pick .pick-label{color:var(--gm-bone2)}
+.title-page .title-pick .arrow{color:var(--gm-bone);border-color:var(--gm-hair2)}
+.title-auth .row{border:0}

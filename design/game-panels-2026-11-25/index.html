@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>游戏面板样稿</title>
+<!--
+  Mockup only (2026-11-25, feedback #77–#80, second pass). Not wired into the game.
+  Her notes on pass 1: 「更像水墨，而不是一个克系感的游戏」; icons should be 「精致游戏、克系游戏符文」;
+  the tracker shows only the current line; the countdown is plain white digits; the title page too.
+  Look: a dark instrument (new tech) carrying runes (old gods), bone lines, one dark red.
+  The eye is the game's own mark (the logo's O). It follows the day slope
+  (visual-slope-tech-to-rune): day 1 closed and clean, day 8 Solomon's red circle, day 14 flesh.
+  No real Goetia seals and no Yellow Sign: every glyph here is our own geometry.
+-->
+<style>
+@font-face{font-family:"Barlow";src:url(/fonts/BarlowCondensed-Bold.woff2) format("woff2");font-weight:700}
+:root{
+  --void:#0b0c0b; --glass:rgba(22,24,22,.3); --glass-edge:rgba(255,255,255,.22); --glow:0 0 8px rgba(255,244,228,.22),0 1px 2px rgba(0,0,0,.55); --bone:#ece6d8; --bone2:#cfc8b8; --bone3:#ada695;
+  --hair:rgba(220,213,196,.16); --hair2:rgba(220,213,196,.32);
+  --blood:#8f1d18; --blood2:#c0372e; --sick:#9fb08a;
+  --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--void);color:var(--bone);font-family:var(--serif)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+svg{overflow:visible}
+.stage{position:relative;height:100vh;overflow:hidden}
+
+/* ---------- the room ---------- */
+.room{position:absolute;inset:0;background:url(/room/shots/room.jpg) center/cover}
+.room::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:none}
+
+/* ---------- HUD top left: the day, then the one current line ---------- */
+.tracker{position:absolute;left:28px;top:22px;width:440px;padding:16px 22px 18px;text-shadow:var(--glow);background:var(--glass);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border:1px solid var(--glass-edge);border-radius:2px;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.day{display:flex;align-items:center;gap:14px}
+.day .glyph{width:34px;height:34px;flex:none}
+.day b{font-size:30px;font-weight:600;letter-spacing:.18em}
+.day small{font-family:"Barlow";font-size:15px;letter-spacing:.14em;color:var(--bone2)}
+.day small em{font-style:normal;font-family:var(--serif);font-size:14px;margin-right:8px;letter-spacing:.2em}
+.scale{display:block;width:330px;height:10px;margin:10px 0 16px}
+.now{display:flex;gap:10px;font-size:18px;line-height:1.5;letter-spacing:.04em}
+.now .mk{flex:none;width:9px;height:9px;margin-top:8px;background:var(--blood2);transform:rotate(45deg);box-shadow:0 0 8px rgba(192,55,46,.7)}
+.now .go{margin-left:8px;font-size:15px;color:var(--bone2);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--blood2);white-space:nowrap}
+.now .go:hover{color:var(--bone)}
+.sub{font-size:14px;color:var(--bone);opacity:.85;margin:4px 0 0 19px;line-height:1.55}
+.wait{display:flex;align-items:baseline;gap:14px;margin:8px 0 0 19px;font-size:15px;color:var(--bone)}
+.wait b{font-family:"Barlow";font-size:22px;letter-spacing:.08em;color:#fff;font-weight:700}
+
+/* ---------- the medallions (人物 / 道具 / 设置; on the title 老物件 / 影集 / 设置) ---------- */
+.dock{position:absolute;right:34px;top:26px;display:flex;gap:20px;z-index:5}
+.med{display:flex;flex-direction:column;align-items:center;font-size:0;color:var(--bone2)}
+.med .disc{position:relative;width:58px;height:58px}
+.med .disc::before{content:"";position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 50% 30%,rgba(60,64,60,.45),rgba(18,20,18,.55) 75%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.25)}
+.med svg{position:absolute;inset:0;width:100%;height:100%;stroke:var(--bone);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px rgba(255,244,228,.35))}
+.med .ring{transition:transform .9s cubic-bezier(.2,.7,.2,1);transform-origin:32px 32px}
+.med .sig{transition:stroke .2s,filter .2s}
+.med:hover{color:var(--bone)}
+.med:hover .ring{transform:rotate(45deg)}
+.med:hover .sig{stroke:#f1d8cf;filter:drop-shadow(0 0 4px rgba(192,55,46,.9))}
+.med .pip{position:absolute;right:5px;top:5px;width:9px;height:9px;background:var(--blood2);transform:rotate(45deg);box-shadow:0 0 0 2px rgba(18,20,18,.7),0 0 8px rgba(192,55,46,.8)}
+
+/* ---------- the menu: full screen, one frame, tabs ---------- */
+.menu{position:absolute;inset:0;display:none;z-index:10}
+.menu.open{display:block}
+.veil{position:absolute;inset:0;overflow:hidden;background:rgba(28,30,28,.22)}
+/* the frosted room: the room picture itself blurred (works where backdrop-filter is not drawn) */
+.veil::before{content:"";position:absolute;inset:-40px;background:url(/room/shots/room.jpg) center/cover;filter:blur(18px) saturate(1.05) brightness(.95);z-index:-1}
+body[data-mode="title"] .veil::before{filter:blur(18px) saturate(.9) brightness(.95)}
+.veil::after{content:"";position:absolute;inset:0;background:rgba(28,30,28,.22)}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.25;mix-blend-mode:overlay;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+.frame{position:absolute;inset:26px;pointer-events:none}
+.frame .line{position:absolute;inset:0;border:1px solid var(--hair2)}
+.frame .line2{position:absolute;inset:6px;border:1px solid var(--hair)}
+.frame .corner{position:absolute;width:64px;height:64px;stroke:var(--bone2);fill:none;stroke-width:1}
+.frame .tl{left:-9px;top:-9px}.frame .tr{right:-9px;top:-9px;transform:scaleX(-1)}
+.frame .bl{left:-9px;bottom:-9px;transform:scaleY(-1)}.frame .br{right:-9px;bottom:-9px;transform:scale(-1)}
+.eye{position:absolute;left:50%;top:-19px;width:120px;height:38px;transform:translateX(-50%);background:rgba(22,24,22,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--glass-edge);border-radius:19px;padding:0 14px}
+.eye svg{filter:drop-shadow(0 0 3px rgba(255,244,228,.4))}
+.eye svg{width:100%;height:100%;stroke:var(--bone);fill:none;stroke-width:1.4}
+.eye .lids-closed,.eye .lids-half,.eye .open{display:none}
+body[data-band="1"] .eye .lids-closed{display:inline}
+body[data-band="8"] .eye .lids-half{display:inline}
+body[data-band="14"] .eye .open{display:inline}
+.circle{position:absolute;left:50%;top:50%;width:760px;height:760px;margin:-380px 0 0 -380px;stroke:var(--blood2);fill:none;stroke-width:1;opacity:0;pointer-events:none;animation:spin 300s linear infinite}
+body[data-band="8"] .circle,body[data-band="14"] .circle{opacity:.2}
+@keyframes spin{to{transform:rotate(360deg)}}
+.veins{position:absolute;inset:0;pointer-events:none;display:none}
+body[data-band="14"] .veins{display:block}
+.veins svg{position:absolute;width:340px;height:240px;stroke:var(--blood);fill:none;opacity:.75;animation:pulse 3.2s ease-in-out infinite}
+.veins .v1{left:0;top:0}.veins .v2{right:0;top:0;transform:scaleX(-1)}.veins .v3{left:0;bottom:0;transform:scaleY(-1)}.veins .v4{right:0;bottom:0;transform:scale(-1)}
+@keyframes pulse{50%{opacity:.45}}
+body[data-band="14"] .veil{animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{50%{background:rgba(70,14,10,.32)}}
+
+.head{position:absolute;left:78px;top:62px;display:flex;align-items:center;gap:18px;text-shadow:var(--glow)}
+.head svg{filter:drop-shadow(0 0 4px rgba(255,244,228,.4))}
+.head svg{width:54px;height:54px;stroke:var(--bone);fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.head b{font-size:34px;font-weight:600;letter-spacing:.42em}
+.head small{display:block;font-family:"Barlow";font-size:12px;letter-spacing:.4em;color:var(--bone3);margin-top:2px}
+.close{position:absolute;right:52px;top:52px;z-index:3}
+.esc{position:absolute;right:62px;bottom:46px;font-size:12px;color:var(--bone3);letter-spacing:.2em}
+.esc kbd{font-family:"Barlow";font-size:12px;border:1px solid var(--hair2);padding:1px 6px;margin-right:6px;color:var(--bone2)}
+
+.tabs{position:absolute;left:62px;top:160px;display:flex;flex-direction:column;gap:4px;width:220px;padding:14px 16px 18px 30px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-edge);text-shadow:var(--glow)}
+.tab{position:relative;display:flex;align-items:center;gap:14px;padding:12px 0 12px 4px;font-size:19px;letter-spacing:.35em;color:var(--bone2);transition:color .2s}
+.tab svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tab i{position:absolute;left:-22px;top:50%;width:8px;height:8px;margin-top:-4px;background:var(--blood2);transform:rotate(45deg) scale(0);transition:transform .2s;box-shadow:0 0 8px rgba(192,55,46,.8)}
+.tab::after{content:"";position:absolute;left:46px;right:0;bottom:4px;height:1px;background:linear-gradient(90deg,var(--bone2),transparent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.tab:hover{color:var(--bone2)}
+.tab.on{color:var(--bone)}
+.tab.on i{transform:rotate(45deg) scale(1)}
+.tab.on::after{transform:scaleX(1)}
+.tabs .hint{margin-top:22px;font-size:12px;color:var(--bone3);letter-spacing:.2em;padding-left:46px}
+.tabs .hint kbd{font-family:"Barlow";border:1px solid var(--hair2);padding:0 5px;margin-right:6px}
+.vrule{display:none}
+
+.pane{position:absolute;left:310px;right:62px;top:160px;bottom:70px;display:none;padding:28px 34px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-edge);text-shadow:var(--glow)}
+.pane.on{display:block;animation:fade .25s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.cap{font-size:12px;letter-spacing:.45em;color:var(--bone2);margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.cap::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--hair2),transparent)}
+
+/* 人物 */
+.who{display:grid;grid-template-columns:400px 1fr;gap:60px;height:100%}
+.lens{position:relative;width:380px;height:380px;margin-top:-6px}
+.lens .pic{position:absolute;inset:34px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#e9e3d5,#b9b19f 75%,#6d675b)}
+.lens .pic img{position:absolute;left:50%;top:-4%;width:118%;transform:translateX(-50%);filter:grayscale(.6) sepia(.25) contrast(1.05)}
+.lens .pic::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 50px rgba(0,0,0,.55)}
+body[data-band="14"] .lens .pic::after{box-shadow:inset 0 0 60px rgba(90,10,8,.75)}
+.lens svg{position:absolute;inset:0;width:100%;height:100%;stroke:var(--bone2);fill:none}
+.lens .slow{animation:spin 120s linear infinite;transform-origin:50% 50%}
+.name{margin-top:6px;text-align:center}
+.name b{font-size:36px;font-weight:600;letter-spacing:.3em}
+.name small{display:block;margin-top:4px;font-size:14px;color:var(--bone2);letter-spacing:.3em}
+.read{padding-top:10px}
+.rd{display:grid;grid-template-columns:90px 1fr 70px;align-items:center;gap:18px;margin-bottom:24px}
+.rd .k{font-size:17px;letter-spacing:.3em;white-space:nowrap}
+.rd .v{justify-self:end;font-family:"Barlow";font-size:24px;letter-spacing:.06em;color:var(--bone)}
+.rd .v.low{color:#d9493f;text-shadow:0 0 8px rgba(192,55,46,.45),0 1px 2px rgba(0,0,0,.4)}
+.ecg{height:44px;position:relative;overflow:hidden;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
+  background:repeating-linear-gradient(90deg,var(--hair) 0 1px,transparent 1px 22px)}
+.ecg svg{position:absolute;left:0;top:0;height:44px;stroke:var(--sick);stroke-width:1.5;fill:none;animation:sweep 4s linear infinite;filter:drop-shadow(0 0 3px rgba(159,176,138,.6))}
+body[data-band="14"] .ecg svg{stroke:var(--blood2);filter:drop-shadow(0 0 3px rgba(192,55,46,.7));animation-duration:2.4s}
+@keyframes sweep{to{transform:translateX(-50%)}}
+.cells{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;height:16px}
+.cells i{border:1px solid var(--hair2)}
+.cells i.f{background:var(--bone2);border-color:var(--bone2)}
+.cells.low i.f{background:var(--blood2);border-color:var(--blood2);box-shadow:0 0 6px rgba(192,55,46,.6)}
+.hungry{font-size:12px;color:var(--blood2);letter-spacing:.2em;margin-left:8px;font-family:var(--serif)}
+.hearts{display:flex;gap:10px}
+.hearts svg{width:24px;height:21px}
+.assim{position:relative;height:20px}
+.assim .tr{position:absolute;left:0;right:0;top:9px;height:1px;background:var(--hair2)}
+.assim .fl{position:absolute;left:0;top:8px;height:3px;background:linear-gradient(90deg,var(--bone3),var(--blood))}
+.assim .mk{position:absolute;top:4px;width:11px;height:11px;margin-left:-5px;border:1.5px solid var(--bone);background:rgba(22,24,22,.9);transform:rotate(45deg)}
+.assim svg{position:absolute;top:-12px;height:44px;width:120px;stroke:var(--blood);fill:none;stroke-width:1.2;display:none}
+body[data-band="14"] .assim svg{display:block}
+.shelf{margin-top:12px}
+.jars{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.jar{position:relative;aspect-ratio:3/4;border:1px solid var(--hair2);background:rgba(10,12,10,.28);display:grid;place-items:center}
+.jar img{width:78%;height:70%;object-fit:contain}
+.jar span{position:absolute;left:4px;bottom:2px;font-family:"Barlow";font-size:10px;letter-spacing:.1em;color:var(--bone3)}
+.jar.empty svg{width:22px;height:22px;stroke:var(--bone3);fill:none;stroke-width:1.2;opacity:.6}
+.talk{margin-top:16px;font-size:14px;color:var(--bone2);letter-spacing:.15em}
+.talk b{font-family:"Barlow";font-size:18px;color:var(--bone);margin:0 4px}
+
+/* 道具 / 老物件 */
+.bag{display:grid;grid-template-columns:290px 1fr 320px;gap:36px;height:100%}
+.sub-tabs{display:flex;gap:22px;margin-bottom:18px}
+.sub-tabs button{font-size:15px;letter-spacing:.3em;color:var(--bone3);padding-bottom:6px;border-bottom:1px solid transparent}
+.sub-tabs button.on{color:var(--bone);border-color:var(--blood2)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid .jar{cursor:pointer;transition:border-color .2s}
+.grid .jar:hover{border-color:var(--bone2)}
+.grid .jar.sel{border-color:var(--bone);box-shadow:0 0 0 1px var(--bone),0 0 18px rgba(192,55,46,.35)}
+.grid .jar.sel::before{content:"";position:absolute;top:-5px;left:50%;width:8px;height:8px;margin-left:-4px;background:var(--blood2);transform:rotate(45deg)}
+.show{position:relative;display:grid;place-items:center}
+.show::before{content:"";position:absolute;left:10%;right:10%;top:0;bottom:8%;background:radial-gradient(50% 55% at 50% 45%,rgba(220,213,196,.16),transparent 70%)}
+.show::after{content:"";position:absolute;left:28%;right:28%;bottom:14%;height:26px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.7),transparent)}
+.show img{position:relative;max-width:78%;max-height:66%;animation:float 6s ease-in-out infinite;filter:drop-shadow(0 18px 18px rgba(0,0,0,.5))}
+@keyframes float{50%{transform:translateY(-8px) rotate(-2deg)}}
+.show .ring{position:absolute;width:420px;height:420px;stroke:var(--hair2);fill:none;animation:spin 200s linear infinite}
+.card{position:relative;padding:22px 24px 26px;border:1px solid var(--hair2);background:rgba(10,12,10,.22)}
+body[data-band="8"] .card{background:linear-gradient(rgba(176,150,104,.12),rgba(176,150,104,.04))}
+.card .no{font-family:"Barlow";font-size:13px;letter-spacing:.3em;color:var(--bone3)}
+.card .ttl{font-size:30px;font-weight:600;letter-spacing:.2em;margin:6px 0 16px}
+.card dl{display:grid;grid-template-columns:64px 1fr;gap:8px 12px;margin:0 0 16px;font-size:14px}
+.card dt{color:var(--bone3);letter-spacing:.2em}
+.card dd{margin:0;color:var(--bone)}
+.stamp{display:inline-block;padding:1px 8px;border:1px solid #d9493f;color:#ff8f85;background:rgba(60,10,8,.35);text-shadow:none;letter-spacing:.25em;font-size:13px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.4),inset 0 0 0 3px rgba(192,55,46,.5)}
+.card p{margin:0;padding-top:14px;border-top:1px solid var(--hair);font-size:15px;line-height:1.9;color:var(--bone2)}
+.actions{display:flex;gap:12px;margin-top:26px}
+.btn{position:relative;padding:11px 28px;font-size:15px;letter-spacing:.35em;color:#121411;background:var(--bone);text-shadow:none;
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}
+.btn:hover{background:#f2ecdf}
+.btn.ghost{background:var(--hair2);color:var(--bone)}
+.btn.ghost::before{content:"";position:absolute;inset:1px;background:rgba(18,20,18,.82);clip-path:inherit}
+.btn.danger{background:rgba(192,55,46,.7);color:#e9a69f}
+.btn.danger::before{content:"";position:absolute;inset:1px;background:rgba(24,14,12,.82);clip-path:inherit}
+.btn span{position:relative}
+.btn.ghost:hover::before{background:rgba(40,44,40,.85)}
+
+/* 设置 */
+.set .row{display:grid;grid-template-columns:170px 1fr;align-items:center;padding:20px 0;border-bottom:1px solid var(--hair)}
+.set .row .k{font-size:18px;letter-spacing:.35em}
+.seg{display:inline-flex;gap:0;border:1px solid var(--hair2);justify-self:start}
+.seg button{min-width:90px;padding:9px 18px;font-size:15px;letter-spacing:.2em;color:var(--bone3);position:relative}
+.seg button+button{border-left:1px solid var(--hair2)}
+.seg button.on{color:var(--bone);background:rgba(220,213,196,.09)}
+.seg button.on::before{content:"";position:absolute;left:8px;top:50%;width:6px;height:6px;margin-top:-3px;background:var(--blood2);transform:rotate(45deg)}
+.mail{font-size:15px;color:var(--bone2);letter-spacing:.1em}
+.mail b{font-weight:400;color:var(--sick);margin-left:8px;font-family:"Barlow";letter-spacing:.08em}
+.set .foot{display:flex;gap:16px;margin-top:36px}
+.set .corner-dial{position:absolute;right:-60px;bottom:-90px;width:380px;height:380px;stroke:var(--bone);fill:none;opacity:.12;animation:spin 160s linear infinite}
+.set .old-obj{position:absolute;right:10px;bottom:10px;width:230px;opacity:.9;filter:grayscale(.35) brightness(.85) drop-shadow(0 18px 20px rgba(0,0,0,.6));transform:rotate(10deg)}
+.set .corner-obj+i{position:absolute;right:-20px;bottom:-30px;width:300px;height:300px;background:radial-gradient(closest-side,rgba(220,213,196,.1),transparent);pointer-events:none}
+.empty-line{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70%;gap:18px;color:var(--bone3);letter-spacing:.3em}
+.empty-line svg{width:90px;height:90px;stroke:var(--bone3);fill:none;stroke-width:1;opacity:.6}
+
+/* ---------- the title page ---------- */
+.title{position:absolute;inset:0;display:none}
+body[data-mode="title"] .title{display:block}
+body[data-mode="title"] .roomhud{display:none}
+body.menu-open .tracker,body.menu-open .stage>.roomhud .dock,body.menu-open .title .list,body.menu-open .title .auth,body.menu-open .title .dock,body.menu-open .title .logo,body.menu-open .title .foot{visibility:hidden}
+.title .bg{position:absolute;inset:0;background:url(/room/shots/room.jpg) center/cover;filter:saturate(.85)}
+.title .bg::after{content:"";position:absolute;inset:0;background:radial-gradient(42% 62% at 22% 40%,rgba(10,11,10,.5),rgba(10,11,10,0) 100%),radial-gradient(30% 30% at 8% 95%,rgba(10,11,10,.35),rgba(10,11,10,0))}
+.title .tcircle{position:absolute;left:330px;top:150px;width:520px;height:520px;margin:-260px 0 0 -260px;stroke:var(--bone);fill:none;opacity:.18;animation:spin 240s linear infinite}
+.title .logo{position:absolute;left:96px;top:96px;width:540px;filter:drop-shadow(0 0 14px rgba(255,244,228,.45)) drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.title .list{position:absolute;left:100px;top:300px;display:flex;flex-direction:column;gap:6px;text-shadow:var(--glow)}
+.title .li{position:relative;display:flex;align-items:center;gap:16px;padding:10px 0;font-size:21px;letter-spacing:.5em;color:#e9e3d6;transition:color .2s}
+.title .li i{width:8px;height:8px;background:transparent;border:1px solid var(--bone2);transform:rotate(45deg);transition:all .2s}
+.title .li small{font-family:"Barlow";font-size:14px;letter-spacing:.15em;color:var(--bone2)}
+.title .li::after{content:"";position:absolute;left:24px;bottom:4px;width:180px;height:1px;background:linear-gradient(90deg,var(--bone2),transparent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.title .li:hover,.title .li.on{color:var(--bone)}
+.title .li:hover i,.title .li.on i{background:var(--blood2);border-color:var(--blood2);box-shadow:0 0 8px rgba(192,55,46,.8)}
+.title .li:hover::after,.title .li.on::after{transform:scaleX(1)}
+.title .foot{position:absolute;left:100px;bottom:44px;font-size:12px;color:var(--bone);text-shadow:var(--glow);letter-spacing:.2em;line-height:1.9}
+.title .dock{top:auto;bottom:40px;right:44px}
+.dock .med .disc{width:52px;height:52px}
+.auth{position:absolute;right:120px;top:50%;width:400px;transform:translateY(-52%);padding:46px 40px 34px;background:rgba(20,22,20,.52);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);border:1px solid var(--glass-edge);box-shadow:0 20px 50px rgba(0,0,0,.25);text-shadow:var(--glow)}
+.auth .frame{inset:0}
+.auth .frame .corner{width:40px;height:40px}
+.auth .eye{top:-17px;width:96px;height:32px}
+.auth h2{margin:0;font-size:26px;font-weight:600;letter-spacing:.45em;text-align:center}
+.auth .sub2{text-align:center;font-size:13px;color:var(--bone2);letter-spacing:.25em;margin:8px 0 28px}
+.field{display:block;margin-bottom:20px}
+.field span{display:block;font-size:12px;letter-spacing:.35em;color:var(--bone2);margin-bottom:6px}
+.field input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--hair2);color:var(--bone);font:15px var(--serif);letter-spacing:.06em;padding:6px 2px;outline:none}
+.field input:focus{border-color:var(--bone)}
+.field input::placeholder{color:var(--bone2);opacity:.75}
+.auth .btn{width:100%;margin-top:8px}
+.auth .swap{display:block;margin:14px auto 0;font-size:13px;color:var(--bone2);letter-spacing:.15em;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--blood2)}
+.auth .or{display:flex;align-items:center;gap:12px;margin:24px 0 16px;color:var(--bone2);font-size:12px;letter-spacing:.3em}
+.auth .or::before,.auth .or::after{content:"";flex:1;height:1px;background:var(--hair)}
+.auth .ghost{width:100%}
+.auth .gh{margin:10px 0 0;font-size:12px;line-height:1.7;color:var(--bone2);text-align:center;letter-spacing:.05em}
+
+/* ---------- mock-only switches ---------- */
+.mockbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:14px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:999px;z-index:50;font:13px -apple-system,"PingFang SC",sans-serif;color:#bbb}
+.mockbar span{display:flex;gap:2px}
+.mockbar button{padding:4px 10px;border-radius:999px}
+.mockbar button.on{background:#ddd;color:#111}
+</style>
+</head>
+<body data-band="1" data-mode="room">
+
+<!-- the runes: our own geometry, one family; built out in the script below -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="s-who" viewBox="-32 -32 64 64"><path d="M-13 0Q0-10.5 13 0Q0 10.5-13 0Z"/><circle r="4.2"/><circle r="1.5" fill="currentColor" stroke="none"/><path d="M0-21v-0M0-19.5V-10.5M0 10.5V19.5M-5 15.5H5M-4.5-16.5 0-20.5l4.5 4"/></symbol>
+    <symbol id="s-bag" viewBox="-32 -32 64 64"><path d="M0-16 14-8V8L0 16-14 8V-8Z"/><path d="M-14-8 0 0 14-8M0 0V16"/><circle cy="-8" r="2.3"/><path d="M-19-3v6M19-3v6M-7 10.5l3 1.7M7 10.5l-3 1.7"/></symbol>
+    <symbol id="s-set" viewBox="-32 -32 64 64"><circle r="12"/><circle r="4.5"/><path id="spokes"/><path d="M0-12V-21M-3.2-18.5H3.2"/><circle cx="12.5" cy="12.5" r="1.3"/><circle cx="-12.5" cy="12.5" r="1.3"/></symbol>
+    <symbol id="s-egg" viewBox="-32 -32 64 64"><path d="M0-16C9-16 12.5-3 12.5 4 12.5 12 6.5 16.5 0 16.5S-12.5 12-12.5 4C-12.5-3-9-16 0-16Z"/><rect x="-5.5" y="-4" width="11" height="8.5" rx="1"/><path d="M-4.5 10h0M0 11h0M4.5 10h0" stroke-width="2.4"/><path d="M0-16V-21M-2.5-19.5h5"/></symbol>
+    <symbol id="s-album" viewBox="-32 -32 64 64"><circle r="13.5"/><path id="blades"/><circle r="2" fill="currentColor" stroke="none"/><path d="M-19 0h-2M19 0h2M0 19v2"/></symbol>
+    <symbol id="s-close" viewBox="-32 -32 64 64"><path d="M-8-8 8 8M8-8-8 8"/><path d="M-10.5-10.5l-1.5-1.5M10.5 10.5l1.5 1.5M10.5-10.5l1.5-1.5M-10.5 10.5l-1.5 1.5" stroke-width="2.4"/></symbol>
+    <symbol id="s-day" viewBox="-32 -32 64 64"><circle r="17"/><circle r="11" stroke-dasharray="2 3"/><path d="M-11 0Q0-7 11 0Q0 7-11 0Z"/><circle r="2.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="ring" viewBox="-32 -32 64 64"><circle r="29.5" stroke-opacity=".3"/><circle r="25.5" stroke-opacity=".75"/><path id="ticks" stroke-opacity=".7"/><path id="diams" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="corner" viewBox="0 0 64 64"><path d="M9 64V9h55"/><path d="M14 64V14h50" stroke-opacity=".45"/><circle cx="9" cy="9" r="5"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M24 9v-4M34 9v-3M44 9v-4M9 24h-4M9 34h-3M9 44h-4"/></symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <!-- ===================== the room ===================== -->
+  <div class="roomhud">
+    <div class="room"></div>
+    <div class="tracker">
+      <div class="day"><svg class="glyph" viewBox="0 0 64 64" style="stroke:var(--bone);fill:none;stroke-width:1.3"><use href="#s-day" width="64" height="64"/></svg><b id="dayNo">第 1 天</b><small><em id="beat">早上</em><span id="clock">09:03</span></small></div>
+      <svg class="scale" viewBox="0 0 330 10" id="scale" style="stroke:var(--bone2);fill:none"></svg>
+      <div id="track"></div>
+    </div>
+    <nav class="dock" id="roomDock">
+      <button class="med" data-open="who" title="人物" aria-label="人物"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-who" width="64" height="64"/></g></svg></span></button>
+      <button class="med" data-open="bag" title="道具" aria-label="道具"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-bag" width="64" height="64"/></g></svg><i class="pip"></i></span></button>
+      <button class="med" data-open="set" title="设置" aria-label="设置"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-set" width="64" height="64"/></g></svg></span></button>
+    </nav>
+  </div>
+
+  <!-- ===================== the title page ===================== -->
+  <div class="title">
+    <div class="bg"></div>
+    <svg class="tcircle" viewBox="-260 -260 520 520" id="tcircle"></svg>
+    <img class="logo" src="/logo.svg" alt="NOT TODAY">
+    <div class="list">
+      <button class="li on"><i></i>继续<small>第 3 天</small></button>
+      <button class="li"><i></i>新游戏</button>
+      <button class="li"><i></i>制作</button>
+    </div>
+    <div class="auth">
+      <div class="frame"><div class="line"></div>
+        <svg class="corner tl"><use href="#corner"/></svg><svg class="corner tr"><use href="#corner"/></svg><svg class="corner bl"><use href="#corner"/></svg><svg class="corner br"><use href="#corner"/></svg>
+        <div class="eye"><svg viewBox="0 0 120 38"><path d="M14 19Q60 33 106 19M30 25l-3 5M45 28l-1 6M60 29v6M75 28l1 6M90 25l3 5"/></svg></div>
+      </div>
+      <h2>登录</h2>
+      <div class="sub2">保存游戏存档与成就</div>
+      <label class="field"><span>邮箱</span><input type="email" placeholder="you@example.com"></label>
+      <label class="field"><span>密码</span><input type="password" placeholder="至少 6 位"></label>
+      <button class="btn"><span>登 录</span></button>
+      <button class="swap">没有账号？注册一个</button>
+      <div class="or">或者</div>
+      <button class="btn ghost"><span>游客身份进入</span></button>
+      <p class="gh">游客的存档只在这台设备上；以后可以在设置里绑定邮箱。</p>
+    </div>
+    <nav class="dock" id="titleDock">
+      <button class="med" data-open="bag" title="老物件" aria-label="老物件"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-egg" width="64" height="64"/></g></svg></span></button>
+      <button class="med" data-open="album" title="影集" aria-label="影集"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-album" width="64" height="64"/></g></svg></span></button>
+      <button class="med" data-open="set" title="设置" aria-label="设置"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-set" width="64" height="64"/></g></svg></span></button>
+    </nav>
+    <div class="foot">v0.1 · Kiroween 2026<br>好大壮 · 与 Claude 一起写成</div>
+  </div>
+
+  <!-- ===================== the menu ===================== -->
+  <div class="menu" id="menu">
+    <div class="veil" data-close></div>
+    <svg class="circle" viewBox="-380 -380 760 760" id="circle"></svg>
+    <div class="grain"></div>
+    <div class="veins">
+      <svg class="v1" viewBox="0 0 340 240" id="vein"></svg><svg class="v2" viewBox="0 0 340 240"><use href="#vein-art"/></svg>
+      <svg class="v3" viewBox="0 0 340 240"><use href="#vein-art"/></svg><svg class="v4" viewBox="0 0 340 240"><use href="#vein-art"/></svg>
+    </div>
+    <div class="frame">
+      <div class="line"></div><div class="line2"></div>
+      <svg class="corner tl"><use href="#corner"/></svg><svg class="corner tr"><use href="#corner"/></svg><svg class="corner bl"><use href="#corner"/></svg><svg class="corner br"><use href="#corner"/></svg>
+      <div class="eye"><svg viewBox="0 0 120 38" id="eyeSvg">
+        <g id="eye-art">
+          <path class="lids-closed" d="M14 19Q60 33 106 19M30 25l-3 5M45 28l-1 6M60 29v6M75 28l1 6M90 25l3 5"/>
+          <g class="lids-half"><path d="M14 19Q60 36 106 19"/><path d="M14 19Q60 14 106 19"/><circle cx="60" cy="22" r="5" fill="currentColor" stroke="none" clip-path="url(#half)"/><clipPath id="half"><path d="M14 19Q60 14 106 19Q60 36 14 19Z"/></clipPath></g>
+          <g class="open"><path d="M14 19Q60-8 106 19Q60 46 14 19Z"/><g id="iris"><circle cx="60" cy="19" r="10"/><circle cx="60" cy="19" r="4.5" fill="#c0372e" stroke="none"/></g><path d="M22 19h-10M98 19h10" stroke="#8f1d18"/></g>
+        </g></svg></div>
+    </div>
+
+    <div class="head"><svg id="headSig" viewBox="0 0 64 64"><use href="#s-who" width="64" height="64"/></svg><div><b id="headName">人物</b></div></div>
+    <button class="med close" data-close aria-label="关上"><span class="disc"><svg viewBox="0 0 64 64"><g class="ring"><use href="#ring" width="64" height="64"/></g><g class="sig"><use href="#s-close" width="64" height="64"/></g></svg></span></button>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="vrule"></div>
+
+    <section class="pane" data-pane="who">
+      <div class="who">
+        <div>
+          <div class="lens"><div class="pic"><img src="/player/she.png" alt=""></div><svg viewBox="-190 -190 380 380" id="lensRing"></svg></div>
+          <div class="name"><b>沈遥</b><small id="whoDay">第 1 天 · 早上</small></div>
+        </div>
+        <div class="read">
+          <div class="cap">状 态</div>
+          <div class="rd"><span class="k">理智</span><div class="ecg"><svg id="ecg" viewBox="0 0 1040 44" width="1040"></svg></div><span class="v" id="sanV">100</span></div>
+          <div class="rd"><span class="k">饱食度</span><div class="cells" id="cells"></div><span class="v" id="fullV">10</span></div>
+          <div class="rd"><span class="k">克总</span><div class="hearts" id="hearts"></div><span></span></div>
+          <div class="rd"><span class="k">同化</span><div class="assim" id="assim"><div class="tr"></div><div class="fl"></div><div class="mk"></div><svg viewBox="0 0 120 44"><path d="M0 22C14 20 18 8 30 10S44 30 58 26 70 6 84 12M30 10c4-6 12-6 14-2M58 26c2 8 10 12 16 8M84 12c8 2 10 10 18 8"/></svg></div><span></span></div>
+          <div class="shelf"><div class="cap">老 物 件 · <span id="found">2</span> / 8</div><div class="jars" id="jars"></div></div>
+          <div class="talk">和它说过<b id="chats">0</b>次话</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="bag">
+      <div class="bag">
+        <div>
+          <div class="sub-tabs" id="bagTabs"><button class="on">老物件</button><button>照片</button><button>收到的</button></div>
+          <div class="grid" id="grid"></div>
+        </div>
+        <div class="show"><svg class="ring" viewBox="-210 -210 420 420" id="showRing"></svg><img id="big" src="/objects/chick_front.png" alt=""></div>
+        <div>
+          <div class="card">
+            <div class="no" id="ino">No. 01</div>
+            <div class="ttl" id="iname">电子宠物</div>
+            <dl><dt>到手</dt><dd id="iwhen">第 1 天</dd><dt>状态</dt><dd><span class="stamp" id="itag">已认出</span></dd></dl>
+            <p id="idesc">壳是黄的，半透明，三个键，一块小屏。壳上印的是「拓麻鸽子」。</p>
+          </div>
+          <div class="actions"><button class="btn"><span>拿起来</span></button><button class="btn ghost" data-close><span>收起</span></button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="album">
+      <div class="empty-line"><svg viewBox="0 0 64 64"><use href="#s-album" width="64" height="64"/></svg>还没拍过。</div>
+    </section>
+
+    <section class="pane set" data-pane="set">
+      <div class="cap">设 置</div>
+      <div class="row"><span class="k">声音</span><span class="seg"><button class="on">开</button><button>关</button></span></div>
+      <div class="row"><span class="k">语言</span><span class="seg"><button class="on">中文</button><button>English</button></span></div>
+      <div class="row"><span class="k">新手提示</span><span class="seg"><button class="on">开</button><button>关</button></span></div>
+      <div class="row"><span class="k">绑定邮箱</span><span class="mail">已绑定<b>yao••••@example.com</b></span></div>
+      <div class="foot"><button class="btn danger" id="restart"><span>重新开始这一局</span></button><button class="btn ghost"><span>返回首页</span></button></div>
+      <svg class="corner-dial" viewBox="-210 -210 420 420" id="setDial"></svg>
+    </section>
+
+    <div class="esc"><kbd>Esc</kbd>关上</div>
+  </div>
+</div>
+
+<div class="mockbar" aria-label="样稿开关">
+  <span id="mMode"><button class="on" data-v="room">房间</button><button data-v="title">标题页</button></span>
+  <span id="mState"><button class="on" data-v="task">平时</button><button data-v="wait">等外卖</button><button data-v="night">晚上</button></span>
+  <span id="mBand"><button class="on" data-v="1">第 1 天</button><button data-v="8">第 8 天</button><button data-v="14">第 14 天</button></span>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const P = (a, r) => [Math.cos(a) * r, Math.sin(a) * r];
+const f = (n) => n.toFixed(2);
+
+// ---- build the rune parts that are easier as numbers ----
+(() => {
+  let t = "", d = "";
+  for (let k = 0; k < 24; k++) {
+    const a = (k / 24) * Math.PI * 2 - Math.PI / 2, long = k % 6 === 0;
+    const [x1, y1] = P(a, 25.5), [x2, y2] = P(a, long ? 29.5 : 27.6);
+    t += `M${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}`;
+  }
+  for (let k = 0; k < 4; k++) {
+    const a = (k / 4) * Math.PI * 2 + Math.PI / 4, [x, y] = P(a, 29.5);
+    d += `M${f(x)} ${f(y - 1.8)}l1.8 1.8-1.8 1.8-1.8-1.8Z`;
+  }
+  $("#ticks").setAttribute("d", t); $("#diams").setAttribute("d", d);
+  let s = "";
+  for (let k = 0; k < 8; k++) { if (k === 6) continue; const a = (k / 8) * Math.PI * 2, [x1, y1] = P(a, 4.5), [x2, y2] = P(a, k % 2 ? 9 : 12); s += `M${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}`; }
+  $("#spokes").setAttribute("d", s);
+  let b = "";
+  for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2, [x1, y1] = P(a, 5.5), [x2, y2] = P(a + 0.95, 13.5); b += `M${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}`; }
+  $("#blades").setAttribute("d", b);
+})();
+
+// a ring of ticks and our own small runes, used for the lens, the plinth, the circles
+function dial(r1, r2, n, runes) {
+  let out = `<circle r="${r1}"/><circle r="${r2}" stroke-opacity=".5"/>`;
+  for (let k = 0; k < n; k++) {
+    const a = (k / n) * Math.PI * 2, [x1, y1] = P(a, r2), [x2, y2] = P(a, k % 5 === 0 ? r1 : r2 + (r1 - r2) * 0.45);
+    out += `<path d="M${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}"/>`;
+  }
+  (runes || []).forEach((id, i, arr) => {
+    const a = (i / arr.length) * Math.PI * 2 - Math.PI / 2, [x, y] = P(a, (r1 + r2) / 2 + 14);
+    out += `<use href="#${id}" x="${f(x - 9)}" y="${f(y - 9)}" width="18" height="18" transform="rotate(${f((a * 180) / Math.PI + 90)} ${f(x)} ${f(y)})"/>`;
+  });
+  return out;
+}
+const RUNES = ["s-who", "s-bag", "s-set", "s-egg", "s-album", "s-day"];
+$("#lensRing").innerHTML = `<g stroke-width="1"><circle r="156" stroke-opacity=".6"/>${dial(186, 172, 60, [])}</g><g class="slow" stroke-width="1.1">${dial(166, 160, 36, RUNES)}</g>`;
+$("#showRing").innerHTML = dial(205, 196, 72, RUNES);
+$("#setDial").innerHTML = dial(200, 184, 72, RUNES) + `<circle r="120"/><circle r="60"/><use href="#s-set" x="-60" y="-60" width="120" height="120"/>`;
+$("#tcircle").innerHTML = dial(255, 240, 90, RUNES.concat(RUNES)) + `<circle r="150"/>`;
+// the ritual circle behind the menu (days 7–9 Solomon, stays after): circles, a seven-point star, our runes
+(() => {
+  let star = "";
+  for (let k = 0; k <= 7; k++) { const [x, y] = P(((k * 3) / 7) * Math.PI * 2 - Math.PI / 2, 250); star += (k ? "L" : "M") + f(x) + " " + f(y); }
+  $("#circle").innerHTML = dial(370, 350, 120, RUNES.concat(RUNES, RUNES)) + `<circle r="250"/><circle r="130"/><path d="${star}"/>`;
+})();
+// the veins (day 14): branching from the frame's corners
+$("#vein").innerHTML = `<g id="vein-art" stroke-linecap="round">
+  <path stroke-width="2.4" d="M0 6C40 12 70 30 104 34S160 58 196 62"/>
+  <path stroke-width="1.6" d="M104 34C116 18 140 14 170 18S214 10 240 14M196 62C214 74 236 76 262 72"/>
+  <path stroke-width="1.1" d="M60 22C64 44 58 70 72 94S70 130 84 150M170 18c10-10 24-12 36-8M140 50c-2 20 8 32 4 48M240 14c14 4 28 0 40 6"/>
+  <path stroke-width="2" d="M8 0C14 40 30 70 34 104S56 160 60 200"/>
+  <path stroke-width=".8" d="M34 104C20 120 18 140 8 156M72 94c14 6 22 18 36 20M262 72c10 8 24 8 36 14"/></g>`;
+// the scale under the day: a ruler with one tick too many
+$("#scale").innerHTML = `<path d="M0 5H330" stroke-opacity=".6"/>` + Array.from({ length: 34 }, (_, k) => `<path d="M${k * 10} ${k % 5 ? 3 : 0}V${k % 5 ? 7 : 10}" stroke-opacity="${k === 33 ? 1 : 0.5}"${k === 33 ? ' stroke="#c0372e"' : ""}/>`).join("");
+
+// ---- the bands (visual-slope-tech-to-rune) ----
+const BAND = {
+  1: { day: 1, san: 100, full: 10, hearts: 1, assim: 12, chats: 0, found: 2 },
+  8: { day: 8, san: 62, full: 50, hearts: 3, assim: 41, chats: 23, found: 7 },
+  14: { day: 14, san: 23, full: 30, hearts: 4, assim: 78, chats: 61, found: 8 },
+};
+function ecg(san) {
+  const jit = ((100 - san) / 100) * 7, amp = 12 + ((100 - san) / 100) * 6;
+  let d = "M0 22", x = 0, seed = 7;
+  const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280 - 0.5) * 2;
+  while (x < 1040) {
+    for (let k = 0; k < 6; k++) { x += 8; d += `L${x} ${f(22 + rnd() * jit * 0.4)}`; }
+    d += `L${x + 6} ${f(22 + 3 + rnd() * jit)}L${x + 11} ${f(22 - amp - rnd() * jit)}L${x + 17} ${f(22 + amp * 0.6)}L${x + 22} ${f(22 + rnd() * jit)}`;
+    x += 22;
+    if (san < 40 && rnd() > 0.3) { d += `L${x + 5} ${f(22 - amp * 0.7)}L${x + 9} ${f(22 + amp * 0.4)}`; x += 9; }
+    for (let k = 0; k < 6; k++) { x += 8; d += `L${x} ${f(22 + rnd() * jit * 0.4)}`; }
+  }
+  return `<path d="${d}"/>`;
+}
+const heart = (full) => `<svg viewBox="0 0 13 11" shape-rendering="crispEdges">${
+  ["0110001100", "1111011110", "1111111111", "1111111111", "0111111110", "0011111100", "0001111000", "0000110000"]
+    .flatMap((row, y) => [...row].map((c, x) => (c === "1" && full ? `<rect x="${x + 1.5}" y="${y + 1.5}" width="1" height="1" fill="#c0372e"/>` : ""))).join("")
+}<path d="M3 1h2v1h1v1h1V2h1V1h2v1h1v1h1v3h-1v1h-1v1H9v1H8v1H7v1H6v-1H5V9H4V8H3V7H2V6H1V3h1V2h1z" fill="none" stroke="${full ? "#c0372e" : "#6f6a5f"}" stroke-width=".9"/></svg>`;
+const OBJ = [
+  { id: "chick", name: "电子宠物", day: 1, desc: "壳是黄的，半透明，三个键，一块小屏。壳上印的是「拓麻鸽子」。" },
+  { id: "pager", name: "寻呼机", day: 2, desc: "黑壳，侧面五个键，屏上一串数。" },
+  { id: "dictionary", name: "电子词典", day: 3, desc: "（介绍照游戏里的原文）" },
+  { id: "tape", name: "磁带", day: 4, desc: "（介绍照游戏里的原文）" },
+  { id: "calculator", name: "计算器", day: 5, desc: "（介绍照游戏里的原文）" },
+  { id: "iccard", name: "IC 卡", day: 6, desc: "（介绍照游戏里的原文）" },
+  { id: "camera", name: "相机", day: 7, desc: "（介绍照游戏里的原文）" },
+  { id: "phone", name: "功能机", day: 8, desc: "（介绍照游戏里的原文）" },
+];
+let band = 1;
+function jarHtml(i, found, cls = "") {
+  const o = OBJ[i], no = String(i + 1).padStart(2, "0");
+  return i < found
+    ? `<div class="jar ${cls}" data-i="${i}"><img src="/objects/${o.id}_front.png" alt=""><span>${no}</span></div>`
+    : `<div class="jar empty ${cls}" data-i="${i}"><svg viewBox="0 0 64 64"><use href="#s-who" width="64" height="64"/></svg><span>${no}</span></div>`;
+}
+function setBand(b) {
+  band = b; document.body.dataset.band = b;
+  const v = BAND[b];
+  $("#dayNo").textContent = `第 ${v.day} 天`;
+  $("#whoDay").textContent = `第 ${v.day} 天 · ${$("#beat").textContent}`;
+  $("#ecg").innerHTML = ecg(v.san);
+  $("#sanV").textContent = v.san; $("#sanV").classList.toggle("low", v.san < 40);
+  $("#fullV").textContent = v.full; $("#fullV").classList.toggle("low", v.full < 20);
+  $("#cells").className = "cells" + (v.full < 20 ? " low" : "");
+  $("#cells").innerHTML = Array.from({ length: 10 }, (_, k) => `<i class="${k < Math.round(v.full / 10) ? "f" : ""}"></i>`).join("");
+  $("#fullV").innerHTML = v.full < 20 ? `${v.full}<span class="hungry">饿</span>` : v.full;
+  $("#hearts").innerHTML = [0, 1, 2, 3, 4].map((k) => heart(k < v.hearts)).join("");
+  $("#assim .fl").style.width = v.assim + "%"; $("#assim .mk").style.left = v.assim + "%";
+  $("#assim svg").style.left = `calc(${v.assim}% - 10px)`;
+  $("#found").textContent = v.found; $("#chats").textContent = v.chats;
+  $("#jars").innerHTML = OBJ.map((_, i) => jarHtml(i, v.found)).join("");
+  $("#grid").innerHTML = OBJ.map((_, i) => jarHtml(i, v.found)).join("");
+  $$("#grid .jar").forEach((s) => (s.onclick = () => pick(+s.dataset.i)));
+  pick(0);
+  $$("#mBand button").forEach((x) => x.classList.toggle("on", x.dataset.v == b));
+}
+function pick(i) {
+  const o = OBJ[i], found = i < BAND[band].found;
+  $$("#grid .jar").forEach((s, j) => s.classList.toggle("sel", j === i));
+  $("#ino").textContent = `No. ${String(i + 1).padStart(2, "0")}`;
+  $("#big").style.opacity = found ? 1 : 0.08; $("#big").src = `/objects/${o.id}_front.png`;
+  $("#iname").textContent = found ? o.name : "？？？";
+  $("#iwhen").textContent = found ? `第 ${o.day} 天` : "——";
+  $("#itag").textContent = found ? "已认出" : "未到手";
+  $("#idesc").textContent = found ? o.desc : "还没有到手。";
+}
+
+// ---- the tracker: only the current line (her note), the countdown as plain white digits ----
+const TRACK = {
+  task: { beat: "早上", clock: "09:03", html: `<div class="now"><i class="mk"></i><span>点个外卖当午饭<a class="go" href="#">前往 ›</a></span></div><div class="sub">打开手机，选一家，下单。</div>` },
+  wait: { beat: "中午", clock: "11:58", html: `<div class="now"><i class="mk"></i><span>随便做点什么（只要不是上班），等外卖来</span></div><div class="wait">外卖在路上<b id="cd">00:52</b></div>` },
+  night: { beat: "夜里", clock: "23:40", html: `<div class="now"><i class="mk"></i><span>关机，上床<a class="go" href="#">前往 ›</a></span></div><div class="sub">今天的活交了。屏幕还亮着。</div>` },
+};
+let timer;
+function track(k) {
+  const t = TRACK[k];
+  $("#track").innerHTML = t.html; $("#beat").textContent = t.beat; $("#clock").textContent = t.clock;
+  $("#whoDay").textContent = `第 ${BAND[band].day} 天 · ${t.beat}`;
+  $$("#mState button").forEach((x) => x.classList.toggle("on", x.dataset.v === k));
+  clearInterval(timer);
+  if (k === "wait") { let s = 52; timer = setInterval(() => { s = s > 0 ? s - 1 : 59; const el = $("#cd"); if (el) el.textContent = "00:" + String(s).padStart(2, "0"); }, 1000); }
+}
+
+// ---- the menu ----
+const TABS = {
+  room: [["who", "人物", "s-who"], ["bag", "道具", "s-bag"], ["set", "设置", "s-set"]],
+  title: [["bag", "老物件", "s-egg"], ["album", "影集", "s-album"], ["set", "设置", "s-set"]],
+};
+const ROMAN = ["I", "II", "III"];
+function tabs() {
+  const list = TABS[document.body.dataset.mode];
+  $("#tabs").innerHTML = list.map(([k, n, s]) => `<button class="tab" data-tab="${k}"><i></i><svg viewBox="0 0 64 64"><use href="#${s}" width="64" height="64"/></svg>${n}</button>`).join("") + `<div class="hint"><kbd>Tab</kbd>切换</div>`;
+  $$(".tab").forEach((b) => (b.onclick = () => tab(b.dataset.tab)));
+}
+function tab(k) {
+  const list = TABS[document.body.dataset.mode], i = list.findIndex((x) => x[0] === k);
+  $$(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === k));
+  $$(".pane").forEach((p) => p.classList.toggle("on", p.dataset.pane === k));
+  $("#headName").textContent = list[i][1];
+  $("#headSig").innerHTML = `<use href="#${list[i][2]}" width="64" height="64"/>`;
+  $("#restart").style.display = document.body.dataset.mode === "title" ? "none" : "";
+}
+function open(k) { tabs(); $("#menu").classList.add("open"); document.body.classList.add("menu-open"); tab(k); }
+function close() { $("#menu").classList.remove("open"); document.body.classList.remove("menu-open"); }
+$$("[data-open]").forEach((b) => (b.onclick = () => open(b.dataset.open)));
+$$("[data-close]").forEach((b) => (b.onclick = close));
+addEventListener("keydown", (e) => {
+  if (e.key === "Escape") close();
+  if (e.key === "Tab" && $("#menu").classList.contains("open")) {
+    e.preventDefault();
+    const ks = TABS[document.body.dataset.mode].map((x) => x[0]), cur = $(".tab.on").dataset.tab;
+    tab(ks[(ks.indexOf(cur) + (e.shiftKey ? ks.length - 1 : 1)) % ks.length]);
+  }
+});
+// day 14: the eye follows the pointer
+addEventListener("pointermove", (e) => {
+  if (band !== 14) return;
+  const r = $("#eyeSvg").getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), m = Math.hypot(dx, dy) || 1;
+  $("#iris").setAttribute("transform", `translate(${f((dx / m) * Math.min(18, m / 20))} ${f((dy / m) * Math.min(5, m / 60))})`);
+});
+// mock switches
+function mode(m) { document.body.dataset.mode = m; close(); $$("#mMode button").forEach((x) => x.classList.toggle("on", x.dataset.v === m)); }
+$$("#mMode button").forEach((b) => (b.onclick = () => mode(b.dataset.v)));
+$$("#mState button").forEach((b) => (b.onclick = () => track(b.dataset.v)));
+$$("#mBand button").forEach((b) => (b.onclick = () => setBand(+b.dataset.v)));
+$$(".seg button, #bagTabs button, .title .li").forEach((b) => (b.onclick = () => [...b.parentNode.children].forEach((x) => x.classList.toggle("on", x === b))));
+
+const q = new URLSearchParams(location.search);
+setBand(+(q.get("band") || 1));
+track(q.get("state") || "task");
+if (q.get("mode")) mode(q.get("mode"));
+if (q.get("open")) open(q.get("open"));
+</script>
+</body>
+</html>

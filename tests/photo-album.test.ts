@@ -118,7 +118,8 @@ describe("R2 · the 影集 on the title page", () => {
     expect(hasAlbum(coll())).toBe(false);
     expect(renderTitle(initialTitle(null, coll({ objects: ["chick"] }))).value).not.toContain('data-action="title-album"');
     expect(hasAlbum(coll({ objects: ["chick", "camera"] }))).toBe(true);
-    expect(renderTitle(initialTitle(null, coll({ objects: ["chick", "camera"] }))).value).toContain(`data-action="title-album">${t("title.album")}</button>`);
+    // game-menu (2026-11-25, #84): 影集 is a medallion at the bottom right, its name the tooltip
+    expect(renderTitle(initialTitle(null, coll({ objects: ["chick", "camera"] }))).value).toContain(`data-action="title-album" title="${t("title.album")}" aria-label="${t("title.album")}"`);
   });
 
   it("a grid of 16 days × 4 (days 3–18, 房间 · 床 · 门 · 窗); a count at the top", () => {

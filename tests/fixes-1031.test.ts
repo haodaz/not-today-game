@@ -34,26 +34,29 @@ describe("(3) one settings button", () => {
   it("the bottom-left row is one ⚙ 设置 button; nothing restarts anywhere", () => {
     const ctx = ctxOf(createStore({ startDay: 1 }));
     const out = room(ctx);
-    expect((out.match(/class="settings-btn"/g) ?? []).length).toBe(1);
+    expect((out.match(/class="med settings-btn"/g) ?? []).length).toBe(1); // game-menu: a rune medallion, top right
     expect(out).not.toContain('class="menu"');
     expect(out).not.toMatch(/restart/);
     ctx.store.appendEvent({ kind: "step", name: "boot", t: "09:00" }); // the monitors are on: the dock (with its 设置 tile) is drawn
     ctx.session.view = "desktop";
     const desk = renderGame(ctx.store, ctx.session, 0).value;
     // guidance R15: on 屏幕 设置 is the dock's right tile (the same panel), not a floating button.
-    expect(desk).not.toContain('class="settings-btn"');
+    expect(desk).not.toContain('settings-btn"');
     expect(desk).toContain('class="app nav settings-tile" data-action="settings-open"');
     expect(desk).not.toMatch(/restart/);
     expect(loopActions["loop-restart"]).toBeUndefined();
   });
 
-  it("opens a centred panel: 声音, 语言 (中文 · English), 返回首页, 取消; 取消 and Esc close it", () => {
+  it("opens the menu's 设置 page: 声音, 语言 (中文 · English), 返回首页; the ×, the outside and Esc close it", () => {
     const ctx = ctxOf(createStore({ startDay: 1 }));
     loopActions["settings-open"]!(ctx, none, null as never);
     const out = room(ctx);
     expect(out).toContain('role="dialog" aria-modal="true"');
-    for (const text of ["设置", "声音", "语言", "中文", "English", "返回首页", "取消"]) expect(out).toContain(text);
+    for (const text of ["设置", "声音", "语言", "中文", "English", "返回首页"]) expect(out).toContain(text);
     expect(out).toContain('data-action="settings-home"');
+    // game-menu (2026-11-25): no 取消 row — the close medallion and the frosted outside both run settings-close
+    expect(out).toContain('<button type="button" class="gm-close med" data-action="settings-close"');
+    expect(out).toContain('<button type="button" class="settings-dim gm-veil" data-action="settings-close"');
     loopActions["settings-close"]!(ctx, none, null as never);
     expect(room(ctx)).not.toContain("settings-layer");
     loopActions["settings-open"]!(ctx, none, null as never);
