@@ -338,3 +338,10 @@
 .title-page .game-menu:not(.inline) .gm-veil::before{content:"";position:absolute;inset:-40px;z-index:-1;background:url(/room/shots/room_nobox.jpg) center/cover;filter:blur(18px) saturate(.9) brightness(.9)}
 /* author 2026-11-26: English keeps ordinary letter spacing (the wide spacing is for Chinese) */
 html[lang="en"] :is(.game-menu,.title-page,.room .hud-left) *{letter-spacing:.02em!important;text-indent:0!important}
+/* author 2026-11-26 (#94): one line per question — the desktop's list rows (.row, desktop.css) drew a
+   second pale line under every row once the card went dark; and the look sits on a light ground
+   that hides the cut edge of the portrait */
+.title-card .row{border-bottom:0;cursor:auto}
+html[lang="en"] .title-q-left .row label,html[lang="en"] .title-q-left .row>span:first-child{width:250px}
+.title-pick .big,.title-badge-card .title-pick .big{border:1px solid var(--gm-hair2);border-radius:2px;background:radial-gradient(circle at 50% 42%,rgba(250,247,240,.96),rgba(226,220,208,.9) 78%)}
+.title-pick .big img{filter:grayscale(.3) sepia(.12)}
