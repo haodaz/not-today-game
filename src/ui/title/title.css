@@ -315,3 +315,11 @@
 .title-badge .face{background:radial-gradient(circle at 50% 40%,rgba(250,247,240,.95),rgba(226,220,208,.88) 75%)}
 .title-badge .face img{filter:grayscale(.4) sepia(.15)}
 .title-badge.none .face img{opacity:.8}
+/* Claude 2026-11-26: four even columns that fit the pane (a picture never widens its column), every
+   case one height, 玩一局 floats on its case's corner so the rows stay level */
+.title-drawer-page .drawer-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.title-drawer-page .drawer-cell,.title-drawer-page .drawer-card .drawer-cell{aspect-ratio:auto;height:232px;min-width:0;flex:none}
+.title-drawer-page .drawer-photo{width:auto;max-width:78%;height:138px;max-height:none}
+.title-drawer-page .drawer-card{position:relative;min-width:0}
+.title-drawer-page .drawer-card .drawer-play{position:absolute;right:8px;top:8px;z-index:1;padding:3px 10px;font-size:12px}
+.title-drawer-page .drawer-cell-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
