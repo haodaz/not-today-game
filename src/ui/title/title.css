@@ -310,3 +310,7 @@
 .title-badge .name{max-width:100%;font-size:16px;letter-spacing:.18em;text-indent:.18em}
 .title-badge .co{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.12em}
 .title-badge .lanyard{top:-26px}
+/* author 2026-11-25 (#90): the portrait's cut edge shows when small — a light disc behind it hides it */
+.title-badge .face{background:radial-gradient(circle at 50% 40%,rgba(250,247,240,.95),rgba(226,220,208,.88) 75%)}
+.title-badge .face img{filter:grayscale(.4) sepia(.15)}
+.title-badge.none .face img{opacity:.8}
