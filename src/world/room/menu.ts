@@ -38,11 +38,17 @@ export interface MenuShell {
   readonly pane: string;
   readonly id: string;
   readonly extra?: string;
+  /** author 2026-11-26 (#93): on the title, one glass card beside the menu — no frame, no eye, no
+   *  heading, no frosted screen; the title's words stay where they are. */
+  readonly inline?: boolean;
 }
 
 const CORNERS = (["tl", "tr", "bl", "br"] as const).map((k) => html`<svg class="gm-corner ${k}" viewBox="0 0 64 64" aria-hidden="true">${CORNER}</svg>`);
 
 export function menuShell(m: MenuShell): SafeHtml {
+  if (m.inline) {
+    return html`<div class="${cls("settings-layer", "game-menu", "inline", m.extra)}" data-band="tech"><button type="button" class="settings-dim gm-veil" data-action="${m.close}" aria-label="${t("status.close")}" tabindex="-1"></button><div class="gm-pane pane-${m.pane}" role="dialog" aria-modal="true" aria-labelledby="${m.id}"><h3 id="${m.id}" class="gm-sr">${m.title}</h3><button type="button" class="gm-x" data-action="${m.close}" aria-label="${t("status.close")}" title="${t("status.close")}">${rune("close", "gm-x-rune")}</button>${m.body}</div></div>`;
+  }
   const band = m.day === null ? "tech" : bandOf(m.day);
   const tabs = m.tabs.length
     ? html`<nav class="gm-tabs" aria-label="${t("hud.menu")}">${m.tabs.map((tb) => html`<button type="button" class="${cls("gm-tab", tb.id === m.active && "on")}" data-action="menu-tab" data-tab="${tb.id}" aria-pressed="${tb.id === m.active ? "true" : "false"}"><i aria-hidden="true"></i>${rune(tb.rune, "gm-tab-rune")}<span>${tb.label}</span></button>`)}<div class="gm-hint"><kbd>Tab</kbd>${tr("hud.menuTab")}</div></nav>`

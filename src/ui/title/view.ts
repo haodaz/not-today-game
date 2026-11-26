@@ -52,7 +52,8 @@ function menu(m: TitleModel): SafeHtml {
   // game-menu (author 2026-11-25, #84): 设置 / 老物件 / 影集 are the rune medallions at the bottom
   // right; the column keeps 继续 or 新游戏, 制作 and, last, who you are (the identity card).
   const inert = m.screen === "questions" || m.badgeOpen || !pastGate(m.account);
-  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("hud.menu")}"${inert ? html` inert` : null}>${first}<button type="button" data-action="title-credits">${tr("title.credits")}</button>${badge(m)}</nav>`;
+  // author 2026-11-26 (#93): 设置 sits with the other words again, not as a medallion
+  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("hud.menu")}"${inert ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button><button type="button" data-action="title-credits">${tr("title.credits")}</button>${badge(m)}</nav>`;
 }
 
 /**
@@ -64,8 +65,9 @@ function titleDock(m: TitleModel): SafeHtml | null {
   const med = (action: string, name: Rune, word: string, extra = "") => html`<button type="button" class="med" data-action="${action}" title="${word}" aria-label="${word}"${raw(extra)}>${medal(name)}</button>`;
   const drawer = hasDrawer(m.collection) ? med("title-drawer", "egg", t("title.drawer")) : null;
   const album = hasAlbum(m.collection) ? med("title-album", "album", t("title.album")) : null;
+  if (!drawer && !album) return null;
   const inert = m.badgeOpen || !pastGate(m.account);
-  return html`<nav class="title-dock hud-tiles" aria-label="${t("title.settings")}"${inert ? html` inert` : null}>${drawer}${album}${med("title-settings", "set", t("title.settings"), ' aria-haspopup="dialog"')}</nav>`;
+  return html`<nav class="title-dock hud-tiles" aria-label="${t("title.drawer")}"${inert ? html` inert` : null}>${drawer}${album}</nav>`;
 }
 
 /** title-badge: who wears the badge — a user or a guest; nobody else has one. */
@@ -184,5 +186,5 @@ export function renderTitle(m: TitleModel): SafeHtml {
   const gate = gated && m.account?.kind === "gate" ? html`<button type="button" class="title-badge-dim" data-action="auth-cancel" tabindex="-1" aria-label="${t("settings.cancel")}"></button>${gateCard(m.account)}` : null;
   const middle = m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
   const badgeOpen = gated ? null : badgeCard(m);
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated", badgeOpen && "badge-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${titleDock(m)}${gate}${badgeOpen}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated", badgeOpen && "badge-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${titleDock(m)}${gate}${badgeOpen}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true, inline: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

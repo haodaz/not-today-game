@@ -60,9 +60,9 @@ describe("the title page (FR1–FR3)", () => {
   it("snapshot: without a save — 新游戏 · 设置 · 制作", () => {
     const out = page(initialTitle(null, EMPTY_COLLECTION));
     const menu = [...out.matchAll(/<nav class="title-menu"[^>]*>(.*?)<\/nav>/g)][0]![1]!;
-    expect([...menu.matchAll(/data-action="(title-[a-z]+)"/g)].map((m) => m[1])).toEqual(["title-new", "title-credits"]);
-    // game-menu (author 2026-11-25, #84): 设置 is a rune medallion at the bottom right, not in the column
-    expect(out).toMatch(/<nav class="title-dock hud-tiles"[^>]*><button type="button" class="med" data-action="title-settings"/);
+    // author 2026-11-26 (#93): 设置 is with the other words again; with nothing collected there are no medallions
+    expect([...menu.matchAll(/data-action="(title-[a-z]+)"/g)].map((m) => m[1])).toEqual(["title-new", "title-settings", "title-credits"]);
+    expect(out).not.toContain("title-dock");
     expect(out).toContain("NOT TODAY");
     // The stage's screen class never borrows a child's rule (the nav is `.title-menu`).
     expect(out).toMatch(/^<div class="stage title-page screen-menu" data-screen="menu">/);
@@ -97,8 +97,10 @@ describe("the title page (FR1–FR3)", () => {
   it("settings opens the same panel as in game, without 返回首页; 制作 is a page with a back button", () => {
     const m = { ...initialTitle(null, EMPTY_COLLECTION), settingsOpen: true };
     const out = page(m);
-    // game-menu (2026-11-25): the one menu, alone (no tabs) on the title
-    expect(out).toContain('class="settings-layer game-menu solo"');
+    // author 2026-11-26 (#93): on the title, one glass card beside the menu (no frame, no tabs)
+    expect(out).toContain('class="settings-layer game-menu inline"');
+    expect(out).not.toContain("gm-frame");
+    expect(out).toContain('class="gm-x" data-action="settings-close"');
     expect(out).toContain('<div class="gm-pane pane-settings" role="dialog"');
     expect(out).not.toContain('data-action="settings-home"');
     const credits = page({ ...initialTitle(null, EMPTY_COLLECTION), screen: "credits" });

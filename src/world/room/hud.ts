@@ -569,12 +569,12 @@ function hintsRow(on: boolean | undefined): SafeHtml | null {
 
 export function settingsPanel(
   session: Pick<Session, "settingsOpen" | "muted"> & { readonly settingsConfirm?: SettingsConfirm | null; readonly hintsOn?: boolean },
-  opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean; readonly room?: { readonly day: number; readonly found: number } } = { home: true },
+  opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean; readonly room?: { readonly day: number; readonly found: number }; readonly inline?: boolean } = { home: true },
 ): SafeHtml | null {
   if (!session.settingsOpen) return null;
   // game-menu (2026-11-25): a page of the one menu in the room (with its tabs); alone on the title
   const shell = (body: SafeHtml, close: string) =>
-    menuShell({ active: "settings", day: opts.room?.day ?? null, title: tr("settings.title"), rune: "set", tabs: opts.room ? roomTabs(opts.room.found) : [], close, body, pane: "settings", id: "settings-title" });
+    menuShell({ active: "settings", day: opts.room?.day ?? null, title: tr("settings.title"), rune: "set", tabs: opts.room ? roomTabs(opts.room.found) : [], close, body, pane: "settings", id: "settings-title", ...(opts.inline ? { inline: true } : {}) });
   // playtest-1105 R8: 重新开始这一局 / 清除全部 ask first, in the same panel: the question, 确定 · 取消.
   const asking = session.settingsConfirm ?? null;
   if (asking) {

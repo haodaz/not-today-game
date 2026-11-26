@@ -315,7 +315,47 @@ for (let pass = 0; pass < ITEMS.length; pass++) {
   if (held.length) note(`(order: ${held.map((x) => `${x.id} (unlock ${x.unlock})`).join(", ")} stay after the pickup: what unlocks them comes after it)`);
 }
 const deferred = new Set();
-for (const it of ITEMS) {
+// 2026-11-26: the checklist leads. The day's order changed under the driver (lunch before any work, a
+// meal taken in on the lunch step, 起床 first on day 1), so instead of walking the file in order each
+// step reads the task card's current line (`.list .it.now[data-id]`, the room HUD), does that item,
+// and reads again. The work line (`work`) is the next work task not done yet. A line that comes back
+// three times is a stall: say where (the step, the line, what is on screen) and stop the day.
+const tasksDone = new Set(); const tries = new Map(); let stalled = null;
+// The day the HUD shows (第 N 天 / Day N): the morning after lying down is the next day's.
+const shownDay = async () => { const m = /第 (\d+) 天|Day (\d+)/.exec(await text()); return m ? Number(m[1] ?? m[2]) : null; };
+// the night is over: tomorrow on the card (the old "第 N 天 · 早上" text is gone from the task card)
+const nextMorning = async () => ((await shownDay()) ?? 0) > day || /今天过去了|The day is over/i.test(await text());
+const currentLine = async () => {
+  for (let k = 0; k < 3; k++) {
+    await readLines();
+    // game-menu R1: while a meal is on its way and nothing else is current, the card says
+    // checklist.waitIdle (no id, no 前往): that is a wait, not a missing line
+    const v = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now')].find(__vis); return e ? JSON.stringify({ id: e.dataset.id || (e.classList.contains('idle') ? '__wait' : ''), text: e.innerText.replace(/\\s+/g,' ').replace(/前往›?/,'').trim() }) : ''})()");
+    if (v) return JSON.parse(v);
+    await interrupts(); await toRoom();
+  }
+  return null;
+};
+const itemFor = (lineId) => lineId === "work" ? ITEMS.find((x) => /^flag:task/.test(x.done) && !tasksDone.has(x.id)) : ITEMS.find((x) => x.id === lineId);
+for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
+  // the day is over once the HUD shows a later day (lying down ended it)
+  const shown = await shownDay(); if (shown !== null && shown > day) { note(`   (the HUD shows day ${shown}: day ${day} is over)`); break; }
+  const line = await currentLine();
+  // a meal on its way and nothing else to do: wait for it (the doorbell; settle takes 拿进来), up to 3 min
+  if (line?.id === "__wait") {
+    note(`   (waiting: ${line.text})`); await shotStep("wait");
+    let moved = false;
+    for (let w = 0; w < 90 && !moved; w++) { await sleep(2); await interrupts(); if (await has("[data-action=loop-choice]")) await settle(); const l = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now')].find(__vis); return e ? (e.dataset.id||'idle') : 'none'})()"); moved = l !== "idle"; }
+    if (!moved) { stalled = { step: stepNo, line: line.text, why: "the meal never came (3 min)" }; await shotStep("stall"); break; }
+    continue;
+  }
+  if (!line) { stalled = { step: stepNo, line: null, why: "no current line on the task card" }; note(`   STALL: no current line · stage=${await ev("document.querySelector('.stage')?.className")} · ${(await text()).slice(0, 120)}`); await shotStep("stall"); break; }
+  // the boss's call is a synthetic line (`__call`): it rings by itself; answer it when it does
+  if (line.id === "__call") { await interrupts(); await sleep(2); if ((tries.set("__call", (tries.get("__call") ?? 0) + 1).get("__call")) > 60) { stalled = { step: stepNo, line: line.text, why: "the call never came" }; break; } continue; }
+  const it = itemFor(line.id);
+  if (!it) { stalled = { step: stepNo, line: line.text, why: `no item for line id ${line.id}` }; note(`   STALL: the line "${line.text}" (${line.id}) is not in the day file`); await shotStep("stall"); break; }
+  const n = (tries.get(it.id) ?? 0) + 1; tries.set(it.id, n);
+  if (n > 3) { const acts = await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+(e.dataset.view?':'+e.dataset.view:'')+(e.dataset.guide==='on'?'*':'')))])"); stalled = { step: stepNo, line: line.text, why: `still the current line after 3 tries (${it.id}, ${it.done})`, acts }; note(`   STALL: "${line.text}" (${it.id}) after 3 tries · stage=${await ev("document.querySelector('.stage')?.className")} · acts ${acts}`); await shotStep("stall"); break; }
   currentTaskId = it.id;
   const [kind, ...rest] = it.done.split(":"); const what = rest.join(":");
   note(`▶ ${it.id} (${it.done}) ${it.text}`);
@@ -345,6 +385,8 @@ for (const it of ITEMS) {
   try {
     // A self-ticking item (day 17 「把东西放回去」, `self: true`): the runtime ticks it after a beat; nothing to do.
     if (it.self === true) { note("   (ticks itself: skipped)"); await settle(); }
+    // day1-playtest-1117 R1: 起床 is day 1's first line — the ceiling's rise spot (or Esc) asks, 起床 answers
+    else if (it.done === "event:rise") { if (!(await has(".stage.lying-view"))) ok = true; else { await rise(); ok = !(await has(".stage.lying-view")); } }
     else     if (it.done === "event:boot") { await toRoom(); ok = await sel("[data-action=tower-power]"); if (!ok) { await sel("[data-action=view][data-view=desk]", 2); ok = await sel("[data-action=tower-power]"); } await settle(); }
     else if (it.done === "event:openApp:msgs") { ok = await toTingTalk(); await settle(); await toRoom(); }
     // author 2026-11-24 (#11): read a thread (day 1: the work group, then the family) before dinner — 汀汀 holds the work threads, 喂信 (msgs) the family
@@ -764,12 +806,12 @@ for (const it of ITEMS) {
           await sleep(0.8); if (!(await has("[data-action=loop-choice]"))) await sel("[data-action=bed]", 2.5);
         }
       }
-      let slept = (await click(S("room.bed.sleep"), 3)) || /第 \d+ 天 · 早上|今天过去了|Day \d+ · morning|The day is over/i.test(await text());
+      let slept = (await click(S("room.bed.sleep"), 3)) || (await nextMorning());
       // 2026-11-20: the night's first lines (the pink point between the screens) before anything advances them
       if (slept) { await sleep(1.6); await shotStep("night-first"); await sleep(2.5); await shotStep("night-second"); }
-      if (slept) { for (let n = 0; n < 70; n++) { await sleep(1.3); await shotStep("night"); if (/第 \d+ 天 · 早上|Day \d+ · morning/.test(await text())) break; await key("Enter"); } }
+      if (slept) { for (let n = 0; n < 70; n++) { await sleep(1.3); if (n % 6 === 0) await shotStep("night"); if (await nextMorning()) break; await key("Enter"); } }
       // A night beat can ask first (the gap, the hand): take its first choice, advance, then try to sleep again.
-      for (let k = 0; k < 4 && !slept; k++) { note(`   night k${k}: acts=${(await ev("JSON.stringify([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action))")||'').slice(0,400)}`); for (let n = 0; n < 60; n++) { await sleep(1.1); await shotStep("night"); const tx = await text(); if (/第 2 天|Day 2|今天过去了|The day is over/.test(tx) && !(await has("[data-action=loop-advance]"))) break; if (await has("[data-action=loop-advance]")) await sel("[data-action=loop-advance]", 0.5); else await key("Enter"); } const ch = await ev("__choices()"); if (ch && ch.length) { note(`   night choice → ${ch[0]}`); await shotStep("night-choice"); await sel("[data-action=loop-choice]", 1.5); } else if (/缝里|the gap/i.test(await text()) && k < 2) { const want = { 7: "iccard", 10: "tape", 13: "dictionary", 16: "calculator" }[day]; await sel("[data-action=items-toggle]", 0.8); const held = (want && (await sel(`[data-action=loop-hold][data-object=${want}]`, 2))) || (await sel("[data-action=loop-hold]", 2)); note(`   night raid: held up ${want ?? 'an object'} (${held})`); await sleep(2); await key("Escape"); await sleep(0.5); await key("Escape"); } else await key("Enter"); await settle(); await sel("[data-action=bed]", 1.5); slept = (await click(S("room.bed.sleep"), 3)) || /第 \d+ 天 · 早上|今天过去了|Day \d+ · morning|The day is over/i.test(await text()); } if (!slept && day === 18 && ((await has("[data-action=ending-next], .ending, .credits, .boss-page, .pull-out")) || /NOT TODAY|credits/i.test(await text()))) { slept = true; note("   (day 18: lying down is the ending)"); } if (!slept) note("   no 睡 button"); ok = ok && slept;
+      for (let k = 0; k < 4 && !slept; k++) { note(`   night k${k}: acts=${(await ev("JSON.stringify([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action))")||'').slice(0,400)}`); for (let n = 0; n < 60; n++) { await sleep(1.1); if (n % 6 === 0) await shotStep("night"); const tx = await text(); if ((await nextMorning()) && !(await has("[data-action=loop-advance]"))) break; if (await has("[data-action=loop-advance]")) await sel("[data-action=loop-advance]", 0.5); else await key("Enter"); } const ch = await ev("__choices()"); if (ch && ch.length) { note(`   night choice → ${ch[0]}`); await shotStep("night-choice"); await sel("[data-action=loop-choice]", 1.5); } else if (/缝里|the gap/i.test(await text()) && k < 2) { const want = { 7: "iccard", 10: "tape", 13: "dictionary", 16: "calculator" }[day]; await sel("[data-action=items-toggle]", 0.8); const held = (want && (await sel(`[data-action=loop-hold][data-object=${want}]`, 2))) || (await sel("[data-action=loop-hold]", 2)); note(`   night raid: held up ${want ?? 'an object'} (${held})`); await sleep(2); await key("Escape"); await sleep(0.5); await key("Escape"); } else await key("Enter"); await settle(); await sel("[data-action=bed]", 1.5); slept = (await click(S("room.bed.sleep"), 3)) || (await nextMorning()); } if (!slept && day === 18 && ((await has("[data-action=ending-next], .ending, .credits, .boss-page, .pull-out")) || /NOT TODAY|credits/i.test(await text()))) { slept = true; note("   (day 18: lying down is the ending)"); } if (!slept) note("   no 睡 button"); ok = ok && slept;
       if (slept) { await sleep(1.6); await shotStep("night-first"); await sleep(2.5); await shotStep("night-second"); }
       await settle(); await sleep(6); await settle(); await sleep(8);
     }
@@ -788,8 +830,12 @@ for (const it of ITEMS) {
   note(`   events: ${await lastEvents()}`);
   if (!ok) note(`   diag: mask=${await has(".dlg-layer .story-mask")} buttons=${await ev("JSON.stringify([...document.querySelectorAll('button,[role=button]')].filter(__vis).map(__txt).slice(0,16))")}`);
   if (errors.length) { note("   JS: " + errors.join(" | ")); errors.length = 0; }
+  if (/^flag:task/.test(it.done) && ok) tasksDone.add(it.id);
   if (process.env.STOP_AFTER === it.id) break;
+  // lying down ends the day: the next line is tomorrow's
+  if (it.done === "event:lieDown" && ok) break;
 }
+if (stalled) note(`   STALLED at step ${stalled.step}: ${stalled.why} · last line "${stalled.line ?? "—"}"${stalled.acts ? ` · visible ${stalled.acts}` : ""}`);
 // day 18's boss fight (2026-11-13): after the pull-out (6 s) the fight sits before the pages; the dev cheat wins it, the box clicks through
 if (day === 18) {
   for (let k = 0; k < 40 && !(await has("[data-action=boss-next], [data-action=boss-cheat], [data-action=ending-next]")); k++) await sleep(0.5);

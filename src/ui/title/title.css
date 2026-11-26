@@ -323,3 +323,18 @@
 .title-drawer-page .drawer-card{position:relative;min-width:0}
 .title-drawer-page .drawer-card .drawer-play{position:absolute;right:8px;top:8px;z-index:1;padding:3px 10px;font-size:12px}
 .title-drawer-page .drawer-cell-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* author 2026-11-26 (#93): 设置 on the title is one glass card beside the menu column — no frame, no
+   eye, no heading, nothing frosted; the logo, the words and the badge stay as they are */
+.title-page .game-menu.inline .gm-veil{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;animation:none}
+.title-page .game-menu.inline .gm-pane{left:470px;right:auto;top:290px;bottom:auto;width:640px;max-height:560px;transform:none;padding:26px 34px 30px;background:rgba(20,22,20,.5);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);box-shadow:0 20px 50px rgba(0,0,0,.28)}
+.title-page .game-menu.inline .gm-dial{display:none}
+.game-menu .gm-x{position:absolute;right:12px;top:12px;width:34px;height:34px;padding:0;border:0;background:none;color:var(--gm-bone2);cursor:pointer;z-index:2}
+.game-menu .gm-x:hover,.game-menu .gm-x:focus-visible{color:#fff;outline:none}
+.game-menu .gm-x-rune{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+/* the full-screen pages (老物件, 影集): the title's words step aside, and the frosted room is the room
+   picture itself blurred (some browsers draw no backdrop blur inside the scaled title stage) */
+.title-page:has(.game-menu:not(.inline)) :is(.title-name,.title-menu,.title-dock,.title-ver){visibility:hidden}
+.title-page .game-menu:not(.inline) .gm-veil{overflow:hidden;isolation:isolate}
+.title-page .game-menu:not(.inline) .gm-veil::before{content:"";position:absolute;inset:-40px;z-index:-1;background:url(/room/shots/room_nobox.jpg) center/cover;filter:blur(18px) saturate(.9) brightness(.9)}
+/* author 2026-11-26: English keeps ordinary letter spacing (the wide spacing is for Chinese) */
+html[lang="en"] :is(.game-menu,.title-page,.room .hud-left) *{letter-spacing:.02em!important;text-indent:0!important}
