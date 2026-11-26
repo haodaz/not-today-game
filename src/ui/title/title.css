@@ -302,3 +302,11 @@
 .title-page .title-pick .pick-title,.title-page .title-pick .pick-label{color:var(--gm-bone2)}
 .title-page .title-pick .arrow{color:var(--gm-bone);border-color:var(--gm-hair2)}
 .title-auth .row{border:0}
+/* author 2026-11-25 (#89): the badge hangs upright, about as wide as the words above it — the face
+   on top, the name under it (a long one is cut with …), the company or 点击登录 last */
+.title-menu .title-badge{flex-direction:column;align-items:center;gap:9px;width:138px;margin-top:40px;padding:16px 10px 12px;text-align:center}
+.title-badge .face{flex:0 0 auto;width:58px;height:58px}
+.title-badge .who{width:100%;align-items:center;padding:10px 0 0;border-left:0;border-top:1px solid var(--gm-hair2)}
+.title-badge .name{max-width:100%;font-size:16px;letter-spacing:.18em;text-indent:.18em}
+.title-badge .co{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.12em}
+.title-badge .lanyard{top:-26px}
