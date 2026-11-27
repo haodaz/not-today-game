@@ -28,7 +28,7 @@ import { arrivalOf, mealView, ordersOn } from "@world/delivery/meals";
 import { doorLines } from "@world/delivery/view";
 import { hasString, t } from "@world/i18n";
 import { booted, itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
-import { dropWaiting, EMPTY_DIALOGUE, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
+import { dropWaiting, EMPTY_DIALOGUE, placedLines, push, pushBefore, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { settleSession } from "@world/dialogue/place";
 import { arrivalDue, MINUTE, msUntilDue, msUntilMinimum } from "./waiting";
 
@@ -274,13 +274,15 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         if (q) dialogue = push(dialogue, q);
       }
     } else if (e.kind === "recognise") {
-      if (e.option !== undefined) dialogue = push(dialogue, answerQueued(day, e.objectId, e.option));
+      // #120③: what follows the answer goes ahead of a waiting 「入夜了。」 (the box may have been the day's last thing)
+      const night = `d${day}:nightfall`;
+      if (e.option !== undefined) dialogue = pushBefore(dialogue, answerQueued(day, e.objectId, e.option), night);
       // object-tutor R1: then Kuro's line about it, once a run (from the log: a reload has seen it).
       const first = firstRecogniseOnItsDay(events, e);
       const tutor = first ? tutorQueued(day, e.objectId) : null;
-      if (tutor) dialogue = push(dialogue, tutor);
+      if (tutor) dialogue = pushBefore(dialogue, tutor, night);
       // author 2026-11-24 (#26): then the object's own first-hold line (`hold.first.<id>`: the camera's 「还剩十张」)
-      if (first && hasString(`hold.first.${e.objectId}`)) dialogue = push(dialogue, { key: `d${day}:hold.first.${e.objectId}`, lines: [{ k: "inner", t: t(`hold.first.${e.objectId}`) }], ending: { kind: "none" } });
+      if (first && hasString(`hold.first.${e.objectId}`)) dialogue = pushBefore(dialogue, { key: `d${day}:hold.first.${e.objectId}`, lines: [{ k: "inner", t: t(`hold.first.${e.objectId}`) }], ending: { kind: "none" } }, night);
       // box-arrival R5: on the arrival day, then the player's line about the carton; read, it turns to 房间.
       const placed = first && day === ARRIVAL_DAY ? placedQueued(day) : null;
       if (placed) dialogue = push(dialogue, placed);

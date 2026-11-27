@@ -19,7 +19,9 @@ type Game = Extract<BoardGame, { kind: "pacman" }>;
 export type Dir = "up" | "down" | "left" | "right";
 
 export interface Mover { readonly x: number; readonly y: number; readonly dir: Dir; readonly next: Dir | null }
-export interface Ghost extends Mover { readonly id: number; readonly home: number; readonly eaten: boolean }
+/** `spent` (2026-11-27): swallowed during this coffee and back at its place. Until the coffee is over it is a pale face that neither
+ *  catches nor can be swallowed again (before, standing on its place swallowed it anew every tick: the count ran up by the dozen). */
+export interface Ghost extends Mover { readonly id: number; readonly home: number; readonly eaten: boolean; readonly spent?: boolean }
 export interface PacGame {
   readonly key: string;
   readonly cols: number;
@@ -161,14 +163,16 @@ export function pacTick(g: PacGame, nowMs: number): PacGame {
     if (gh.eaten) {
       // back home, then out again
       const home = { x: gh.home % g.cols, y: Math.floor(gh.home / g.cols) };
-      return { ...gh, x: home.x, y: home.y, eaten: false, dir: "up" as const, next: null };
+      return { ...gh, x: home.x, y: home.y, eaten: false, spent: fear, dir: "up" as const, next: null };
     }
+    if (gh.spent && !fear) return { ...gh, spent: false };
+    if (gh.spent) return gh; // it waits at its place, pale, until the coffee wears off
     const moved = advance(g, gh, (fear ? FEAR_SPEED : GHOST_SPEED) * dt, ghostPick({ ...g, you }, roll, fear));
     return { ...gh, ...moved };
   });
   next = { ...next, ghosts };
   for (const gh of next.ghosts) {
-    if (gh.eaten) continue;
+    if (gh.eaten || gh.spent) continue;
     if (Math.abs(gh.x - you.x) + Math.abs(gh.y - you.y) < CATCH_R) {
       if (fear) next = { ...next, ghosts: next.ghosts.map((x) => (x.id === gh.id ? { ...x, eaten: true } : x)), eatenGhosts: next.eatenGhosts + 1, score: next.score + 200 };
       else return { ...next, over: true, running: false };
@@ -214,7 +218,7 @@ export function pacStage(task: Task, board: TaskBoard, s: BoardState, session: {
   });
   const pos = (x: number, y: number) => `left:${String(Math.round(x * TILE))}px;top:${String(Math.round(y * TILE))}px`;
   const you = g ? html`<i class="${cls("pm-you", g.you.dir, g.over && "caught")}" style="${pos(g.you.x, g.you.y)}"></i>` : null;
-  const ghosts = g ? g.ghosts.map((gh) => html`<i class="${cls("pm-ghost", fear && "fear", gh.eaten && "eaten")}" style="${pos(gh.x, gh.y)}"><img src="${last ? LAST_FACES[gh.id % LAST_FACES.length]! : fear ? FACES[gh.id % FACES.length]! : "/npc/laozhou_av.png"}" alt=""></i>`) : null;
+  const ghosts = g ? g.ghosts.map((gh) => html`<i class="${cls("pm-ghost", fear && !gh.spent && "fear", (gh.eaten || gh.spent) && "eaten")}" style="${pos(gh.x, gh.y)}"><img src="${last ? LAST_FACES[gh.id % LAST_FACES.length]! : fear ? FACES[gh.id % FACES.length]! : "/npc/laozhou_av.png"}" alt=""></i>`) : null;
   const maze = html`<div class="${cls("pm-maze", fear && "fear")}" style="--cols:${String(m.cols)};--rows:${String(m.rows)}"><div class="pm-grid">${cells}</div>${ghosts}${you}</div>`;
   const notes = board.slots.map((slot) => html`<li class="mn-note"><b>${slot.label}</b><span>${slot.id in s.slots ? cardText(board, s.slots[slot.id]!) : ""}</span></li>`);
   const pad = (["up", "left", "down", "right"] as const).map((d) => html`<button type="button" class="${cls("sk-arrow", "sn-key", d)}" data-action="pacman-turn" data-dir="${d}" aria-label="${d}">${d === "up" ? "▲" : d === "left" ? "◀" : d === "down" ? "▼" : "▶"}</button>`);

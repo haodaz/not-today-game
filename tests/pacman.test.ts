@@ -97,6 +97,16 @@ describe("pac-man", () => {
     const home = pacTick(meal.g, meal.now + 80);
     expect(home.ghosts[0]!.eaten).toBe(false);
     expect(home.ghosts[0]).toMatchObject({ x: 5, y: 3 });
+    // 2026-11-27: back at its place it is spent while the coffee lasts: standing on that very tile neither swallows it again
+    // (the count once ran up by the dozen a second there) nor gets you caught; when the coffee wears off it is itself again
+    expect(home.ghosts[0]!.spent).toBe(true);
+    let onHome: PacGame = { ...home, you: { x: 5, y: 3, dir: "left", next: null } }, t = meal.now + 80;
+    for (let i = 0; i < 10; i++) { t += 80; onHome = pacTick(onHome, t); }
+    expect(onHome.eatenGhosts).toBe(1);
+    expect(onHome.over).toBe(false);
+    expect(onHome.ghosts[0]).toMatchObject({ x: 5, y: 3, spent: true });
+    const worn = pacTick({ ...onHome, you: { x: 1, y: 1, dir: "left", next: null } }, onHome.startAt + onHome.fearUntil + 200);
+    expect(worn.ghosts[0]!.spent).toBe(false);
     expect(pacSolve(g).done).toBe(true);
     const paused = pacPause(g, 500);
     expect(pacTick(paused, 9000)).toBe(paused);

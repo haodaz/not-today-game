@@ -202,7 +202,7 @@ function face(w, h, bg, draw) {
 }
 
 // ---------- the shader patch: collapse and unreality are computed, not painted ----------
-const U = { uCollapse: { value: 0 }, uWhite: { value: 0 }, uPixel: { value: 0 }, uTime: { value: 0 }, uSwimAmp: { value: 1 }, uSwimRate: { value: 1 }, uSwimLead: { value: 0 } }; // uSwim*: the greater one's swimming (1, 1, 0 in the game; a film take turns them up, see ?great=1 and window.proto.U)
+const U = { uCollapse: { value: 0 }, uWhite: { value: 0 }, uPixel: { value: 0 }, uTime: { value: 0 }, uSwimAmp: { value: 2.3 }, uSwimRate: { value: 4.1 }, uSwimLead: { value: 58 } }; // uSwim*: the greater one's swimming. 1, 1, 0 was the first build (author 2026-11-27: 像一个棍子一样; after the film take with these turned up: 克克龙老好看多了): the wave is faster, wider and starts just behind the head
 const NOISE = /* glsl */ `
 uniform float uCollapse;
 uniform float uWhite;
@@ -2886,9 +2886,9 @@ function updateCondense(s) {
   FAR.gKey.intensity = 13 * show; FAR.gFill.intensity = 6.5 * show;
   FAR.gRed.intensity = 9 * Math.pow(3 * S, 1.2) * smooth(0.4, 0.8, t); FAR.gRed.distance = 7 * S;
   FAR.gMaw.intensity = 0; FAR.gMaw.distance = 16 * S;
-  FAR.murk.visible = show > 0; FAR.murk.quaternion.copy(CON.q); FAR.murk.position.copy(camera.position).addScaledVector(CON.left, -(((s * (CON.murkV ?? 9)) % 600) - 300)); for (const sp of FAR.murk.children) sp.material.opacity = sp.userData.o * smooth(0.4, 1, t);
+  FAR.murk.visible = show > 0; FAR.murk.quaternion.copy(CON.q); FAR.murk.position.copy(camera.position).addScaledVector(CON.left, -(((s * (CON.murkV ?? 45)) % 600) - 300)); for (const sp of FAR.murk.children) sp.material.opacity = sp.userData.o * smooth(0.4, 1, t);
   FAR.dust.visible = show > 0; FAR.dust.material.opacity = 0.5 * smooth(0.5, 1, t);
-  FAR.dust.quaternion.copy(CON.q); FAR.dust.position.copy(camera.position).addScaledVector(CON.left, -((s * (CON.dustV ?? 14)) % 400)); // it passes him, front to back
+  FAR.dust.quaternion.copy(CON.q); FAR.dust.position.copy(camera.position).addScaledVector(CON.left, -((s * (CON.dustV ?? 100)) % 400)); // it passes him, front to back
   FAR.eye2.visible = true; FAR.eye2.quaternion.copy(camera.quaternion);
   FAR.eye2.position.copy(G.position).addScaledVector(CON.fwd, -1.05 * S);
   const d = 1.5 * S * (1 + 2.2 * (1 - smooth(0.3, 0.7, t))); FAR.eye2.scale.set(d * 1.15, d, 1); FAR.eye2.material.opacity = smooth(0.3, 0.56, t) * (1 - smooth(0.56, 0.7, t)) * 0.9; /* only a flare over the moment the world turns into an eye */

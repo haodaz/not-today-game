@@ -58,6 +58,11 @@
 .hud-host .hud-br{position:fixed;right:12px;bottom:12px;z-index:40}
 /* The body is 192 px (late-days FR1); during a conversation it is away (it is talking in the box). */
 .hud-kuro{position:relative;width:192px;height:192px}
+/* #133 (2026-11-27): Kuro is carried by a press that moves and stays where it is set down (desktop/kuro/drag.ts writes the offset) */
+.hud-kuro,.kpet-btn{translate:var(--kuro-dx,0px) var(--kuro-dy,0px)}
+.hud-kuro .kuro-btn,.kpet-btn{touch-action:none}
+.kuro-carried .hud-kuro .kuro-btn,.kuro-carried .kpet-btn{cursor:grabbing}
+.kuro-carried,.kuro-carried *{user-select:none;-webkit-user-select:none}
 .hud-kuro.away{visibility:hidden;pointer-events:none}
 /* author 2026-11-11: while Kuro speaks in the box the corner keeps a still copy. */
 .hud-kuro.talking .kpet{position:absolute;inset:0;width:192px;height:192px;pointer-events:none}

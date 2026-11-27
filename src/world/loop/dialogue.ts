@@ -196,6 +196,19 @@ export function push(d: DialogueState, q: Queued): DialogueState {
   return { ...d, queue: [...d.queue, ...splitVoices(q)] };
 }
 
+/**
+ * Like `push`, but ahead of the queued item `beforeKey` when that one has not begun (ledger #120③, author 2026-11-27:
+ * when opening the box was the day's last thing, 「入夜了。」 was queued behind the object's question and so came up between
+ * the question and its answer). Without such an item waiting, it is a plain push.
+ */
+export function pushBefore(d: DialogueState, q: Queued, beforeKey: string): DialogueState {
+  if (q.lines.length === 0 && q.ending.kind === "none") return d;
+  if (queuedKey(d, q.key)) return d;
+  const i = d.queue.findIndex((x) => x.key === beforeKey);
+  if (i < 0 || (i === 0 && d.line > 0)) return push(d, q);
+  return { ...d, queue: [...d.queue.slice(0, i), ...splitVoices(q), ...d.queue.slice(i)] };
+}
+
 /** A day sequence's lines with the sequence's `where` as the default of those without their own. */
 export function placedLines(seq: Sequence): readonly SayLine[] {
   const where = seq.where;

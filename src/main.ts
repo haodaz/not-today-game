@@ -8,6 +8,7 @@
 // The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
 import { watchIdleLoops } from "@world/dialogue/idle";
+import { watchKuroDrag } from "@world/desktop/kuro/drag";
 import "./world/room/room.css";
 import { cutsSupported } from "./world/cut/layer";
 import "./world/room/devices.css";
@@ -182,6 +183,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     // room-3d-wake: the code-built room's messages (day 4's wake flash).
     room3d: createRoom3dLayer(onRoomMessage, { boss: onBossRoom }),
   });
+  // #133: Kuro can be carried to another place on the screen; where it is set down is kept in this browser
+  watchKuroDrag(document, () => game, window.localStorage);
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
   // opening R2: a new run starts with the dream before day 1 (the box over the dream backdrops).

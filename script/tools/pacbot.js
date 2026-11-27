@@ -10,7 +10,7 @@
     const g = window.__nt && window.__nt.session.pacman; if (!g || g.done || g.over || !g.running) { was = {}; return; }
     for (const h of g.ghosts) { if (h.eaten && !was[h.id] && !window.__pacDone[h.id]) { window.__pacDone[h.id] = true; const r = document.querySelector(".pm-you").getBoundingClientRect(); window.__pacLog.push({ at: Date.now(), who: WHO[h.id % 4], x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }); } was[h.id] = h.eaten; }
     const C = g.cols, R = g.rows, id = (x, y) => y * C + x, cx = Math.round(g.you.x), cy = Math.round(g.you.y);
-    const fear = !!document.querySelector(".pm-maze.fear"), live = g.ghosts.filter((h) => !h.eaten), want = live.filter((h) => !window.__pacDone[h.id]), hungry = Object.keys(window.__pacDone).length < g.ghosts.length;
+    const fear = !!document.querySelector(".pm-maze.fear"), live = g.ghosts.filter((h) => !h.eaten && !h.spent), want = live.filter((h) => !window.__pacDone[h.id]), hungry = Object.keys(window.__pacDone).length < g.ghosts.length;
     const danger = new Set(); if (!fear) for (const h of live) { const hx = Math.round(h.x), hy = Math.round(h.y); for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) danger.add(id(hx + dx, hy + dy)); }
     const goals = new Set(fear && want.length ? want.map((h) => id(Math.round(h.x), Math.round(h.y))) : !fear && hungry && g.powers.length ? g.powers : g.lines.filter((v) => v >= 0));
     if (!goals.size) return;

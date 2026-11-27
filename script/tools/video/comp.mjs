@@ -1,6 +1,6 @@
 // A composed shot for cut.mjs: a ground (a picture pushed in slowly, a clip, or the dark), cut-out pictures laid over it
 // that appear and can leave, and a written caption.
-// { comp: { bg?, bgSrc?: {src, ss, zoom?, speed?}, cy?, dim?, sat?, push?, layers?: [{ img, h, x, y, at?, out?, rise? }], caption?, capAt?, capSize?, capY? }, dur }
+// { comp: { bg?, bgSrc?: {src, ss, zoom?, speed?}, cy?, dim?, sat?, push?, layers?: [{ img, h, x, y, at?, out?, rise?, drift?: [from, px up, seconds] }], caption?, capAt?, capSize?, capY? }, dur }
 import fs from "node:fs"; import path from "node:path";
 export function compArgs(c, i, { W, H, FPS, FONT, tmp, base, fades }) {
   const k = c.comp, n = Math.round(c.dur * FPS), ins = [], fc = [], R = (p) => path.resolve(base, p);
@@ -14,7 +14,7 @@ export function compArgs(c, i, { W, H, FPS, FONT, tmp, base, fades }) {
   (k.layers || []).forEach((L, j) => {
     const still = L.at === undefined, at = L.at ?? 0, rise = still ? 0 : L.rise ?? 22; ins.push("-loop", "1", "-framerate", String(FPS), "-t", String(c.dur + 0.2), "-i", R(L.img));
     fc.push(`[${j + 1}:v]format=rgba,scale=-1:${L.h}:flags=lanczos${still ? "" : `,fade=t=in:st=${at}:d=0.4:alpha=1`}${L.out !== undefined ? `,fade=t=out:st=${L.out}:d=0.5:alpha=1` : ""}[l${j}]`);
-    fc.push(`[b${j}][l${j}]overlay=x='${L.x}-w/2':y='${L.y}-h/2+${rise}*max(0,1-(t-${at})/0.45)':eval=frame[b${j + 1}]`);
+    fc.push(`[b${j}][l${j}]overlay=x='${L.x}-w/2':y='${L.y}-h/2+${rise}*max(0,1-(t-${at})/0.45)${L.drift ? `-${L.drift[1]}*min(1,max(0,(t-${L.drift[0]})/${L.drift[2] ?? 0.9}))` : ""}':eval=frame[b${j + 1}]`);
   });
   let last = `b${(k.layers || []).length}`;
   if (k.caption) {
