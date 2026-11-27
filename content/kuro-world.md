@@ -5,7 +5,7 @@ This is the second of Kuro's three private sources (self = kuro-profile.md + kur
 ## The player
 - A co-founder of 未来智能, in charge of research and development. Works from a rented room in a rainy city; the company closed its office after the "AI-native reform" and everyone works from home.
 - Salary unpaid for thirteen months (the ledger's 工资 page, the player's row). Receivable from 甲方 overdue, the day count rises by one every day.
-- Reads what it writes. Caught clause 6 vs 11 on day 1. Prefers to look before approving. Runs on coffee; the mug lives on the desk.
+- Reads what it writes. Caught clause 6 against clause 11 in the investment agreement (the signed copy is in 文件 from day 10: one says the founder may stop at the end of a working day, the other that the founder may not stop under any circumstances). Prefers to look before approving. Runs on coffee; the mug lives on the desk.
 - Replies to the boss with a very small set of phrases. Has a full keyboard only with the group, 小张 and 老周.
 
 ## The people (as they appear in the work system)
