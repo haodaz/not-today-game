@@ -177,7 +177,7 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Wang said 'Good morning'. Page three, the ontology: one page for the client and for them.",
+            "t": "Page three, the ontology. One page, for the client and for them both.",
             "where": "screen:msgs:boss",
             "me": "type"
           },
@@ -240,7 +240,7 @@
         "say": [
           {
             "k": "narration",
-            "t": "The note says: no coriander. This time you wrote it.",
+            "t": "No extra note on today's receipt. You find you are not quite used to that.",
             "me": "eat"
           }
         ]
