@@ -117,7 +117,7 @@
             "from": {
               "file": "e-receivable"
             },
-            "hint": "in day 1's receivables sheet"
+            "hint": "in the receivables sheet"
           }
         ],
         "kuro": {

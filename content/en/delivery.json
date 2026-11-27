@@ -118,10 +118,10 @@
     {
       "day": 4,
       "lunch": {
-        "outside": "The doorbell rings once. Your doorbell has been broken for a long time.",
+        "outside": "The doorbell rings, and it sounds a little off, the last note dragging on. You wonder if the bell is about to give out.",
         "bag": "Hot.",
         "receipt": "Braised chicken rice · no coriander · Note: wait",
-        "anomaly": "The note says \"wait\". The word you borrowed today."
+        "anomaly": "There is one word in the note field: wait. You never wrote a note."
       },
       "dinner": {
         "outside": "Footsteps, heavier than usual.",
@@ -136,7 +136,7 @@
         "outside": "The corridor light flickers once.",
         "bag": "Hot.",
         "receipt": "Braised chicken rice · no coriander · Note: no",
-        "anomaly": "The note says \"no\"."
+        "anomaly": "Today the note says \"no\". You did not write that one either."
       },
       "dinner": {
         "outside": "The footsteps stop at the door and don't leave. You wait a while and look again. The corridor is empty.",

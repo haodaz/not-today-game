@@ -117,7 +117,7 @@
             "from": {
               "file": "e-receivable"
             },
-            "hint": "在第 1 天那张应收表里"
+            "hint": "在应收表里"
           }
         ],
         "kuro": {
