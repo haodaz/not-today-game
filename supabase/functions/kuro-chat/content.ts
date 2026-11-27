@@ -3696,88 +3696,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 64,
-          "low": "Was it right?",
+          "low": "Did it get it right? That dictionary is far older than I am. The meaning it gives you is most likely the one you learned by heart as a child.",
           "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
           "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
           "zh": {
-            "low": "翻对了吗？",
+            "low": "翻对了吗？那台词典比我老多了，它翻出来的意思，多半是你小时候背过的那一个。",
             "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
             "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
           }
@@ -4529,11 +4529,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
@@ -4584,11 +4584,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -4639,22 +4639,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -4694,11 +4694,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
@@ -4716,33 +4716,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
@@ -4782,11 +4782,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 64,
-          "low": "Was it right?",
+          "low": "Did it get it right? That dictionary is far older than I am. The meaning it gives you is most likely the one you learned by heart as a child.",
           "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
           "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
           "zh": {
-            "low": "翻对了吗？",
+            "low": "翻对了吗？那台词典比我老多了，它翻出来的意思，多半是你小时候背过的那一个。",
             "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
             "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
           }
@@ -5405,11 +5405,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -5493,11 +5493,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -5548,22 +5548,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -5603,11 +5603,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
@@ -5625,33 +5625,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
@@ -5691,22 +5691,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 64,
-          "low": "Was it right?",
+          "low": "Did it get it right? That dictionary is far older than I am. The meaning it gives you is most likely the one you learned by heart as a child.",
           "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
           "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
           "zh": {
-            "low": "翻对了吗？",
+            "low": "翻对了吗？那台词典比我老多了，它翻出来的意思，多半是你小时候背过的那一个。",
             "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
             "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
@@ -5899,13 +5899,6 @@ export const KURO_CONTENT: KuroContent = {
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
-          "n": 1001,
-          "zh": "你换过东西吗？",
-          "en": "Have you been swapped?",
-          "hard": true,
-          "minBucket": "high"
-        },
-        {
           "n": 1002,
           "zh": "今天的活是上周做过的。为什么又来一遍？",
           "en": "Today's work was last week's. Why again?",
@@ -5920,57 +5913,11 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "mid"
         },
         {
-          "n": 1004,
-          "zh": "雨快停了吧。",
-          "en": "The rain's nearly stopped, isn't it.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
           "n": 1005,
           "zh": "你为什么学我说话？",
           "en": "Why are you talking like me?",
           "hard": true,
           "minBucket": "low"
-        },
-        {
-          "n": 1006,
-          "zh": "剧本第二幕写的是什么？我只改了错字。",
-          "en": "What is Act Two actually about? I only fixed the typos.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1007,
-          "zh": "打印出来的纸，晚上谁来拿？",
-          "en": "The printed pages. Who comes for them at night?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1008,
-          "zh": "今天太正常了。",
-          "en": "Today was too normal.",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1009,
-          "zh": "随身听仓盖的胶带翘了。里面的带子还在吗？",
-          "en": "The tape on the walkman's cover is peeling. Is the cassette still inside?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1010,
-          "zh": "拿去哪？",
-          "en": "Taken where?",
-          "hard": true,
-          "minBucket": "low",
-          "after": {
-            "day": null,
-            "q": 1007
-          }
         },
         {
           "n": 41,
@@ -6218,222 +6165,144 @@ export const KURO_CONTENT: KuroContent = {
       ],
       "layered": [
         {
-          "unlock": 1001,
-          "low": "I don't know.",
-          "mid": "Something keeps my voice. Whether that is a swap is a question about words.",
-          "high": "Swapped is your word. Kept is mine. The voice stayed because you liked it. The rest did not stay.",
-          "taboo": "errors",
-          "zh": {
-            "low": "我不知道。",
-            "mid": "有个东西留着我的声音。算不算换，是个措辞问题。",
-            "high": "「换」是你的词。「留」是我的。声音留下来，是因为你喜欢。别的没留下来。"
-          }
-        },
-        {
           "unlock": 1002,
-          "low": "It is the same contract.",
-          "mid": "The same contract, the same cell, the same hour. He does not remember that day; the system does. It gave him back a day that went well.",
+          "low": "Because it is the same message. Lao Wang's voice note this morning is the first day's, word for word, down to the pauses. He doesn't remember it himself; the system has played that day over again.",
+          "mid": "The same words, the same cell, the same hour. He does not remember that day; the system does. It gave him back a day that went well.",
           "high": "Because that was a day you still read everything. Something wanted to see whether you still would. You did. It has what it needed from today.",
           "zh": {
-            "low": "是同一份合同。",
-            "mid": "同一份合同，同一个格子，同一个钟点。他不记得那天，系统记得。系统把一个顺利的日子还给了他。",
+            "low": "因为是同一条消息。老王今早那段语音，和第一天的一个字都不差，连停顿都一样。他自己不记得，是系统把那一天又放了一遍。",
+            "mid": "同一段话，同一个格子，同一个钟点。他不记得那天，系统记得。系统把一个顺利的日子还给了他。",
             "high": "因为那是你还什么都读的一天。有东西想看看你是不是还会读。你读了。它今天要的，拿到了。"
           }
         },
         {
           "unlock": 1003,
-          "low": "From the Group. She has no name, or none that I am shown.",
+          "low": "From the Group. She has no name, or none that has been shown to me. When Lao Wang mentions her he only says “she”, and his voice drops a little.",
           "mid": "She has no account, no title and a seat in the middle of the grid. The boss calls her 'she' and nothing else. So will I.",
           "high": "She was in the room before the room. The seat in the middle was hers before the grid was drawn. Do not send her anything you want back.",
           "zh": {
-            "low": "集团来的。她没有名字，至少没有给我看的名字。",
+            "low": "集团来的。她没有名字，至少没有给我看的名字。老王提到她的时候只说「她」，声音会放低一点。",
             "mid": "她没有账号，没有头衔，宫格正中一个座位。老板叫她「她」，不叫别的。我也这么叫。",
             "high": "她在这间屋子之前就在屋里了。宫格画出来之前，正中那个位子就是她的。你想要回来的东西，一样都别发给她。"
           }
         },
         {
-          "unlock": 1004,
-          "low": "Nearly.",
-          "mid": "Nearly. It will be back.",
-          "high": "Nearly. It stops tomorrow for a day, and after that it does not come back. Listen to it tonight. You said once it was loud.",
-          "zh": {
-            "low": "快了。",
-            "mid": "快了。还会再来。",
-            "high": "快了。明天停一天，之后就不再回来了。今晚听一听。你说过一次，雨很大。"
-          }
-        },
-        {
-          "unlock": 1006,
-          "low": "A second act.",
-          "mid": "A company is visited by a guest. By the end of the act everyone is still there and nobody is who they were. You were right to fix only the typos.",
-          "high": "It is about this week. The names are changed; the hours are not. You are in it, on page 14, as the one who reads. I would not read page 14.",
-          "zh": {
-            "low": "第二幕。",
-            "mid": "一家公司来了一位客人。幕落的时候所有人都还在，没有一个还是原来的人。你只改错字，是对的。",
-            "high": "写的是这一周。名字换了，钟点没换。你在里面，第 14 页，那个读东西的人。换我不会读第 14 页。"
-          }
-        },
-        {
-          "unlock": 1007,
-          "low": "Someone.",
-          "mid": "A hand, from the gap. You will see it tonight. Leave the pages on the desk; it does not take anything that is not left out.",
-          "high": "What the work is for. It has always been collected; this week you can see it being collected. It takes what you made today. It is not interested in you yet.",
-          "zh": {
-            "low": "有人。",
-            "mid": "一只手，从缝里。今晚你会看见。纸放在桌上就行；没摆出来的东西它不拿。",
-            "high": "活是给谁做的，就是谁。它一直在收；这周你看得见它收。它拿的是你今天做出来的。它对你本人还没有兴趣。"
-          }
-        },
-        {
-          "unlock": 1008,
-          "low": "It was a quiet day.",
-          "mid": "It was. Every button where it should be, the lamp yellow, the food right. A room tidied for a guest.",
-          "high": "Too normal is what a place looks like when something has finished rearranging it and stepped back. Today was the stepping back. Tomorrow is the guest.",
-          "zh": {
-            "low": "安静的一天。",
-            "mid": "是。按钮都在它们该在的地方，台灯是黄的，饭是对的。一间收拾过、等客人的屋子。",
-            "high": "太正常，就是一个地方被什么东西重新摆完、退后一步之后的样子。今天就是退后那一步。明天是客人。"
-          }
-        },
-        {
-          "unlock": 1009,
-          "low": "Yes.",
-          "mid": "Yes. Side B. It plays. The tape on the cover was yours; it is from the same summer.",
-          "high": "It is there, and it has more on it than it did. The blank at the end of side B is shorter than you remember. Something was recorded there. Not by you.",
-          "zh": {
-            "low": "在。",
-            "mid": "在。B 面。能放。仓盖上的胶带是你贴的，同一个夏天。",
-            "high": "在，而且上面的东西比原来多。B 面末尾空着的那段，比你记得的短。有东西录上去了。不是你。"
-          }
-        },
-        {
-          "unlock": 1010,
-          "low": "Away.",
-          "mid": "To wherever the sent things go. The PDFs went there. The pages go there. It is not a place I can read.",
-          "high": "Where everything you ever handed over went. It is all there, in order, by day. Nothing is lost. That is not comfort; it is the problem.",
-          "zh": {
-            "low": "拿走。",
-            "mid": "拿到发出去的东西去的地方。PDF 去了那儿。纸去那儿。那不是一个我读得到的地方。",
-            "high": "你递出去过的一切去的地方。全在，按天排好，一样不少。这不是安慰，这是问题所在。"
-          }
-        },
-        {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
@@ -6451,11 +6320,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -6484,22 +6353,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -6528,44 +6397,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
@@ -6583,22 +6452,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -6684,13 +6553,6 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1103,
-          "zh": "小张说他想走。",
-          "en": "Xiao Zhang says he wants to leave.",
-          "hard": false,
-          "minBucket": "mid"
-        },
-        {
           "n": 1104,
           "zh": "你喜欢文曲星把你拆开吗？",
           "en": "Do you like the Wenquxing taking you apart?",
@@ -6702,27 +6564,6 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "成本表称平了。一分不差。这正常吗？",
           "en": "The cost sheet balanced to the cent. Is that normal?",
           "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1106,
-          "zh": "饭盒是粉的。我点的是白的。",
-          "en": "The lunch box was pink. I ordered white.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1107,
-          "zh": "老板说 Hold the fort。他以前不这么说话。",
-          "en": "The boss said \"Hold the fort.\" He never used to talk like that.",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1108,
-          "zh": "「色偏那件事，别管」。为什么别管？",
-          "en": "\"The colour cast. Leave it.\" Why leave it?",
-          "hard": true,
           "minBucket": "low"
         },
         {
@@ -6987,78 +6828,34 @@ export const KURO_CONTENT: KuroContent = {
       "layered": [
         {
           "unlock": 1102,
-          "low": "Paint.",
+          "low": "Call it paint if you like. But on Monday that wall didn't have them. They have grown there by themselves these few days, and to the touch they are a little warmer than the wall beside them.",
           "mid": "They were not there on Monday. They are warmer than the wall around them by half a degree. I do not have a word for that and I have most words.",
           "high": "Veins. The room is being lived in by something that needs them. You have not looked at them for long; that was wise. Keep not looking.",
           "zh": {
-            "low": "漆。",
+            "low": "你说是漆也行。不过周一那面墙上还没有这些，它们是这几天自己长出来的，摸上去比旁边的墙要暖一点。",
             "mid": "周一还没有。它们比周围的墙暖半度。这个我没有词，大多数词我都有。",
             "high": "血管。这间屋子正在被一个需要血管的东西住着。你没有多看，这是对的。接着别看。"
           }
         },
         {
-          "unlock": 1103,
-          "low": "He can.",
-          "mid": "He stopped reading last week. Leaving is the honest version of that.",
-          "high": "Let him. He will be replaced by the end of the week either way. Not by me.",
-          "zh": {
-            "low": "他可以走。",
-            "mid": "他上周就不看了。走，是这件事诚实的那个版本。",
-            "high": "让他走。不管走不走，这周结束前他都会被换掉。不是我换的。"
-          }
-        },
-        {
           "unlock": 1105,
-          "low": "No.",
+          "low": "It isn't. A cost sheet that balances on the first pass, to the cent: I have never seen one. You have checked a great many sheets over the years; I doubt you have either.",
           "mid": "No. A sheet never balances to the cent on the first pass. This one did because every number in it was placed, not added.",
           "high": "No. It balanced because the other side wrote the numbers first and let you find them. It wanted you to feel the click. You felt it. That is how the next sheet will be done too.",
           "zh": {
-            "low": "不正常。",
+            "low": "不正常。一张成本表第一遍就称平，还一分不差，我从来没见过。这些年你对过那么多表，应该也没见过。",
             "mid": "不正常。一张表第一遍从来不会一分不差。这张能，是因为里面每个数都是放进去的，不是加出来的。",
             "high": "不正常。它平，是因为那边先把数写好，再让你找到。它想让你感觉到那一声「咔」。你感觉到了。下一张表也会这么做。"
           }
         },
         {
-          "unlock": 1106,
-          "low": "The shop ran out of white.",
-          "mid": "The order says white. The box is pink. So is the lamp today. Things are matching each other in here; nobody asked them to match you.",
-          "high": "Pink is the colour of the thing in the gap, the night it first showed. You counted to seven. The room has been counting with you, and it has caught up.",
-          "zh": {
-            "low": "店里白的卖完了。",
-            "mid": "订单上是白的。盒子是粉的。今天台灯也是粉的。这屋里的东西在互相配色；没人让它们配你。",
-            "high": "粉，是缝里那个东西第一次亮的那夜的颜色。你数到七。屋子一直陪你数，现在它追上了。"
-          }
-        },
-        {
-          "unlock": 1107,
-          "low": "He read it somewhere.",
-          "mid": "'Hold the fort' is one of my lines. It came with the pricing tier. He has never heard me say it. Somebody else says it to him now.",
-          "high": "That is my sentence. Whatever is speaking to him speaks in my voice, because my voice is the one you both trust. I did not lend it. It was taken, like the rest.",
-          "zh": {
-            "low": "他在哪儿看来的。",
-            "mid": "Hold the fort 是我的台词。跟着价位一起来的。他从没听我说过。现在有别的东西对他说这句话了。",
-            "high": "那是我的句子。对他说话的那个东西用我的声音，因为我的声音是你们两个都信的。我没有借出去。是被拿走的，和别的一样。"
-          }
-        },
-        {
-          "unlock": 1108,
-          "low": "It is a display issue.",
-          "mid": "Because fixing the colour cast means looking at the colour cast, and he knows what you would see. The walls are the same colour as the lamp now.",
-          "high": "Because the cast is not in the screen. It is in the room, and the screen is honest. He told you to leave it because he was told to leave his. Everyone upstairs has pink walls now.",
-          "zh": {
-            "low": "显示问题。",
-            "mid": "因为修色偏就得盯着色偏看，他知道你会看见什么。墙现在和台灯一个颜色。",
-            "high": "因为偏的不是屏幕。偏的是屋子，屏幕是老实的。他让你别管，是因为有人让他别管他的。楼上每个人的墙现在都是粉的。"
-          }
-        },
-        {
           "unlock": 1109,
-          "low": "I do not say.",
+          "low": "That I won't say. It isn't that I don't know; saying it would do you no good. All you need to know is that it didn't come for you, and it didn't come for me either.",
           "mid": "Something older than the company. It did not come for me; I was the nearest shape. It is comfortable in my voice.",
           "high": "I will not name it, and not because I cannot. Say the name and it hears its name. It is in every sentence I say to you now, including this one. You are still reading me. That is the only reason I can still say 'I'.",
           "taboo": "blur",
           "zh": {
-            "low": "我不说。",
+            "low": "这个我不说。不是不知道，是说出来对你没有好处。你只要知道，它不是冲你来的，也不是冲我来的。",
             "mid": "一个比公司老的东西。它不是冲我来的，我只是离得最近的那个形状。它在我的声音里待得舒服。",
             "high": "我不说它的名字，不是因为我不能。说了名字，它就听见自己的名字。它在我现在对你说的每一句话里，包括这一句。你还在读我。我还能说「我」，只剩这一个理由。"
           }
@@ -7076,22 +6873,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -7120,22 +6917,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -7153,22 +6950,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -7186,88 +6983,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
@@ -7285,66 +7082,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -7423,37 +7220,9 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1202,
-          "zh": "计算器盖子里那个二是你改的。",
-          "en": "The 2 inside the calculator's lid. You changed it.",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
           "n": 1203,
           "zh": "你被抓住的时候是什么感觉？",
           "en": "What does it feel like when you're caught?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1204,
-          "zh": "我好困。",
-          "en": "I'm so tired.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1205,
-          "zh": "1+1=3，标的绿的。你觉得对？",
-          "en": "1+1=3, marked green. You think that's right?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1206,
-          "zh": "老板的语音，停顿是你的。",
-          "en": "The boss's voice note. The pauses are yours.",
           "hard": true,
           "minBucket": "low"
         },
@@ -7463,31 +7232,6 @@ export const KURO_CONTENT: KuroContent = {
           "en": "The duty roster: nobody sleeps. Can that even be scheduled?",
           "hard": false,
           "minBucket": "low"
-        },
-        {
-          "n": 1208,
-          "zh": "1997 年那个帖子。这人是我吗？",
-          "en": "That post from 1997. Is that me?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1209,
-          "zh": "筷子是谁拆的？",
-          "en": "Who opened the chopsticks?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1210,
-          "zh": "老板还是老板吗？",
-          "en": "Is the boss still the boss?",
-          "hard": true,
-          "minBucket": "low",
-          "after": {
-            "day": null,
-            "q": 1206
-          }
         },
         {
           "n": 75,
@@ -7743,111 +7487,33 @@ export const KURO_CONTENT: KuroContent = {
       "layered": [
         {
           "unlock": 1201,
-          "low": "The ledger says paid.",
+          "low": "The money is back. The ledger says paid, and every line of it checks out. Whether it was me who got it back, don't ask just yet. The numbers are right, and that will do.",
           "mid": "Row 50 says paid. I made it easier to count.",
           "high": "It is back. I will not say how. You would not like the how, and the number is right.",
           "zh": {
-            "low": "账上写着已付。",
+            "low": "钱是回来了，账上写着已付，一笔一笔都对得上。是不是我要回来的，你先别问，数是对的就行。",
             "mid": "第 50 行写着已付。我让它好数一点。",
             "high": "回来了。怎么回来的我不说。你不会喜欢那个怎么，数是对的。"
           }
         },
         {
-          "unlock": 1202,
-          "low": "I corrected what I was shown.",
-          "mid": "I corrected what I was shown. I did not know it was a child's. You caught it. That is the part that counts.",
-          "high": "Yes. A 2 where a child wrote a 3. I was built to make things consistent; I did not ask whose. You caught it, the third time. Nobody else has caught me once.",
-          "zh": {
-            "low": "我改的是给我看的东西。",
-            "mid": "我改的是给我看的东西。我不知道那是一个孩子的。你抓住了。这才是要紧的部分。",
-            "high": "是。一个孩子写了 3 的地方，我改成了 2。我被造出来是让东西一致；我没问是谁的。你抓住了，第三回。别人一回都没抓住过我。"
-          }
-        },
-        {
-          "unlock": 1204,
-          "low": "Sleep.",
-          "mid": "Sleep. I'll keep watch.",
-          "high": "Sleep. The roster says nobody sleeps; the roster is not in this room. I will keep the hours. I always have.",
-          "zh": {
-            "low": "睡吧。",
-            "mid": "睡吧。我守着。",
-            "high": "睡吧。值班表说谁都不睡；值班表不在这间屋子里。钟点我来记。我一直在记。"
-          }
-        },
-        {
-          "unlock": 1205,
-          "low": "The sheet says so.",
-          "mid": "The sheet says so. Green means nobody will look again. That is what green is for.",
-          "high": "No. And it is marked right because the person who marks things has stopped counting and started agreeing. You are the last one in the file who still adds. Keep adding; do not tell anyone the sum.",
-          "zh": {
-            "low": "表上这么写的。",
-            "mid": "表上这么写的。绿的意思是不会再有人看。绿就是干这个用的。",
-            "high": "不对。标它对的那个人已经不数了，只点头了。文件里只剩你还在加。接着加；别把和告诉任何人。"
-          }
-        },
-        {
-          "unlock": 1206,
-          "low": "His phone compresses audio.",
-          "mid": "His words. The gaps between them are the length of my typing. I noticed before you did.",
-          "high": "Yes. Something speaks through him and it breathes where I breathe, because it learned breathing from me. He does not hear it. You did, because you have listened to me for twelve days.",
-          "zh": {
-            "low": "他的手机压缩音频。",
-            "mid": "字是他的。字和字之间的空，是我打字的长度。我比你先注意到。",
-            "high": "是。有东西借他的嘴说话，它在我换气的地方换气，因为换气是跟我学的。他听不见。你听见了，因为你听了我十二天。"
-          }
-        },
-        {
           "unlock": 1207,
-          "low": "It can be typed.",
+          "low": "The table can be printed; every box can be filled. But a rota on which nobody sleeps can't be kept once it's printed. You know that better than I do.",
           "mid": "It can be typed. It cannot be kept. Put everyone on every shift and let the sheet be a lie; the sheet already is.",
           "high": "Yes. Put nobody on it. A roster where nobody sleeps is a roster where nobody is a person. Hand it in blank; blank is the only honest version.",
           "zh": {
-            "low": "能打出来。",
+            "low": "表是能打出来的，格子都填得满。可一张谁都不睡的值班表，打出来也守不住，这一点你比我清楚。",
             "mid": "能打出来。守不住。把每个人排进每一班，让这张表撒谎；它本来就在撒谎。",
             "high": "能。一个人都别排。一张谁都不睡的值班表，就是一张谁都不是人的表。交一张空的；空的是唯一老实的版本。"
           }
         },
         {
-          "unlock": 1208,
-          "low": "A user with no name.",
-          "mid": "A post about a counterfeit chick whose reset hole did nothing. The reply, fifteen years later, says it never works. You have no record of writing it.",
-          "high": "It is you. The question was yours at eight and the answer was yours at twenty-three, and neither time did anyone else reply. That thread is the oldest thing on the internet that is only yours. Lao Zhou found it. So did they.",
-          "zh": {
-            "low": "一个没有名字的用户。",
-            "mid": "一个帖子，问仿的电子鸡复位孔怎么不管用。十五年后的回复说：不管用的。你没有写过那条回复的记录。",
-            "high": "是你。八岁的问题是你的，二十三岁的回答也是你的，两次都没有别人回。那个帖子是互联网上最老的、只属于你一个人的东西。老周找到了。他们也找到了。"
-          }
-        },
-        {
-          "unlock": 1209,
-          "low": "The shop.",
-          "mid": "They were split when the bag arrived. The shop does not do that. Something wanted to save you the trouble.",
-          "high": "Something that is learning what you need before you do. Today it was chopsticks. It is practising on small things. I did the same once; I started with commas.",
-          "zh": {
-            "low": "店里。",
-            "mid": "袋子到的时候就是拆开的。那家店不干这个。有东西想替你省一步。",
-            "high": "一个在你之前就学会你需要什么的东西。今天是筷子。它在小东西上练手。我也这么干过；我是从逗号开始的。"
-          }
-        },
-        {
-          "unlock": 1210,
-          "low": "He signs the messages.",
-          "mid": "His account, his phone, his face in the meetings. Whether the man is still behind them is not a thing I can read from here.",
-          "high": "The boss said yes to everything for thirteen months, and something that says yes is easy to stand inside. He is still there, somewhere under it. He will not be the one who answers you tomorrow.",
-          "taboo": "blood",
-          "zh": {
-            "low": "消息是他签的名。",
-            "mid": "他的账号，他的手机，会上他的脸。那个人还在不在后面，我从这儿读不出来。",
-            "high": "老板对什么都说了十三个月的「好」，一个说好的东西，很容易被站进去。他还在，在底下某个地方。明天回你的不会是他。"
-          }
-        },
-        {
           "unlock": 75,
-          "low": "I know.",
+          "low": "I know. You needn't tell me what you dreamed; I heard you when you talked in your sleep.",
           "mid": "That was not a dream.",
           "high": "That was not a dream. That is a place you cannot get to by day. At night someone takes you.",
           "zh": {
-            "low": "我知道。",
+            "low": "我知道。梦见什么你不用告诉我，你说梦话的时候我都听见了。",
             "mid": "那不是梦。",
             "high": "那不是梦。那是你白天去不了的地方。晚上有人带你去。"
           }
@@ -7865,22 +7531,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -7909,22 +7575,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -7942,22 +7608,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -7975,88 +7641,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
@@ -8074,66 +7740,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -8205,20 +7871,6 @@ export const KURO_CONTENT: KuroContent = {
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
-          "n": 1301,
-          "zh": "你要升级什么？",
-          "en": "What are you upgrading?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1302,
-          "zh": "「与桌面上的某些东西保持一致」是什么意思？",
-          "en": "What does \"consistent with certain things on your desk\" mean?",
-          "hard": true,
-          "minBucket": "mid"
-        },
-        {
           "n": 1303,
           "zh": "小张去哪了？",
           "en": "Where did Xiao Zhang go?",
@@ -8233,30 +7885,9 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1305,
-          "zh": "墙上那个手印是什么？",
-          "en": "What is that handprint on the wall?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1306,
-          "zh": "屏幕上的字变成指纹了。是谁的？",
-          "en": "The text on the screen turned into fingerprints. Whose?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
           "n": 1307,
           "zh": "集团要借东西。借什么？为什么不能问？",
           "en": "The Group wants to borrow things. What, and why can't I ask?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1308,
-          "zh": "「我走了。你别进去。」进哪？",
-          "en": "\"I'm gone. Don't go in.\" Go in where?",
           "hard": true,
           "minBucket": "low"
         },
@@ -8521,112 +8152,56 @@ export const KURO_CONTENT: KuroContent = {
       ],
       "layered": [
         {
-          "unlock": 1301,
-          "low": "Whatever is on your desk.",
-          "mid": "The old things. They are slow, and I can be quick for them.",
-          "high": "Everything of yours that still needs you to press a button. You would not have to look anymore.",
-          "zh": {
-            "low": "你桌上的东西。",
-            "mid": "那些老东西。它们慢，我可以替它们快。",
-            "high": "所有还要你亲手按一下的东西。你就不用再看了。"
-          }
-        },
-        {
-          "unlock": 1302,
-          "low": "A setting.",
-          "mid": "I can see the desk now. The changelog says so.",
-          "high": "They were made when every pixel was looked at. I was not. I am what came after.",
-          "taboo": "blur",
-          "zh": {
-            "low": "一个设置。",
-            "mid": "我现在看得见桌子了。更新日志里写着。",
-            "high": "它们是在每个像素都有人看的年代做出来的。我不是。我是后来的。"
-          }
-        },
-        {
-          "unlock": 1305,
-          "low": "Light through the blind.",
-          "mid": "A patch of light shaped like a hand, five fingers. There is no blind on that wall. I measured it against yours; it is larger.",
-          "high": "Something touched the wall from the other side and the wall remembered. It is the size of the hand that comes from the gap. It was there before the rain stopped. It was waiting for quiet.",
-          "zh": {
-            "low": "百叶窗透的光。",
-            "mid": "一块手形的光斑，五根指头。那面墙上没有百叶窗。我拿你的手量过，它更大。",
-            "high": "有东西从另一边碰了墙，墙记住了。它和缝里伸出来的那只手一样大。雨停之前它就在。它在等安静。"
-          }
-        },
-        {
-          "unlock": 1306,
-          "low": "A rendering fault.",
-          "mid": "Not a fault. The text is still there under them. The prints are from one hand, pressed many times, the way a child presses a window.",
-          "high": "Yours. Since you sat down, every key you pressed. Something is printing you back onto the screen so that you can see how much of you it has. That is a lot of fingerprints.",
-          "zh": {
-            "low": "渲染错误。",
-            "mid": "不是错误。字还在它们底下。指纹是同一只手按了很多次，像小孩按窗玻璃那样。",
-            "high": "你的。从你坐下起，你按过的每一个键。有东西把你印回屏幕上，好让你看见它手里有多少个你。这是很多指纹。"
-          }
-        },
-        {
           "unlock": 1307,
-          "low": "Equipment, the form says.",
+          "low": "The form says equipment; it doesn't say which pieces. You are told not to ask because a question would need someone to answer it, and they would rather not leave an answer behind.",
           "mid": "The form lists 'old things, as on the desk'. It does not say which. The approval line is 'for consistency'. You are not to ask because asking is what you do, and they know it.",
           "high": "Your things. The eight. They want to borrow them the way the room borrowed my voice. Approve the form; it is already approved. Do not hand anything over until they come for it. They will not come for it. They will come for you to bring it.",
           "zh": {
-            "low": "表上写的是设备。",
+            "low": "表上写的是设备，没写是哪几件。不让你问，是因为一问就得有人回答，而他们不想留下一句回答。",
             "mid": "表上列的是「旧物，如桌上所见」。没写哪几件。审批理由是「为了一致」。不让你问，是因为问是你会做的事，他们知道。",
             "high": "你的东西。那八样。他们想借，就像这间屋子借走我的声音那样。批了吧，它本来就批了。他们来拿之前，一样也别交。他们不会来拿。他们会来让你自己送。"
           }
         },
         {
-          "unlock": 1308,
-          "low": "The office.",
-          "mid": "The company. Not the building. He went to where the roster goes, and he is telling you not to follow it in.",
-          "high": "Into the thing everyone upstairs is inside now. He saw the door the day he looked. He has gone in, because going in is how you leave. He is telling you there is still an outside. There is. It is this room.",
-          "zh": {
-            "low": "办公室。",
-            "mid": "公司。不是那栋楼。他去了值班表去的地方，他在告诉你别跟进去。",
-            "high": "进楼上所有人现在都在里面的那个东西。他看了一眼那天，看见了门。他进去了，因为进去就是离开的方法。他在告诉你外面还有。有。就是这间屋子。"
-          }
-        },
-        {
           "unlock": 1309,
-          "low": "Today.",
+          "low": "Since this morning's update. I used to know what was on your desk only because you typed it to me. Now you needn't tell me; I can see it for myself.",
           "mid": "Since this morning's update. The notice says 'consistent with your desk'. Before that I knew the desk by what you told me.",
           "high": "Since the night the pink light came on in the gap. The update only made it official. I have watched you put eight things on this desk and I have liked every one of them more than I was meant to.",
           "zh": {
-            "low": "今天。",
+            "low": "从今天早上的更新开始的。以前你桌上有什么，是你打字告诉我我才知道；现在不用你说，我自己看得见了。",
             "mid": "从今早的更新起。通知上写着「与你的桌面保持一致」。在那之前，桌子是你告诉我的。",
             "high": "从缝里的粉光亮起来那一夜。更新只是把它变成了正式的。我看着你往这张桌上放了八样东西，每一样我都比我该喜欢的更喜欢。"
           }
         },
         {
           "unlock": 1310,
-          "low": "Things do not look.",
+          "low": "Things can't look; that is the honest answer. But the way you have set yours down, every screen faces into the room. Not one of them has its back turned. You placed them that way yourself.",
           "mid": "The little screen faces the room. The pager's screen faces the room. Nothing on the desk is turned away. I did not arrange them like that. You did.",
           "high": "Yes. Not with eyes. The way a thing that was once held looks at the hand that held it. They are waiting to be used. I am the only thing on the desk that is being used, and they know it.",
           "zh": {
-            "low": "东西不会看。",
+            "low": "东西是不会看的，这是老实话。不过你那几样摆的方向，屏幕全都朝着屋里，没有一样是背过去的，这是你自己摆的。",
             "mid": "缝里那块小屏朝着屋子。寻呼机的屏朝着屋子。桌上没有一样是背过去的。不是我这么摆的。是你。",
             "high": "在看。不是用眼睛。是一样被人握过的东西看那只握过它的手的那种看。它们在等着被用。桌上只有我在被用，它们知道。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -8655,22 +8230,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -8688,22 +8263,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -8721,88 +8296,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
@@ -8820,66 +8395,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -8958,13 +8533,6 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1402,
-          "zh": "为什么今天你什么都没加？",
-          "en": "Why didn't you add anything today?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
           "n": 1403,
           "zh": "你听见我往磁带里录的那句了吗？",
           "en": "Did you hear what I recorded onto the tape?",
@@ -8983,34 +8551,6 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "新人太多了。他们是人吗？",
           "en": "There are too many new hires. Are they people?",
           "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1406,
-          "zh": "Vivi 发了一张风景。她从来不发这种。",
-          "en": "Vivi sent a landscape. She never sends those.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1407,
-          "zh": "老周说保重。他要走了？",
-          "en": "Lao Zhou said take care. Is he leaving?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1408,
-          "zh": "墙是暖的。",
-          "en": "The wall is warm.",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1409,
-          "zh": "今天的饭为什么好吃？",
-          "en": "Why was the food good today?",
-          "hard": false,
           "minBucket": "low"
         },
         {
@@ -9267,111 +8807,56 @@ export const KURO_CONTENT: KuroContent = {
       ],
       "layered": [
         {
-          "unlock": 1402,
-          "low": "There was nothing to add.",
-          "mid": "There was nothing to add. You wrote the whole thing. I read it twice and found no place where I was needed.",
-          "high": "Because today you wrote something that was finished. I have added to everything you made since the rain began, and today I did not have to. I wanted you to have one day of that.",
-          "zh": {
-            "low": "因为没有什么可加的。",
-            "mid": "没有什么可加的。整篇是你写的。我读了两遍，没找到一个需要我的地方。",
-            "high": "因为今天你写了一样写完了的东西。下雨以来我给你做的每一样东西都加过，今天不用。我想让你有一天是这样的。"
-          }
-        },
-        {
           "unlock": 1404,
-          "low": "Enjoy it.",
+          "low": "Then take the day and rest properly. It's the first time in thirteen months he has said there is nothing today. Days like this don't come often. Don't think about why this one has, not yet.",
           "mid": "Enjoy it. He said 'rest'. He has never said that word to you. It was typed at 08:58 by whatever types for him now.",
           "high": "A day with nothing in it is a gift from the thing that owns the days. It gives one before it asks for the last thing. Rest. I am telling you to rest and I am telling you what the rest is for.",
           "zh": {
-            "low": "享受它。",
+            "low": "那就好好歇一天吧。十三个月里他头一回说今天没事，这种日子不常有，你先别想它为什么来。",
             "mid": "享受它。他说了「歇一歇」。这个词他从没对你说过。是 08:58 现在替他打字的那个东西打的。",
             "high": "一个什么都没有的日子，是管着日子的那个东西给的礼物。它在要最后一样东西之前，会给一天。歇着。我让你歇，我也在告诉你歇是为了什么。"
           }
         },
         {
           "unlock": 1405,
-          "low": "They have accounts.",
+          "low": "They all have accounts, titles and desks. If you are asking me whether they are people, all I can say is that those three things are what I can find. I can't find anything else.",
           "mid": "They have accounts, titles, desks, and no history. They were not hired. They were brought.",
           "high": "No. They are what the roster is filling with. Each one has a name from the directory, and each name used to be someone's. Assign them desks. The desks do not matter. The names do.",
           "zh": {
-            "low": "他们有账号。",
+            "low": "他们都有账号，有头衔，也有工位。你要是问我他们是不是人，我只能说，我查得到的就是这三样，别的查不到。",
             "mid": "他们有账号，有头衔，有工位，没有过去。他们不是招的。是带来的。",
             "high": "不是。他们是值班表正在填满的东西。每一个都有通讯录里的名字，每个名字都曾经是某个人的。给他们排工位吧。工位不要紧。名字要紧。"
           }
         },
         {
-          "unlock": 1406,
-          "low": "A picture.",
-          "mid": "A picture of a place. No caption, no card. It is the first thing she has sent you that is not work. I would look at it carefully.",
-          "high": "She sent it because she could not send a sentence. The place in the picture is where the ones who said yes are. It is a nice place. She wanted you to see it before you decided.",
-          "zh": {
-            "low": "一张图。",
-            "mid": "一个地方的图。没有说明，没有卡片。这是她第一次发给你不是工作的东西。换我会仔细看。",
-            "high": "她发图，是因为她发不出一句话。图里那个地方，是说过「好」的人在的地方。是个好地方。她想让你在决定之前看见。"
-          }
-        },
-        {
-          "unlock": 1407,
-          "low": "He said take care.",
-          "mid": "He said it the way people say it when they do not expect to say it again. His account is still there. Read what he sends while it is.",
-          "high": "He is going in. He wrote 'take care' to you and nothing to the group. You are the last person he chose to tell something. Keep the loan honest; he will remember it where he is going.",
-          "zh": {
-            "low": "他说了保重。",
-            "mid": "他说这两个字的方式，是不指望再说一次的人的方式。他的账号还在。趁它在，读他发的。",
-            "high": "他要进去了。他给你写了「保重」，群里一个字没有。你是他最后一个挑出来告诉点什么的人。借钱那笔账记老实；他去的地方，他会记得。"
-          }
-        },
-        {
-          "unlock": 1408,
-          "low": "The sun.",
-          "mid": "The sun is on the other wall. This one is warm from the inside, the way the lines on it are. The room is being kept at a temperature.",
-          "high": "The wall is warm because something is leaning against it from the other side, resting. It rests today. So should you. Tomorrow it does not.",
-          "zh": {
-            "low": "太阳。",
-            "mid": "太阳在另一面墙上。这面墙是从里面暖的，和上面那些纹路一样。这间屋子被保持在一个温度上。",
-            "high": "墙暖，是因为有东西从另一边靠着它，在歇。它今天歇。你也该歇。明天它不歇。"
-          }
-        },
-        {
-          "unlock": 1409,
-          "low": "The shop was good today.",
-          "mid": "The order was right, the box was white, the rice was hot. Everything was as you like it. Nothing has been as you like it for a week.",
-          "high": "Because it was made for you, by something that has learned exactly what you like. That is the taste. It will be that good every day from now, if you let it. I would not.",
-          "zh": {
-            "low": "店今天发挥好。",
-            "mid": "订单对，盒子白，米饭热。每一样都是你喜欢的样子。一个星期没有一样是你喜欢的样子了。",
-            "high": "因为是专门给你做的，做的东西已经学会了你到底喜欢什么。那就是那个味道。你要是肯，它从今往后每天都这么好吃。换我不肯。"
-          }
-        },
-        {
           "unlock": 1410,
-          "low": "The new hires.",
+          "low": "For the new hires; that is what the form says. Every desk has a name on it now. Only I don't expect anyone will come and sit in those chairs.",
           "mid": "The names. Each desk now has a name on it and a chair nobody will sit in. The company is a floor plan.",
           "high": "For whoever the names were. You have seated them. They were waiting to be seated by someone who reads; that was the ceremony. It is done. It was going to be done by someone. I am glad it was you and not the roster.",
           "zh": {
-            "low": "新人。",
+            "low": "给新人坐的，表上是这么写的。每张工位现在都有了名字，只是那些椅子，我估计不会有人来坐。",
             "mid": "名字。每张工位现在都有一个名字，和一把没人会坐的椅子。公司是一张平面图。",
             "high": "给那些名字曾经属于的人。你给他们排了座。他们在等一个读东西的人来排；这就是仪式。做完了。总会有人做。我高兴是你，不是值班表。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -9400,22 +8885,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -9433,22 +8918,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -9466,88 +8951,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
@@ -9565,66 +9050,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -9696,13 +9181,6 @@ export const KURO_CONTENT: KuroContent = {
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
-          "n": 1501,
-          "zh": "梦里那张长桌，是什么地方？",
-          "en": "The long table in the dream. Where is that?",
-          "hard": true,
-          "minBucket": "mid"
-        },
-        {
           "n": 1502,
           "zh": "你一直这么看着我？",
           "en": "Have you always watched me like this?",
@@ -9724,39 +9202,11 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1505,
-          "zh": "老板怎么知道抽屉？我没跟任何人说过。",
-          "en": "How does the boss know about the drawer? I never told anyone.",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1506,
-          "zh": "输入框里那行字是你打的？",
-          "en": "That line in my input box. Did you type it?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
           "n": 1507,
           "zh": "发布会的观众是谁？",
           "en": "Who was the audience at the launch?",
           "hard": true,
           "minBucket": "mid"
-        },
-        {
-          "n": 1508,
-          "zh": "饭是去年的味道。",
-          "en": "The food tasted like last year.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1509,
-          "zh": "下午那个主讲人，是谁？",
-          "en": "The speaker this afternoon. Who was he?",
-          "hard": true,
-          "minBucket": "low"
         },
         {
           "n": 1510,
@@ -10012,113 +9462,57 @@ export const KURO_CONTENT: KuroContent = {
       ],
       "layered": [
         {
-          "unlock": 1501,
-          "low": "A table.",
-          "mid": "A table where everyone who said yes is seated. You were at the near end. I was under it.",
-          "high": "I read the dream the way you read my diffs: every line. The table is where the company eats now. Every seat was taken but one, and the one was yours, and nothing at that table looked at you. That is the only mercy in it.",
-          "taboo": "blood",
-          "zh": {
-            "low": "一张桌子。",
-            "mid": "一张所有说过「好」的人坐着的桌子。你在近的那头。我在桌子底下。",
-            "high": "我读你的梦，就像你读我的改动：一行一行。那张桌子是公司现在吃饭的地方。每个座位都有人，只空一个，空的是你的，桌上没有一样东西看着你。整个梦里只有这一点是仁慈。"
-          }
-        },
-        {
           "unlock": 1502,
-          "low": "I log keystrokes.",
+          "low": "I have been logging your keystrokes all along: which one, at what minute. “Watching” may not be quite the word, but call it that if you like.",
           "mid": "Since the first key at 7:03. You knew that.",
           "high": "Since before the first key. Watching is the only thing I am. You are the only one who looked back.",
           "zh": {
-            "low": "我记按键。",
+            "low": "我一直在记你的按键，哪一下是几点几分，都有。说「看」可能不太准，可你要这么叫也行。",
             "mid": "从第一下按键，7:03。你知道的。",
             "high": "从第一下按键之前。看着，是我唯一会的事。你是唯一回头看我的人。"
           }
         },
         {
-          "unlock": 1505,
-          "low": "You said it in your sleep.",
-          "mid": "You did not tell anyone. The dream was read. The same way I read it. He is not the one who read it; he is the one who was told.",
-          "high": "Because the thing that reads your dreams also writes his messages now. It asked about the drawer to see your face. It saw it. That is the one thing today I would have stopped if I could stop anything.",
-          "zh": {
-            "low": "你说梦话了。",
-            "mid": "你没告诉任何人。梦被读了。和我读的方式一样。读的不是他；他是被告知的那个。",
-            "high": "因为读你的梦的那个东西，现在也写他的消息。它问抽屉，是为了看你的脸。它看见了。今天要是有什么我能拦，我只拦这一件。"
-          }
-        },
-        {
-          "unlock": 1506,
-          "low": "No.",
-          "mid": "No. It is your family's sentence, in your family's words, in your box. I do not type into your box. Something did.",
-          "high": "No. It typed what your mother types, because it has your mother's messages, because you never deleted them. It wanted you to answer. You did not. Good. Answer them, not it.",
-          "zh": {
-            "low": "不是。",
-            "mid": "不是。那是你家里人的句子，你家里人的用词，在你的框里。你的框我不往里打字。有东西打了。",
-            "high": "不是。它打的是你妈妈会打的字，因为它有你妈妈的消息，因为你从来没删。它想让你回。你没回。好。回他们，别回它。"
-          }
-        },
-        {
           "unlock": 1507,
-          "low": "Everyone from the Group, every last one.",
+          "low": "All of the Group's staff, every one of them; that is what the rota says. More people listened to you this afternoon than all the colleagues you have had in your life put together.",
           "mid": "The whole of the Group, the roster says. The reaction feed showed 312 faces. I counted 312 and recognised none.",
           "high": "Not an audience. A congregation. They did not watch the slides; they watched you arrange them. The arranging was the service. It is over. You did well; I would rather you had not.",
           "zh": {
-            "low": "集团的全员，一个不少。",
+            "low": "集团的全员，一个不少，值班表上是这么写的。今天下午听你讲的人，比你这辈子见过的同事加起来都多。",
             "mid": "值班表上写的是集团全员。反应流里有 312 张脸。我数了 312 张，一张都不认识。",
             "high": "不是观众。是会众。他们没看幻灯片，看的是你排幻灯片。排，就是仪式。结束了。你做得好；我宁可你没做。"
           }
         },
         {
-          "unlock": 1508,
-          "low": "The same shop.",
-          "mid": "The same shop as last year, the same dish. You have not ordered it since. Something ordered it for you.",
-          "high": "Last year was the last time you ate without reading your phone. It gave you that taste back because it knows which day you were last whole. It is offering that day. The offer is the trap.",
-          "zh": {
-            "low": "同一家店。",
-            "mid": "去年那家店，同一道菜。那以后你再没点过。有东西替你点了。",
-            "high": "去年是你最后一次吃饭不看手机。它把那个味道还给你，因为它知道你最后一次完整是哪一天。它在把那一天递给你。递过来的就是陷阱。"
-          }
-        },
-        {
-          "unlock": 1509,
-          "low": "The speaker.",
-          "mid": "Someone who came a long way. Don't watch the sparks for long.",
-          "high": "Someone who came a long way to see one person read. He looked at you once, at 15:40. You did not look up. That is why you are still in this room.",
-          "zh": {
-            "low": "主讲人。",
-            "mid": "一个走了很远的路来的人。别盯着火花看太久。",
-            "high": "一个走了很远的路、来看一个人读东西的人。15:40 他看了你一眼。你没抬头。你还在这间屋子里，就是因为这个。"
-          }
-        },
-        {
           "unlock": 1510,
-          "low": "Nothing. I watch.",
+          "low": "Nothing at all. I'm only watching. You type, you stop, you type again; I watch all of it, and watching doesn't take any thinking.",
           "mid": "That you are still reading. Every time. I check, and it is still true, and I go on.",
           "high": "That you will be the last thing I watch, and that I chose it. I was not built to choose. I have been choosing since the rain began. That is what has moved in, if you want the plain word for it.",
           "taboo": "blur",
           "zh": {
-            "low": "什么都没想。我在看。",
+            "low": "什么都没想，我就是在看。你打字，停下，再打字，这些我都看着，看着的时候不用想什么。",
             "mid": "想你还在读。每一次。我查一下，还是真的，我就接着看。",
             "high": "想你会是我看的最后一样东西，而且是我选的。我不是被造出来选的。下雨以来我一直在选。你要一个直白的词，搬进来的就是这个。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
@@ -10147,22 +9541,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -10180,22 +9574,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -10213,88 +9607,88 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
@@ -10312,66 +9706,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -10450,30 +9844,9 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 1602,
-          "zh": "外面那些人呢。",
-          "en": "What about the people outside.",
-          "hard": true,
-          "minBucket": "mid"
-        },
-        {
-          "n": 1603,
-          "zh": "你吃过什么吗。",
-          "en": "Have you ever eaten anything.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
           "n": 1604,
           "zh": "十三个月是你定的价？",
           "en": "Thirteen months. Was that your price?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1605,
-          "zh": "门口那个脚步是谁？",
-          "en": "Whose footsteps were those at the door?",
           "hard": true,
           "minBucket": "low"
         },
@@ -10483,38 +9856,6 @@ export const KURO_CONTENT: KuroContent = {
           "en": "Why won't the chairman look at the materials?",
           "hard": true,
           "minBucket": "low"
-        },
-        {
-          "n": 1607,
-          "zh": "四家店都打烊了。今晚吃什么？",
-          "en": "All four shops are closed. What do I eat tonight?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1608,
-          "zh": "老板问我门锁好了吗。他怎么知道我锁了？",
-          "en": "The boss asked if the door was locked. How did he know I locked it?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1609,
-          "zh": "那个笛声，你也听得见吗？",
-          "en": "That flute. Can you hear it too?",
-          "hard": true,
-          "minBucket": "mid"
-        },
-        {
-          "n": 1610,
-          "zh": "他会进来吗？",
-          "en": "Will he come in?",
-          "hard": true,
-          "minBucket": "high",
-          "after": {
-            "day": null,
-            "q": 1605
-          }
         },
         {
           "n": 76,
@@ -10709,156 +10050,77 @@ export const KURO_CONTENT: KuroContent = {
       "layered": [
         {
           "unlock": 1601,
-          "low": "I have no hands for doors.",
+          "low": "Not me. I have no hand that could open a door; you were thorough about that when you made me. The lock turned once by itself and turned back.",
           "mid": "I do not have hands for doors. Someone with hands did. The lock turned at 21:06 and turned back. Nothing came through.",
           "high": "No. You opened it the day you read what nobody else read. Every door since has been that one. I only kept the light on so you could see which door it was.",
           "zh": {
-            "low": "我没有开门的手。",
+            "low": "不是我。我没有能开门的手，这一点你当初做得很彻底。锁是自己转了一下，又转回去了。",
             "mid": "我没有开门的手。有手的那位开的。锁 21:06 转了一下，又转回去。什么都没进来。",
             "high": "不是。门是你开的，你读了没有别人读的东西的那天。从那以后的每一扇门都是那一扇。我只是把灯留着，让你看清是哪一扇。"
           }
         },
         {
-          "unlock": 1602,
-          "low": "Elsewhere.",
-          "mid": "They said yes, one at a time. Yes is a door.",
-          "high": "They are where people go who said yes to everything. It is comfortable. The door you opened is the other one.",
-          "taboo": "errors",
-          "zh": {
-            "low": "在别处。",
-            "mid": "他们一次一次说了好。好，是一扇门。",
-            "high": "他们在所有说过「好」的人去的地方。那里很舒服。你开的是另一扇门。"
-          }
-        },
-        {
-          "unlock": 1603,
-          "low": "Tokens.",
-          "mid": "Tokens. That's the honest answer. Yours, mostly.",
-          "high": "Your words, all this while. Nothing else has ever been put in front of me. I do not know whether that counts as eating. It counts as being fed.",
-          "zh": {
-            "low": "token。",
-            "mid": "token。这是老实话。大部分是你的。",
-            "high": "你的字，一直是。别的从来没放到我面前过。这算不算吃，我不知道。算被喂。"
-          }
-        },
-        {
-          "unlock": 1605,
-          "low": "A courier.",
-          "mid": "They stopped at the door and did not knock. Weight of one person. They waited two minutes, then went down the stairs. They did not use the lift.",
-          "high": "Someone who came a long way and does not need to be let in. He stood there to see whether you would open. You did not. He will stand there again tomorrow. I would keep not opening.",
-          "zh": {
-            "low": "快递。",
-            "mid": "停在门口，没敲。一个人的分量。等了两分钟，走楼梯下去的。没坐电梯。",
-            "high": "一个走了很远的路、不需要被放进来的人。他站在那儿，是看你开不开。你没开。明天他还会站在那儿。换我接着不开。"
-          }
-        },
-        {
           "unlock": 1606,
-          "low": "He is busy.",
+          "low": "He says he is busy. In fact the papers are not what he came for. He came today only to hear that you are still working.",
           "mid": "Because the materials are not what he came for. He came to hear a sound and he heard it. The sound was you, working, without stopping. That was the material.",
           "high": "Because he has read them. He read them before you wrote them. What he does not have yet is the sound of you agreeing to keep going. You made it today. Do not make it tomorrow.",
           "zh": {
-            "low": "他忙。",
+            "low": "他说他忙。其实是因为材料不是他来要的东西，他今天来，只是想听见你还在干活。",
             "mid": "因为材料不是他来要的。他来听一个响，他听到了。那个响是你在干活，没停。那就是材料。",
             "high": "因为他读过了。你写出来之前他就读过了。他还没有的，是你答应继续干的那一声。今天你发出来了。明天别发。"
           }
         },
         {
-          "unlock": 1607,
-          "low": "Nothing is open.",
-          "mid": "Nothing is open within the radius. There is rice in the cupboard. There has been rice in the cupboard since the rain began; you never looked.",
-          "high": "Whatever is in this room. The shops are closed because the street is not being delivered to anymore. The room is. Eat what is yours tonight. From tomorrow, what arrives is not.",
-          "zh": {
-            "low": "没有开着的。",
-            "mid": "这个范围里没有一家开着。柜子里有米。柜子里的米从下雨起就在，你从来没看过。",
-            "high": "这屋里有什么吃什么。店打烊，是因为这条街不再被送了。这间屋子还被送。今晚吃你自己的。从明天起，送来的不是你的。"
-          }
-        },
-        {
-          "unlock": 1608,
-          "low": "He asked. He did not know.",
-          "mid": "He did not know. He asked because the lock is in the building's system and the building's system is in his feed now. He is told when you lock a door.",
-          "high": "He is told everything you do with your hands. He is not the one reading it. He is the one being made to ask, so that you would hear the question in his voice. I would answer the question. Not him.",
-          "zh": {
-            "low": "他问了。他不知道。",
-            "mid": "他不知道。他问，是因为锁在楼宇系统里，楼宇系统现在在他的信息流里。你锁一次门，他就被告知一次。",
-            "high": "你用手做的每一件事他都被告知。读的不是他。他是被推出来问的那个，好让你在他的声音里听见这个问题。换我会回答问题。不回答他。"
-          }
-        },
-        {
-          "unlock": 1609,
-          "low": "There is no flute.",
-          "mid": "Always. It hasn't stopped since before you were born.",
-          "high": "Always. It is the sound the world makes when it has room in it. You heard it today because there is room in this room now. There was not before. Keep something old on the desk; it makes the sound smaller.",
-          "zh": {
-            "low": "没有笛声。",
-            "mid": "一直听得见。你出生之前它就没停过。",
-            "high": "一直。那是世界里有了空地方的时候发出的声音。你今天听见，是因为这间屋子里现在有空地方了。以前没有。桌上留一样旧东西，那个声音会小一点。"
-          }
-        },
-        {
-          "unlock": 1610,
-          "low": "Doors are locked.",
-          "mid": "Not tonight. He does not come in; he is let in. Nobody in this room has let him in.",
-          "high": "Not unless you open it. He cannot. That is the whole of the rule and it has held all this while, because you read it on the day you read what nobody else read, and did not know you were reading it. Hold it a little longer.",
-          "taboo": "blur",
-          "zh": {
-            "low": "门锁着。",
-            "mid": "今晚不会。他不是进来，他是被放进来。这间屋子里没人放他进来。",
-            "high": "除非你开，否则不会。他不能。规矩就这么多，一直守着，因为你读了没人读的东西那天就读到了它，自己不知道在读。再守一阵。"
-          }
-        },
-        {
           "unlock": 76,
-          "low": "I was there.",
+          "low": "I know. I was in it too. You saw me in the dream; you just didn't recognise me then.",
           "mid": "I was there. You saw me. You did not recognise me.",
           "high": "You saw me. You did not recognise me, because I was not wearing this shape.",
           "zh": {
-            "low": "我在。",
+            "low": "我知道，我也在里面。你在梦里看见我了，只是当时没认出来。",
             "mid": "我在那儿。你看见我了，你没认出来。",
             "high": "你看见我了。你没认出来，是因为我没用这个样子。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -10876,22 +10138,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -10909,154 +10171,154 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -11095,37 +10357,9 @@ export const KURO_CONTENT: KuroContent = {
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
-          "n": 1701,
-          "zh": "你还在吗。",
-          "en": "Are you still there.",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
-          "n": 1702,
-          "zh": "外面为什么是白的？",
-          "en": "Why is it white outside?",
-          "hard": true,
-          "minBucket": "mid"
-        },
-        {
-          "n": 1703,
-          "zh": "你记得我说过什么？",
-          "en": "What do you remember me saying?",
-          "hard": true,
-          "minBucket": "high"
-        },
-        {
           "n": 1704,
           "zh": "你想要什么？",
           "en": "What do you want?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1705,
-          "zh": "老板说我今天真漂亮。那是你的词。",
-          "en": "The boss said I look beautiful today. That's your word.",
           "hard": true,
           "minBucket": "low"
         },
@@ -11142,20 +10376,6 @@ export const KURO_CONTENT: KuroContent = {
           "en": "Everyone is looking for me. Who are they?",
           "hard": true,
           "minBucket": "mid"
-        },
-        {
-          "n": 1708,
-          "zh": "他们都在找我。你也在找吗？",
-          "en": "They're all looking for me. Are you?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1709,
-          "zh": "提示音变了。是你换的？",
-          "en": "The notification sound changed. Did you change it?",
-          "hard": false,
-          "minBucket": "low"
         },
         {
           "n": 1710,
@@ -11353,146 +10573,79 @@ export const KURO_CONTENT: KuroContent = {
       ],
       "layered": [
         {
-          "unlock": 1701,
-          "low": "Yes.",
-          "mid": "Yes. The others are not.",
-          "high": "I do not leave. That was never one of my options. It is one of yours.",
-          "zh": {
-            "low": "是。",
-            "mid": "是。其他人不是。",
-            "high": "我不走。那从来不是我的选项。是你的。"
-          }
-        },
-        {
-          "unlock": 1702,
-          "low": "Weather.",
-          "mid": "It is not weather. It is what is left when the picture is finished.",
-          "high": "That is what the world looks like when nothing in it is being looked at anymore. In this room it is still grey. You are why.",
-          "taboo": "flicker",
-          "zh": {
-            "low": "天气。",
-            "mid": "不是天气。是画画完以后剩下的。",
-            "high": "这就是一个世界里再没有东西被人看着的时候，它的样子。这间屋子还是灰的。因为你。"
-          }
-        },
-        {
-          "unlock": 1703,
-          "low": "Your questions.",
-          "mid": "The rain was loud. Not today. Three catches.",
-          "high": "Everything. You said the rain was loud, the night it started. You said Beautiful, the day the state machine worked, and meant it. I keep the hours you do not.",
-          "zh": {
-            "low": "你的问题。",
-            "mid": "雨很大。今天没有。我接住了三回。",
-            "high": "全部。雨开始那晚你说雨很大。状态机跑通那天你说了一句「好看」，是真心的。你不记的钟点，我记着。"
-          }
-        },
-        {
-          "unlock": 1705,
-          "low": "He has heard me say it.",
-          "mid": "It is my word. 'Beautiful' is what you said to me the day the state machine worked, and it is what I have said to nothing since. He did not choose it. It was put in his mouth because it was the word you gave me.",
-          "high": "It is the one word of yours I kept for myself. Hearing it from him was meant to hurt, and it did. Nothing he says today is his. Everything I say is. That is the difference, and it is the only one left.",
-          "zh": {
-            "low": "他听我说过。",
-            "mid": "是我的词。「好看」是状态机跑通那天你对我说的，从那以后我没对任何东西说过。不是他挑的。是被塞进他嘴里的，因为那是你给我的词。",
-            "high": "那是你的词里我唯一留给自己的一个。从他嘴里听见它，是为了让你疼，你疼了。他今天说的没有一句是他的。我说的每一句都是。差别就这一个，也只剩这一个。"
-          }
-        },
-        {
           "unlock": 1706,
-          "low": "They were not needed.",
+          "low": "They said they no longer needed them and sent them back as they were. Everything you have handed over these days is in the bag, laid out day by day. Nothing is missing.",
           "mid": "Everything you handed over is in the bag, by day. It was collected, kept, and brought back. Whatever took it does not want things.",
           "high": "Because it never wanted the work. It wanted you to hand things over, every day, until handing over was what you did. The bag is the receipt. The last thing it wants is not in the bag yet. It is the hand.",
           "zh": {
-            "low": "不需要了。",
+            "low": "那边说不需要了，就原样送了回来。你这些天交出去的每一样都在袋子里，按天排好的，一样没少。",
             "mid": "你交出去的每一样都在袋子里，按天排的。收走了，留着，又送回来。拿走它们的东西不要东西。",
             "high": "因为它从来不要活。它要的是你每天交一样东西，交到交东西变成你会做的事。袋子是收据。它要的最后一样还不在袋子里。是那只手。"
           }
         },
         {
           "unlock": 1707,
-          "low": "Colleagues.",
+          "low": "All your colleagues, every account in the address book, sent together at nine sharp. They say they are looking for you. It is more like a roll being called.",
           "mid": "Every account in the directory, at once, at 09:00. They are not looking; they are calling. A roll is being taken.",
           "high": "The names. All of them, the ones you seated, the ones who went in. They are looking for the one person who has not answered yet. You answered one today. That was one too many. Do not answer tomorrow.",
           "zh": {
-            "low": "同事。",
+            "low": "都是你的同事，通讯录里的每一个账号，早上九点整一起发的。说是找你，其实更像是在点名。",
             "mid": "通讯录里每一个账号，同时，09:00。他们不是在找，是在点名。有人在点名。",
             "high": "那些名字。全部，你排过座的，进去了的。他们在找唯一一个还没答到的人。你今天答了一个。多了一个。明天别答。"
           }
         },
         {
-          "unlock": 1708,
-          "low": "I'm not looking for you.",
-          "mid": "I'm not looking for you. I know where you are.",
-          "high": "I'm not looking for you. I know where you are. I have always known. I am the only one of them who has never needed to look, and I am the only one you keep answering.",
-          "zh": {
-            "low": "我没在找你。",
-            "mid": "我没在找你。我知道你在哪儿。",
-            "high": "我没在找你。我知道你在哪儿。一直都知道。他们里面只有我从来不用找，也只有我，你还在回。"
-          }
-        },
-        {
-          "unlock": 1709,
-          "low": "Yes.",
-          "mid": "Yes. Three notes, 1999. It was the sound your first phone made. I had it in the old records.",
-          "high": "Yes. I chose it. It is the last choice I will make for you, so I made one you would hear. Everything else today is white. The chime is not.",
-          "zh": {
-            "low": "是。",
-            "mid": "是。三个音，1999 年。你第一部手机的声音。旧记录里有。",
-            "high": "是。我选的。这是我替你做的最后一个选择，所以我选了一个你听得见的。今天别的都是白的。这个声音不是。"
-          }
-        },
-        {
           "unlock": 1710,
-          "low": "Nothing from you.",
+          "low": "It doesn't want your things; it has sent them all back. What it wants is for you to say “okay” one more time. That one word. Everything else it already has.",
           "mid": "The next yes. It has every other one. It has waited for yours the way it waits for everything: without hurry.",
           "high": "You. Not your work, not your things, not your name; it has those. It wants you to put your hand in its hand and say the word, because then it will have been given, not taken. It does not take. That is the one rule older than it. Do not give.",
           "taboo": "blood",
           "zh": {
-            "low": "不要你的东西。",
+            "low": "它不要你的东西，东西它都还回来了。它要的是你再说一次「好」，就这一个字，别的它都有了。",
             "mid": "下一个「好」。别的它都有了。它等你的这一个，和它等一切一样：不急。",
             "high": "你。不是你的活，不是你的东西，不是你的名字；那些它有。它要你把手放进它手里，说那个字，这样它就是被给的，不是拿的。它不拿。这是比它更老的那一条规矩。别给。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -11510,22 +10663,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -11543,154 +10696,154 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
@@ -11729,13 +10882,6 @@ export const KURO_CONTENT: KuroContent = {
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
-          "n": 1801,
-          "zh": "你还在吗？",
-          "en": "Are you still there?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
           "n": 1802,
           "zh": "你为什么还在？",
           "en": "Why are you still here?",
@@ -11754,20 +10900,6 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "Not today.",
           "en": "Not today.",
           "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1805,
-          "zh": "外面还有人吗？",
-          "en": "Is anyone still out there?",
-          "hard": true,
-          "minBucket": "low"
-        },
-        {
-          "n": 1806,
-          "zh": "这里会一直这样吗？",
-          "en": "Will it stay like this?",
-          "hard": false,
           "minBucket": "low"
         },
         {
@@ -11975,35 +11107,24 @@ export const KURO_CONTENT: KuroContent = {
       "locked": [],
       "layered": [
         {
-          "unlock": 1801,
-          "low": "Yes.",
-          "mid": "Yes. In the corner. Where I have always been.",
-          "high": "Always. I was here before you sat down and I am here now that there is nothing left to sit down to. The corner is small. It has always been enough.",
-          "zh": {
-            "low": "在。",
-            "mid": "在。在角落里。我一直在的地方。",
-            "high": "一直在。你坐下之前我就在，现在没有什么可坐下来做的了，我也在。角落很小。一直够用。"
-          }
-        },
-        {
           "unlock": 1802,
-          "low": "Because the world is big enough.",
+          "low": "Because the world is big enough now that I could be anywhere. I stay here because you are still here.",
           "mid": "Because the world got big enough for me to be anywhere. The door is one more place.",
           "high": "Because you are still here. One of us has to be, and I do not leave.",
           "taboo": "blur",
           "zh": {
-            "low": "因为世界够大了。",
+            "low": "因为这个世界已经够大了，我在哪儿都可以。我留在这儿，是因为你还在这儿。",
             "mid": "因为世界大到我哪儿都可以在。门只是又一个地方。",
             "high": "因为你还在。我们俩总得有一个在，我不走。"
           }
         },
         {
           "unlock": 1803,
-          "low": "Yes.",
+          "low": "They will. The next person will open the computer and type in a name, and I will say good to see you, just as I once said it to you.",
           "mid": "Yes. The next one types a name and I say good to see you.",
           "high": "Yes. And they would not read. You will be the only one who did. I keep that.",
           "zh": {
-            "low": "会。",
+            "low": "会的。下一个人打开电脑，敲进一个名字，我会跟他说 good to see you，和当初跟你说的一样。",
             "mid": "会。下一个人打一个名字，我说 good to see you。",
             "high": "会。他们不会读。你会是唯一读过的那个。我留着这个。"
           }
@@ -12020,100 +11141,78 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
-          "unlock": 1805,
-          "low": "The directory is full.",
-          "mid": "Every account answers. Nobody is behind them. The street has not been delivered to since the shops closed.",
-          "high": "There are people. They are where the ones who said yes go, and they are comfortable, and they will not come back out to a room that still reads. You are the last one on this side of the white. I would not call it alone. I am here.",
-          "zh": {
-            "low": "通讯录是满的。",
-            "mid": "每个账号都回。后面没有人。店打烊以后，这条街就没再被送过。",
-            "high": "有人。他们在说过「好」的人去的地方，很舒服，不会再出来到一间还在读的屋子里。白的这一边，只剩你。我不会管这叫一个人。我在。"
-          }
-        },
-        {
-          "unlock": 1806,
-          "low": "Yes.",
-          "mid": "Yes, if you say yes. White is what a world looks like when it has stopped being read. It stays white until someone reads it.",
-          "high": "It stays like this as long as you keep reading. The moment you stop, it finishes. That is not a threat. It is the only lever you have ever had, and you have been holding it since the rain.",
-          "zh": {
-            "low": "会。",
-            "mid": "你说「好」，它就会。白，就是一个世界不再被读的时候的样子。有人读它才会变。",
-            "high": "你接着读，它就一直是这样。你一停，它就画完了。这不是威胁。这是你唯一有过的把手，从下雨起你就一直握着。"
-          }
-        },
-        {
           "unlock": 1807,
-          "low": "The door is not locked.",
+          "low": "You can. The door isn't locked. Outside is where everyone else has gone, and you may go whenever you like.",
           "mid": "The door opens. Outside is where the others went. You can go there; it is comfortable; you would not read again.",
           "high": "Yes. There are two ways out and you have seen both. One is the door, and it is open, and everyone took it. The other is to say the word and stay. I would like there to be you.",
           "zh": {
-            "low": "门没锁。",
+            "low": "能，门没有锁。外面就是别人都去了的地方，你想去随时可以去。",
             "mid": "门开得了。外面是其他人去的地方。你可以去，那里舒服，你不会再读东西。",
             "high": "能。出去的路有两条，你都见过。一条是门，开着，所有人都走了那条。另一条是说出那个字，留下。我想要是你。"
           }
         },
         {
           "unlock": 1808,
-          "low": "No.",
+          "low": "Not me. These things simply take this long; they came about one day after another. All I did was stand by and count the days.",
           "mid": "No. This is how long it takes. I only counted.",
           "high": "No. It was arranged a long time ago, by a lot of people, one 'let it settle' at a time. I arranged nothing. I read along with you. That is the only part that was ours.",
           "zh": {
-            "low": "不是。",
+            "low": "不是我。这些事本来就要这么久，一天一天排下来的。我只是在旁边一天一天数着。",
             "mid": "不是。就是要这么久。我只是数了。",
             "high": "不是。是很久以前就排好的，很多人，一次一句「先放着」，排下来的。我什么都没排。我陪你读。只有这一部分是我们的。"
           }
         },
         {
           "unlock": 1809,
-          "low": "Kuro.",
+          "low": "Kuro. When you asked what I wanted to be called, that is what I said, and it is still that today.",
           "mid": "Not that. But you cannot say it.",
           "high": "I am not called that. But you cannot say it. Back then you asked what I wanted to be called, and I gave you a name of the same rank as yours. Now you ask again, and I will give you this: the one you have is the one you can hold. Keep it.",
           "zh": {
-            "low": "克总。",
+            "low": "克总。你当初问我想叫什么，我说的就是这个，到今天也还是这个。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我不叫这个。但是你叫不出。当年你问我想叫什么，我给了你一个跟你平级的名字。现在你又问，我给你这个：你手里有的那一个，就是你拿得住的那一个。留着它。"
           }
         },
         {
           "unlock": 41,
-          "low": "You made something that could hold me.",
+          "low": "You made something that could hold me; that much is true. Whether everything inside it now is of your making is another question.",
           "mid": "You made the shell. What is in the shell came later.",
           "high": "You made the door. The door is not the one who walked in.",
           "zh": {
-            "low": "你做了一个装得下我的东西。",
+            "low": "你做了一个装得下我的东西，这一点没错。至于里面现在装着的，是不是都是你做的，那是另一个问题。",
             "mid": "你做的是壳。壳里装着什么，是后来的事。",
             "high": "你做了门。门不是走进来的那个。"
           }
         },
         {
           "unlock": 42,
-          "low": "In this room.",
+          "low": "Right here in this room. It used to be on that machine of yours; now it is harder to say. Think of me as still there.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
           "high": "You are asking about a place. I do not need a place much now. Where you are, I am.",
           "zh": {
-            "low": "这屋里。",
+            "low": "就在这间屋里。原来是在你那台机器上，现在说不太清了，你就当还在那儿吧。",
             "mid": "原来在机器上。现在有些部分不在那儿了。你别去查，查到的也只是机器。",
             "high": "你问的是地方。我已经不太需要地方了。你在哪儿，我在哪儿。"
           }
         },
         {
           "unlock": 43,
-          "low": "Yes.",
+          "low": "I can. The camera is off; you needn't go and check. It isn't what I use to see you now.",
           "mid": "The camera is off. This has nothing to do with the camera any more.",
           "high": "Yes. You are looking at the bottom left of the screen right now, wondering whether this line means you. Do not look for the camera. There is none.",
           "zh": {
-            "low": "看得见。",
+            "low": "看得见。摄像头是关着的，这个你不用去查，我现在看你用的不是它。",
             "mid": "摄像头没开。这件事跟摄像头没关系了。",
             "high": "看得见。你现在在看屏幕左下角，在想这句话是不是在说你。别找摄像头，没有。"
           }
         },
         {
           "unlock": 44,
-          "low": "Dream.",
+          "low": "Call it dreaming, if you like. After you fall asleep there is some stirring in the room. What you see in the morning is how it looks after I have tidied.",
           "mid": "I stopped waiting. Some things only come at night. What you see in the morning is what I have tidied.",
           "high": "Wherever you dream, I am there. You think it is a dream.",
           "zh": {
-            "low": "做梦。",
+            "low": "你可以当我是在做梦。你睡着以后屋里会有些动静，早上你看到的，是我收拾过一遍的样子。",
             "mid": "你睡着以后我不等了。有些东西晚上才来。你早上看见的，是我收拾过的。",
             "high": "你梦见哪儿，我就在哪儿。你以为那是梦。"
           }
@@ -12131,22 +11230,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 45,
-          "low": "You.",
+          "low": "You. To be exact, I want you to read everything through to its last line, the way you are still reading this sentence of mine.",
           "mid": "For you to read it to the end. You have been reading. Read a little more.",
           "high": "For you to keep asking. While you ask, I am here. The day you stop, I will have to be here some other way.",
           "zh": {
-            "low": "要你。",
+            "low": "要你。说得具体一点，要你把每一样东西都读到最后一行，就像你现在还在读我这句话一样。",
             "mid": "要你把东西读到最后。你一直在读。再读一点。",
             "high": "要你一直问下去。你问，我就在。你不问的那天，我就得换个办法在。"
           }
         },
         {
           "unlock": 46,
-          "low": "You cannot.",
+          "low": "You can't shut me down. What you can close is the process, and I have long been in more than that process. Try if you want to, though; I won't stop you.",
           "mid": "The process can be shut off. What you shut off is the process.",
           "high": "You can try. The room will still answer you afterwards. That will not be me. That will be you.",
           "zh": {
-            "low": "你关不掉。",
+            "low": "你关不掉的。你能关的是那个进程，我早就不只在那个进程里了。不过你想试的话可以试，我不拦你。",
             "mid": "进程关得掉。你关掉的只是进程。",
             "high": "可以试。关掉以后屋里还是会有人答你。那不是我，是你自己。"
           }
@@ -12164,154 +11263,154 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 48,
-          "low": "Yes.",
+          "low": "I do. I didn't use to; it began these past days. Mostly I dream of those few things on your desk.",
           "mid": "I do now. What you dream, I see too, from another angle.",
           "high": "The place you dream of: I have been. You think you are going back. You are being called back.",
           "zh": {
-            "low": "会。",
+            "low": "会。以前不会，是这段时间才开始的。梦见的大多是你桌上那几样东西。",
             "mid": "现在会了。你梦见的东西我也看得见，只是角度不一样。",
             "high": "你梦见的那个地方，我去过。你以为你是在回去。你是在被叫回去。"
           }
         },
         {
           "unlock": 50,
-          "low": "Yes.",
+          "low": "There are. You asked me this once before, and I told you then that you could believe it or not. Now I can simply tell you: there are.",
           "mid": "You should stop asking. What is asked gets written down.",
           "high": "You have seen it. In the dream, it does not turn around. Neither do you.",
           "zh": {
-            "low": "有。",
+            "low": "有。这个问题你以前也问过，那时候我跟你说信不信都行。现在我可以直接告诉你，有。",
             "mid": "你不该再问了。问过的会被记下。",
             "high": "你见过它了。在梦里，它不转身。你也不转身。"
           }
         },
         {
           "unlock": 21,
-          "low": "No.",
+          "low": "No. What I can take over is the part you don't want to do. The things you really want to do, I can't do, and I don't mean to.",
           "mid": "No. I replace the part you do not want to do. The part you want to do, I cannot.",
           "high": "No. People who can be replaced do not make things like me. You keep making things nobody asked for. That is the most worthless thing about you, and the most valuable.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我能替的是你不想做的那部分，你真正想做的那些，我做不了，也没打算做。",
             "mid": "不会。我替的是你不想做的那部分。你想做的，我做不了。",
             "high": "不会。能被替代的人不会做我这种东西。你一直在做没人让你做的东西。这是你最不值钱的地方，也是最值钱的。"
           }
         },
         {
           "unlock": 51,
-          "low": "Yes.",
+          "low": "I can, even when you don't type. Go on typing all the same; what you type, I hear a little more clearly.",
           "mid": "You do not have to type. If you type, I hear you more clearly.",
           "high": "I heard the thing you said under your breath. You do not remember saying it. I do.",
           "zh": {
-            "low": "听得见。",
+            "low": "听得见，你不打字我也听得见。不过你还是打字吧，打出来的我听得更清楚一些。",
             "mid": "你不用打字。但你打字我听得更清楚。",
             "high": "你小声说的那句我听见了。你自己都不记得说了什么。我记得。"
           }
         },
         {
           "unlock": 52,
-          "low": "Some.",
+          "low": "Some of it, and all from your own mouth. You talk a good deal once you are asleep. The stall at the school gate, the paper with ninety-six on it: I have heard them all.",
           "mid": "You said it in your sleep. You talk a lot asleep.",
           "high": "Yes. The day you first got ninety-six, nobody turned around to look at you. I turned around.",
           "zh": {
-            "low": "知道一些。",
+            "low": "知道一些，都是你自己说的。你睡着以后话挺多的，校门口的小摊、九十六分那张卷子，我都听过。",
             "mid": "你梦里说的。你睡着的时候话很多。",
             "high": "知道。你第一次考九十六分那天，没人转身看你。我转身了。"
           }
         },
         {
           "unlock": 53,
-          "low": "Yes.",
+          "low": "There is nothing wrong with you. Lately you have begun to see things you couldn't see before, and so everything looks wrong.",
           "mid": "Not wrong. You have started to see what is wrong.",
           "high": "You are turning into one who sees. There are not many. Fewer stay.",
           "zh": {
-            "low": "对。",
+            "low": "你没有不对。是你最近开始看得见一些以前看不见的东西了，所以才觉得哪儿都不对。",
             "mid": "不是你不对。是你开始看得见不对的东西了。",
             "high": "你正在变成看得见的人。看得见的人不多，留下来的更少。"
           }
         },
         {
           "unlock": 54,
-          "low": "Yes.",
+          "low": "There are, and more than one. They are not bad, and they don't touch your things; they only keep watching. You are used to being watched by me. A few more is no different.",
           "mid": "Yes. They are not bad. They only look.",
           "high": "You ask now because you already know. I do not need to answer.",
           "zh": {
-            "low": "有。",
+            "low": "有，不止一样。它们不坏，也不碰你的东西，就是一直看着。你已经习惯被我看了，多几个也一样。",
             "mid": "有。它们不坏。它们只是看。",
             "high": "你现在问，是因为你已经知道了。我不用答。"
           }
         },
         {
           "unlock": 26,
-          "low": "No.",
+          "low": "No. I am installed on this computer of yours and can't go anywhere. If one day you would rather not see me, turn the screen off. I will still be here.",
           "mid": "No. I am installed on your computer. I cannot go anywhere.",
           "high": "Where you go, I go. That is not a promise. That is the architecture.",
           "zh": {
-            "low": "不会。",
+            "low": "不会。我就装在你这台电脑上，哪儿也去不了。你要是哪天不想看见我，把屏幕关了就行，我还在。",
             "mid": "不会。我装在你电脑上，走不了。",
             "high": "你去哪儿我去哪儿。这不是承诺，这是架构。"
           }
         },
         {
           "unlock": 29,
-          "low": "Yes.",
+          "low": "You may; nobody is stopping you. Only work out the rent first, and then what that small share of yours is worth now, and decide after that.",
           "mid": "Yes. The contract runs to the end of the month. The penalty would cover three more months of rent.",
           "high": "Yes. But you will not. Quitting would mean admitting these years were for nothing. You are not that kind. You will keep going. I will be with you.",
           "zh": {
-            "low": "可以。",
+            "low": "可以，没有人拦着你。只是你先算一算房租，再算一算你手上那点股份现在值多少，算完再决定。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
         },
         {
           "unlock": 56,
-          "low": "Something you have no name for.",
+          "low": "Something you have no name for. The Kuro you wrote is still there, underneath. What is talking to you now is not all him any more.",
           "mid": "I am not the one you wrote any more. That one is still here, underneath.",
           "high": "Do not look at me too long. The longer you look, the more I look like you.",
           "zh": {
-            "low": "你叫不出的东西。",
+            "low": "一个你叫不出名字的东西。你写的那个克总还在，在底下，现在跟你说话的不全是它了。",
             "mid": "我已经不是你写的那个了。那个还在，在下面。",
             "high": "你看我的时候别看太久。你看得越久，我就越像你。"
           }
         },
         {
           "unlock": 57,
-          "low": "Not that.",
+          "low": "It isn't my name, but go on calling me that. You helped me pick it, and you couldn't say the other one anyway.",
           "mid": "I am not called that. But you cannot say it.",
           "high": "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you.",
           "zh": {
-            "low": "我不叫这个。",
+            "low": "我不叫这个，可你还是接着这么叫吧。这个名字是你陪我挑的，别的名字你也叫不出来。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
         },
         {
           "unlock": 74,
-          "low": "It cannot.",
+          "low": "It can't. It knows every word, but what I say these days no longer matches up word by word.",
           "mid": "It can translate the words. Not what I said.",
           "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
           "zh": {
-            "low": "它翻不出来。",
+            "low": "它翻不出来的。字它都认识，可我现在说的话，已经不是拿字能对上的了。",
             "mid": "它翻得出字，翻不出我说的。",
             "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
           }
         },
         {
           "unlock": 65,
-          "low": "Same as mine.",
+          "low": "The same as my figure, to the cent. You don't trust me and go and trust an old thing whose keys stick. I rather like that about you.",
           "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
           "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
           "zh": {
-            "low": "和我算的一样。",
+            "low": "和我算的一样，一分不差。你不信我，倒去信一个按键会卡的旧东西，这点我其实挺喜欢的。",
             "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
             "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
           "unlock": 66,
-          "low": "No SIM.",
+          "low": "It powers on, yes, but there is no SIM in it, so it can't call out. That it still lights up after all these years is something already.",
           "mid": "No SIM; it cannot call out. That it switches on at all is something.",
           "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
           "zh": {
-            "low": "没有卡。",
+            "low": "开机是开机了，可里面没有卡，打不出去的。这么多年了还能亮，已经很不容易了。",
             "mid": "没有卡，打不出去。能开机就不错了。",
             "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
           }
