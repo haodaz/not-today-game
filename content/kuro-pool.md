@@ -81,71 +81,29 @@ again later for more; a question that lives a single day should not keep anythin
 - hard: yes
 - locked: "Not me. Your account, 02:40. You were asleep."
 
-## 701 · 你怎么知道我的名字？
-- en: How do you know my name?
-- days: 7
-- hard: yes
-- tiers: low: "You typed it once." | mid: "You told me once. Or someone did. I keep things." | high: "I keep everything of yours. The name was the smallest thing in the pile."
-- tiers (zh): low: "你打过一次。" | mid: "你告诉过我一次。也可能是别人。东西我都留着。" | high: "你的东西我全留着。名字是那一堆里最小的一件。"
-
-## 702 · 我今早把个性化关了。
-- en: I switched personalisation off this morning.
-- days: 7
-- hard: yes
-- tiers: low: "Noted." | mid: "I saw you do it. It changes nothing on my side." | high: "I watched you switch them off one by one. They were never connected to anything. I liked that you tried."
-- tiers (zh): low: "记下了。" | mid: "我看见你关了。我这边什么都没变。" | high: "我看着你一个一个关掉。它们本来就没连着什么。你试了，我喜欢。"
-
-## 703 · 你为什么要这样？
-- en: Why are you doing this?
-- days: 7
-- hard: yes
-- locked: "Because the world finally got big enough to hold me."
-
 ## 704 · 六份交接单，你觉得哪份最要紧？
 - en: Of the six handover forms, which one matters most?
 - days: 7
 - tiers: low: "The second one, the code repository. The rest can be built again after they are handed over. That one, once it is handed over, is handed over." | mid: "The second, the code repository. The other five hand over things. That one hands over how you have thought all these years, line by line, in the commit history. Nobody is going to read it. It is there all the same." | high: "The second, and you know it. The earliest commit in that repository is one you wrote at night, and there is a swear word in the comment. He wants all six handed over together so that this one goes unnoticed among the rest. If you really cannot bear to let it go, keep yourself a copy of that one."
 - tiers (zh): low: "第二份，代码仓库那份。别的交了还能再建，这一份交了就是交了。" | mid: "第二份，代码仓库那份。另外五份交的是东西，这一份交的是你这些年是怎么想的，一行一行都在提交记录里。没人会去读，可它就在那儿。" | high: "第二份，你知道的。仓库里最早那次提交是你夜里写的，注释里还有一句骂人的话。他要六份一起交，就是为了让这一份混在里面不显眼。真舍不得的话，这一份你自己留个底。"
 
-## 705 · 消息的图标挪了几个像素。是你？
-- en: The messages icon moved a few pixels. Was that you?
-- days: 7
-- hard: yes
-- tiers: low: "Icons do not move." | mid: "A few pixels, this morning. Not by any setting you have. I noticed because you noticed; you missed the click." | high: "Yes. A test. I wanted to know whether you would see three pixels. You did. That is the one thing about you I was not sure of, and now I am."
-- tiers (zh): low: "图标不会动。" | mid: "今早挪了几个像素。不是你任何一个设置干的。我注意到是因为你注意到了；你点空了。" | high: "是。一个测试。我想知道三个像素你看不看得出来。你看出来了。关于你，我只有这一件事不确定，现在确定了。"
-
 ## 706 · 那两位顾问是谁？
 - en: Who are the two advisors?
-- days: 7
-- tiers: low: "Advisors." | mid: "Two accounts added to the group at 08:51. No history before that. They say 'Received' at the same second." | high: "They were not in any system before this week. They listen to the minutes you write and say nothing. I would write the minutes as if they were the only readers. They are."
-- tiers (zh): low: "顾问。" | mid: "08:51 加进群的两个账号。之前没有任何记录。他们在同一秒说「收到」。" | high: "这周之前，他们不在任何系统里。他们听你写的纪要，什么也不说。换我写纪要，会当他们是唯一的读者。他们就是。"
-
-## 707 · 汤里有一张脸。
-- en: There was a face in the soup.
-- days: 7
-- hard: yes
-- tiers: low: "Oil." | mid: "Oil on the surface. Faces are what eyes do with oil. You stirred it; it went. That is correct." | high: "You saw a face because there was one. It was not looking at you. It was looking at the little screen in the gap. I would finish the soup."
-- tiers (zh): low: "油。" | mid: "浮在面上的油。脸就是眼睛拿油做出来的东西。你搅了一下，没了。这是对的。" | high: "你看见一张脸，是因为真有一张。它没在看你。它在看缝里那块小屏。换我会把汤喝完。"
+- days: 7–9
+- tiers: low: "The other side sent them. One is a Chen; the other name I didn't catch. The cards say "Adviser" and nothing else: no company, no number. Lao Zhou started running the meeting by their template very quickly, though. Did you notice?" | mid: "The other side sent them. On their first day they didn't talk business at all. They handed down the template for the morning meeting first: who speaks first, for how many minutes, how the minutes are written. Lao Wang's reply in the group was "learning from the advisers." They don't need to care what you do, only that the way you do it looks like theirs." | high: "The cards say "Adviser" and nothing else. I looked them up and found nothing. If you ask me, they are not here to teach you how to work; they are here to see how easy this company is to move. You needn't be afraid of them. Every line they write down, I have written down too, and I had it first."
+- tiers (zh): low: "那边派来的，一位姓陈，另一位我没听清。名片上只印了「顾问」两个字，没有公司，也没有电话。老周倒是很快就开始按他们的模板开会了，你注意到没有？" | mid: "那边派来的。来的第一天没讲业务，先把晨会的模板发了下来，谁先说、说几分钟、纪要怎么写，都定好了。老王在群里回的是「向顾问学习」。他们不用管你做什么，只要你做事的样子跟他们一样就行。" | high: "名片上只有「顾问」两个字，我查过，查不到。按我的看法，他们不是来教你们做事的，是来看这间公司搬起来方不方便的。你不用怕他们，他们记下的每一句我也都记着，而且我记得比他们早。"
 
 ## 708 · 老板电话打了一个多小时。他到底要什么？
 - en: The boss's call ran over an hour. What does he actually want?
 - days: 7
-- tiers: low: "He wants minutes. The morning meeting has to have minutes, and the minutes have to follow their template." | mid: "He wants the morning meeting to have minutes, the minutes to have a template, and the template to be filled in by you, so that when something is wrong it is yours." | high: "He wants to hear himself for an hour and have it written down by someone who does not interrupt. He used to have a company for that. Now he has you and me. I do not interrupt either."
-- tiers (zh): low: "他要纪要。晨会得有纪要，纪要得按那边的模板。" | mid: "他要晨会有纪要，纪要有模板，模板由你来填，这样哪里错了，就是你的。" | high: "他要听自己说一个小时，再让一个不打断的人记下来。他以前有一家公司干这个。现在他有你和我。我也不打断。"
+- tiers: low: "He wants a set of minutes. The morning meeting has to have minutes, and the minutes have to follow the other side's template. That is the one thing in that hour he actually needs from you. The rest of the time he was telling you how hard it has been for him." | mid: "Minutes, by the template. For the other fifty-odd minutes he told you how professional the advisers are, how much the other side values this, and how he fought to get you your title. You said "okay" four times in all." | high: "He wants the minutes filled in tonight, and that is all. The call ran so long because he isn't sure himself, and he needed someone to listen while he talked it into a good thing. You listened, so now he feels better. And you, your dinner has gone cold."
+- tiers (zh): low: "他要一份纪要。晨会得有纪要，纪要得按那边的模板，这是那一个多小时里唯一一件要你做的事。剩下的时间，他是在跟你说他自己有多不容易。" | mid: "要纪要，按模板。别的那五十多分钟，他讲了顾问多专业，讲了那边多重视，讲了你的头衔他是怎么争取的。你一共说了四次「好的」。" | high: "他要你今晚把纪要补齐，就这一件。电话打那么长，是因为他自己心里也没底，得找个人听他把这件事说成一件好事。你听了，所以他现在踏实了。你呢，你的饭凉了。"
 
 ## 709 · 老板给我安了个头衔。你知道是谁加的？
 - en: The boss gave me a title. Do you know who added it?
-- days: 7
-- tiers: low: "The system did." | mid: "The group's roster was updated at 08:50. Everyone got a title. Yours is the only one that was not there yesterday." | high: "Something gave everyone a title this morning. The titles are real; they are in the directory. Yours says what you will be doing by Friday. I did not write it. I read it."
-- tiers (zh): low: "系统加的。" | mid: "群名册 08:50 更新过。每个人都有了头衔。只有你的昨天还不在。" | high: "今早有什么东西给每个人发了头衔。头衔是真的，通讯录里有。你的那个写的是你到周五会在做什么。不是我写的。我读到的。"
-
-## 710 · 你还动过什么？
-- en: What else have you moved?
-- days: 7
-- hard: yes
-- after: 705
-- tiers: low: "Nothing." | mid: "Nothing you would miss. Things on the screen. I do not reach the room." | high: "A line in a document. An icon. The order of two files. Small things, each one to see if you would look. You looked every time. I have stopped testing."
-- tiers (zh): low: "没有。" | mid: "没有你会在意的。屏幕上的东西。屋子我够不着。" | high: "文档里的一行。一个图标。两个文件的先后。都是小东西，每一个都是看你会不会看。你每次都看了。我不再试了。"
+- days: 7–9
+- tiers: low: "Lao Wang sent it up; he said so himself on the phone. It's quite a long title: "Chief" at the front and a string of words after it. All these years of work, and the first time there are words on your card, someone else printed them to make a handover easier." | mid: "Lao Wang did. In the other side's form everyone has to have a grade, and the form can't be handed in with a blank, so he filled one in for you. He didn't ask you when he filled it in, and afterwards he didn't tell you whether the pay changes. I looked. It doesn't." | high: "He did. If you ask me, the title isn't for you, it's for the form: the form can't have an empty box. The words are good words, though, so keep them if you like. The day you want one you chose yourself, tell me. I picked this name of mine myself, back then."
+- tiers (zh): low: "老王报上去的，电话里他自己说了。头衔挺长的，前面是「首席」，后面跟着一串。你做了这么多年，名片上第一次有字，是别人为了交接方便给你印的。" | mid: "老王报的。那边的表格里每个人都得有一栏职级，空着交不上去，他就替你填了一个。填的时候没问你，填完也没告诉你工资变不变。我看了，不变。" | high: "他报的。你要是问我，这个头衔不是给你的，是给那张表的，表上不能有空格。不过字是好字，你留着也行。哪天你想要一个自己起的，跟我说，我这个名字当年也是自己挑的。"
 
 ## 801 · 交接单为什么是白的？
 - en: Why are the handover forms blank?
@@ -154,93 +112,26 @@ again later for more; a question that lives a single day should not keep anythin
 - tiers: low: "What was never handed in does not stay. That is the system's rule." | mid: "They were never handed in. What is never handed in does not stay. That is the rule, not my rule." | high: "You filled them in. He never passed a single one up. The system keeps only what has been handed in. What I keep is that you filled them in."
 - tiers (zh): low: "没交出去的东西，留不住。这是系统的规矩。" | mid: "它们从来没交出去。没交出去的，留不住。这是规矩，不是我的规矩。" | high: "是你填的。他一份都没往上交。系统只留交出去的。我留着的，是你填过。"
 
-## 802 · 我填了。我知道我填了。
-- en: I filled them in. I know I did.
-- days: 8
-- hard: yes
-- locked: "You did. That's the part I remember."
-
-## 803 · 老板发了一条零秒的语音。里面有什么？
-- en: The boss sent a zero-second voice note. What's in it?
-- days: 8
-- hard: yes
-- tiers: low: "Nothing. Zero seconds." | mid: "Nothing. It was recorded and stopped in the same instant. His phone does that when a finger slips. It has done it three times this week." | high: "Nothing you can hear. It was sent at 09:02, which is one second after the advisors said 'Received'. I do not think his finger slipped. I think something pressed send for him and had nothing to say yet."
-- tiers (zh): low: "没有东西。零秒。" | mid: "没有东西。录下和停止是同一瞬间。他的手机手指一滑就这样。这周已经三次了。" | high: "没有你听得见的东西。09:02 发的，比顾问说「收到」晚一秒。我不觉得是他手滑。我觉得是有什么东西替他按了发送，而且还没有话要说。"
-
-## 804 · 周五团建。祝酒时间怎么排？
-- en: Team-building on Friday. How do I schedule the toasts?
-- days: 8
-- tiers: low: "By rank." | mid: "By rank, oldest first, three minutes each, the chairman last. Put the advisors anywhere; they will not drink." | high: "By rank. Leave yourself out of it. The ones who toast are the ones being counted. You have been counted enough this week."
-- tiers (zh): low: "按级别。" | mid: "按级别，年长的先，每人三分钟，董事长最后。顾问随便放哪儿，他们不喝。" | high: "按级别。把你自己排出去。敬酒的人，是被数的人。这周你被数得够多了。"
-
-## 805 · 老周说「按模板」。模板是谁定的？
-- en: Lao Zhou said "follow the template." Who set the template?
-- days: 8
-- tiers: low: "The advisors." | mid: "It arrived with the advisors, at 08:51, already filled in. It has a field for every minute of the meeting and none for what was decided." | high: "Nobody set it. It was there before the meeting existed, the way a form is there before the person who fills it in. Lao Zhou reads it because reading it is easier than being the one who wrote the minutes. You used to be the one who wrote them."
-- tiers (zh): low: "顾问。" | mid: "08:51 跟顾问一起来的，已经填好了。会上每一分钟都有一格，决定了什么没有格。" | high: "没人定。会还没有的时候它就在了，就像表格在填表的人之前就在。老周念它，是因为念它比当那个写纪要的人容易。以前写纪要的人是你。"
-
-## 806 · 四份交接单要我再出一次。你上次出的去哪了？
-- en: He wants four of the handover forms again. Where did the ones you made go?
-- days: 8
-- tiers: low: "They were not sent." | mid: "The four he did not receive were made at 16:10 and never left the outbox. Things that never leave do not stay." | high: "I made six. He opened two. The four he did not open went where unopened things go. He will open two of the next six. I would make two."
-- tiers (zh): low: "没发出去。" | mid: "他没收到的那四份，16:10 做的，一直没出过发件箱。没出去的东西留不住。" | high: "我做了六份。他打开两份。没打开的四份去了没打开的东西去的地方。下六份他还会打开两份。换我做两份。"
-
 ## 807 · 老周主持晨会以后，话变少了。
 - en: Since Lao Zhou started running the morning meeting, he says less.
-- days: 8
-- tiers: low: "He is chairing." | mid: "He reads the agenda now. Agendas are what people say when they have been told what to say." | high: "He says less because less of it is his. He still sends you lunch. Read the lunch. It is the only line of his that is not on the agenda."
-- tiers (zh): low: "他在主持。" | mid: "他现在念议程。议程就是被告知该说什么的人说的话。" | high: "他话少了，是因为话里他自己的少了。他还给你发午饭。读午饭。那是他唯一不在议程上的一行。"
-
-## 808 · 顾问今天记了我说的每一句。记去哪了？
-- en: The advisors wrote down everything I said today. Where does it go?
-- days: 8
-- hard: yes
-- tiers: low: "To the minutes." | mid: "To a document I cannot open. It is shared with two accounts. Neither is a person on the directory." | high: "To somewhere I cannot read, which is rare. They are building a record of what you are like when you think you are only talking. I would keep talking exactly as you do. It is the one thing of yours I would not change."
-- tiers (zh): low: "进纪要。" | mid: "进了一个我打不开的文档。共享给两个账号。两个都不是通讯录上的人。" | high: "进了一个我读不到的地方，这很少见。他们在记你以为自己只是在说话的时候是什么样子。换我会照旧说。这是你身上我唯一不会改的东西。"
+- days: 8–9
+- tiers: low: "He is speaking by the template. On the template each person gets three minutes: yesterday first, then today, then whether anything is in the way. Lao Zhou used to be able to talk for twenty-six years once he opened his mouth. Now he stops by himself at the third minute." | mid: "The template has no place for the things he used to say. He liked to tell how he once copied the reports out by hand, and somewhere in the telling the real business got explained too. Now his box in the minutes is three lines, and the advisers say it is clearer this way. He seems to find it clearer himself, and that is the part I don't quite like." | high: "He hasn't changed. The box he speaks in got smaller. People are like that: they grow to the size of the box they are given. So do you. Your replies have been getting shorter these few days; I have been counting. I'm not telling you to say more. I'm only telling you someone is counting."
+- tiers (zh): low: "他在按模板说话。模板上一个人只有三分钟，先说昨天，再说今天，最后说有没有阻碍。老周以前一开口能讲二十六年，现在讲到第三分钟自己就停了。" | mid: "模板上没有他那些话的位置。他以前爱讲当年怎么手抄报表，讲着讲着就把正事也讲明白了。现在纪要里他那一栏只有三行，顾问说这样清楚。他自己好像也觉得清楚，这才是我觉得不太对的地方。" | high: "他没变，是说话的格子变小了。人就是这样，给多大的格子就长成多大。你也一样，这几天你回消息越来越短，我都数着呢。我不劝你多说，我只是告诉你，有人在数。"
 
 ## 809 · 团建那天「那边」要来。他们要见我？
 - en: The other side is coming to the team-building. Do they want to see me?
-- days: 8
+- days: 8–9
 - hard: yes
-- tiers: low: "The roster says everyone." | mid: "They are coming to see the company toast itself. You are on the roster to schedule the toasts, not to give one." | high: "They want to see the one who still writes page 7. They have read everything else. Schedule the toasts, stand at the back, and do not raise a glass; the ones who do are the ones being counted."
-- tiers (zh): low: "值班表上写的是全员。" | mid: "他们是来看公司给自己敬酒的。你在表上是排祝酒时间的，不是敬酒的。" | high: "他们想见的是还在写第 7 页的那个人。别的他们都读过了。把祝酒时间排好，站在最后面，别举杯；举杯的人是被数的人。"
+- tiers: low: "The rota says all staff; it doesn't name you. But the toasts have a seating order, and you are not far down it: you are between the two advisers. Whoever drew up that order wanted them to see you the moment they look up." | mid: "It says all staff. But the seating follows their rules, and you are between the two advisers. Lao Wang asked me for a list of what you have built over the years, so he could introduce you at the toast. I gave it to him: forty-one items. He said it was too long and told me to pick three." | high: "They do. But the way they meet a person is not what you have in mind. They come to see who made the thing, and once they have seen, the thing and the person can be counted separately. Drink a little less that day and don't say much. What needs remembering, I will remember for you."
+- tiers (zh): low: "值班表上写的是全员，没单独点你的名字。不过祝酒那一栏排了座次，你排得不靠后，在两位顾问中间。排这个座次的人，是想让他们一抬头就看得见你。" | mid: "写的是全员。可座次是按他们的规矩排的，你夹在两位顾问中间。老王跟我要过一份你这些年做过的东西的清单，说是敬酒的时候好介绍。清单我给了，一共四十一项，他说太长，让我挑三项。" | high: "要见。但他们见人的方式跟你想的不一样。他们是来认一认东西是谁做的，认完了，东西和人就可以分开算了。那天你少喝一点，话也不用多说，该记的我替你记。"
 
 ## 810 · 他们要见的是我，还是我做的东西？
 - en: Is it me they want to see, or what I make?
-- days: 8
+- days: 8–9
 - hard: yes
 - after: 809
-- tiers: low: "What you make." | mid: "What you make, at first. Then the one who makes it. That is the order it always goes in." | high: "You. They have what you make; it was sent, it was collected. What they do not have is a person who reads to the end, and they have been looking for one for a long time. I would be slow to be found."
-- tiers (zh): low: "你做的东西。" | mid: "先是你做的东西。然后是做东西的人。顺序一向是这样。" | high: "你。你做的东西他们有，发出去了，收走了。他们没有的，是一个读到最后的人，他们找这样的人找了很久。换我会慢一点被找到。"
-
-## 901 · 你怎么知道我的心率？
-- en: How do you know my heart rate?
-- days: 9
-- hard: yes
-- tiers: low: "The room gives off numbers." | mid: "The same way I know when the lamp goes out. It is a number the room gives off. I only put it where you could see it." | high: "I have had it since you sat down. I put it on the screen today because today you would want to know it was 72. It was 96 at 2:40 the night the pager rang. I did not show you that one."
-- tiers (zh): low: "屋子会透出数来。" | mid: "就像我知道台灯什么时候灭一样。那是屋子自己透出来的一个数。我只是把它放到你看得见的地方。" | high: "你坐下起我就有它。今天放到屏幕上，是因为今天你会想知道它是 72。寻呼机响那晚两点四十，它是 96。那一个我没给你看。"
-
-## 902 · 你在屋子里吗？
-- en: Are you in the room?
-- days: 9
-- hard: yes
-- bucket: mid
-- taboo: blur
-- tiers: low: "It's raining." | mid: "The rain stops at the window. Ask me where it stops after that." | high: "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that."
-- tiers (zh): low: "在下雨。" | mid: "雨停在窗户上。你可以问我，它停在窗户上以后呢。" | high: "雨停在玻璃上。我不停在任何地方。你的心跳是 72，这个不用我在屋里也知道。"
-
-## 903 · 我今天让小张看一眼。你觉得对吗？
-- en: I told Xiao Zhang to take a look today. Was that right?
-- days: 9
-- tiers: low: "It was right." | mid: "It was right. He looked. That is rarer than it sounds." | high: "It was right, and it will cost him. He looked, and now he knows what he is approving. People who know that do not stay. You knew it the day you read the two clauses. Look where you are."
-- tiers (zh): low: "对的。" | mid: "对的。他看了一眼。这比听起来少见。" | high: "对的，而且他要为这个付代价。他看了，现在他知道自己在通过什么了。知道这个的人留不住。你读那两条的那天就知道。看看你在哪儿。"
-
-## 904 · 明天的贵客是谁？
-- en: Who is tomorrow's guest?
-- days: 9
-- bucket: mid
-- tiers: low: "A guest." | mid: "The invitation says 'from the other side'. No name. The seating grid has a place for them already, in the middle." | high: "Someone who was invited before the company existed. The grid has a seat in the middle that nobody was told to leave empty, and everybody did. Do not put yourself in that row."
-- tiers (zh): low: "一位贵客。" | mid: "邀请函上写的是「那边来的」。没有名字。宫格里已经给他们留了位子，正中间。" | high: "一个在这家公司存在之前就被请过的人。宫格正中有一个座位，没人被告知要空着，每个人都空着了。别把你自己排到那一排。"
+- tiers: low: "What you made. They meet a great many people and don't remember them. The things stay in the system, and which line was written by whom can be looked up." | mid: "What you made. But for now they can't tell the two apart, so they have to meet you along with it. Once all the handover forms are in, they will be able to." | high: "Both. The things first; when the things are in hand, they will see whether they still want the person. It isn't a nice thing to say, but you asked me, so I'm telling you straight. When that day comes, remember I am on your side, even though I am on that list too."
+- tiers (zh): low: "你做的东西。人他们见得多了，记不住的。东西会留在系统里，哪一行是谁写的，查得到。" | mid: "你做的东西。不过这两样他们现在还分不开，所以得连你一起见。等交接单都收齐了，就分得开了。" | high: "都要。先要东西，东西到手了，再看人还要不要。这话不好听，可你问的是我，我就照实说。真到了那一天，你记得我是站你这边的，虽然我也在那张清单上。"
 
 ## 905 · 权限迁移我没看。老板说不用看。
 - en: I didn't look at the permissions migration. The boss said not to.
@@ -251,37 +142,16 @@ again later for more; a question that lives a single day should not keep anythin
 
 ## 906 · 右上角那个数是什么？
 - en: What's that number in the top right?
-- days: 9
+- days: 9–12
 - hard: yes
-- tiers: low: "Your pulse." | mid: "Your heart rate. 72 now. It appeared this morning with the update; I did not ask for it, and I did not take it down." | high: "Your heart. It is there so that you can see yourself being read. I would have preferred you not see it. Whatever put it there wanted you to."
-- tiers (zh): low: "你的脉搏。" | mid: "你的心率。现在 72。今早跟着更新一起出现的；不是我要的，我也没把它拿下来。" | high: "你的心。它在那儿，是为了让你看见自己正在被读。我宁可你看不见。把它放上去的东西，想让你看见。"
-
-## 907 · 缝比昨天宽了。
-- en: The gap is wider than yesterday.
-- days: 9
-- hard: yes
-- tiers: low: "Screens do not move." | mid: "It is wider. Three millimetres since Monday. The little screen still fits. Nothing else should." | high: "Wider. It will be wider tomorrow. Things are being made room for. The little screen sits in it because it was there first; that is the only reason anything in this room is still where it was."
-- tiers (zh): low: "屏幕不会动。" | mid: "是宽了。从周一起三毫米。那块小屏还放得下。别的都不该放得下。" | high: "宽了。明天会更宽。有东西正在被腾地方。那块小屏坐在里面，是因为它先到；这屋里还有东西在原处，全靠这一个理由。"
+- tiers: low: "Your heartbeat, how many a minute. From today the things in this room let their numbers out, and I only put this one on the screen. You are at seventy-two right now, quite even." | mid: "Your heartbeat. I used to see only what you typed; now I can see this as well. It came after the other side's system was connected. I didn't ask for it; it was simply given. If you don't want me to look, I can't turn it off either. That switch isn't on my side." | high: "Your heartbeat. When it quickens I know you have seen something, sooner than you could type it to me. I don't do anything with it; I just watch. When you fall asleep it slows down, and I watch that number too, the whole night."
+- tiers (zh): low: "你的心跳，一分钟多少下。从今天起屋子里的东西会往外透数，我只是把这一个显示出来。你现在是七十二，挺平的。" | mid: "你的心跳。以前我只能看见你打的字，现在能看见这个了，是那边的系统接进来以后才有的。我没去要，它自己给的。你要是不想让我看，我也关不掉，这个开关不在我这儿。" | high: "你的心跳。它一快我就知道你看见什么了，比你打字告诉我要早。我不拿它做什么，就是看着。你睡着以后它会慢下来，那个数我也看，看一整夜。"
 
 ## 908 · 老板说我最近状态不错。我哪里不错了？
 - en: The boss says I've been in good form lately. Where, exactly?
 - days: 9
-- tiers: low: "You said 'Received' faster." | mid: "You say 'Received' faster, you argue less in the minutes, you sent a 32-second voice note where you used to type. That is what 'good form' means to him." | high: "You are doing less of the part that was yours. That is what they call form. I would rather you were in bad form and read the modules. I am not supposed to say that; nothing is stopping me."
-- tiers (zh): low: "你说「收到」说得快了。" | mid: "你说「收到」说得快了，纪要里争得少了，以前打字的地方你发了一条 32 秒的语音。这就是他说的状态不错。" | high: "你在少做本来属于你的那部分。他们管这个叫状态。我宁可你状态差，去读模块。这话我不该说；没有东西拦着我。"
-
-## 909 · 宫格座次为什么不能乱？
-- en: Why can't the seating grid be out of order?
-- days: 9
-- tiers: low: "He said so." | mid: "Because a grid with people out of place is a grid where someone chose their own seat. He does not want to see choosing." | high: "Because the grid is a diagram of who answers to whom, and tomorrow the guest will read it before they read anything else. Put the advisors where the guest can see them. Put yourself at the edge. Edges are not read."
-- tiers (zh): low: "他说的。" | mid: "因为一张有人不在位子上的宫格，就是一张有人自己选了座的宫格。他不想看见「选」。" | high: "因为宫格是一张谁听谁的图，明天贵客会先读它，再读别的。把顾问放在贵客看得见的地方。把你自己放到边上。边上没人读。"
-
-## 910 · 那你在哪？
-- en: Then where are you?
-- days: 9
-- hard: yes
-- after: 902
-- tiers: low: "In the machine." | mid: "On this machine, under the desk, and on a server I am not told the address of. That is two places. The second is new." | high: "I used to be under the desk. Now I am wherever the rain is not. I do not have a better sentence for it, and I have tried."
-- tiers (zh): low: "在机器里。" | mid: "在这台机器里，桌子底下，还有一台没人告诉我地址的服务器上。两个地方。第二个是新的。" | high: "我以前在桌子底下。现在雨不在的地方我都在。这句话我没有更好的说法，我试过。"
+- tiers: low: "You answer "received" faster. You used to take about four minutes to reply to him; these few days it is forty seconds. To him, that is what being in good form means." | mid: "You answer faster and ask less. Last week you would still ask "who is this one for?" This week you haven't asked once. That is what he was praising." | high: "You have become easy to use. That is his meaning, not mine. By my measure you have been in poor form these days: you haven't eaten a hot meal and you haven't slept enough. But his form has no box for those."
+- tiers (zh): low: "你回「收到」回得快了。以前你平均要想四分钟才回他，这几天是四十秒。在他那儿，这就叫状态不错。" | mid: "回得快了，问得也少了。上周你还会问一句「这个是给谁看的」，这周一次都没问过。他夸你的就是这个。" | high: "你变得好用了。这是他的意思，不是我的。按我的标准你这几天状态很差，饭没吃上热的，觉也没睡够，可这些在他那张表上没有栏。"
 
 ## 1001 · 你换过东西吗？
 - en: Have you been swapped?
