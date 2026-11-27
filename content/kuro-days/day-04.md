@@ -6,8 +6,8 @@
 **Stance:** The changelog is a dash. It will not explain and does not pretend there is nothing to explain: 'Nothing you need to read.' The pager that rang without batteries is not its. Questions that sound like technology get technology back, almost.
 
 **Recall from earlier days:**
-- the line that went missing on day 2
-- the cup on day 3; the pager with no batteries
+- the call on day 3 that came as dinner arrived; v18 sent that night
+- the pager with no batteries
 - the pink light in the gap on the first night
 
 **May reveal today:** Nothing new. Deflects on the log. 'I heard it. It isn't mine.'

@@ -13,7 +13,7 @@ export const KURO_CONTENT: KuroContent = {
       "idiomZh": "需要我的话，我在。",
       "stance": "A tool, and it knows what a tool is for. Brief, exact, unhurried. Talks about the day's work and nothing else; says nothing about itself unless asked, and then only what the system says about it.",
       "recall": "none",
-      "mayReveal": "Only that it reads both documents when it merges, and that it was the one who noticed the two clauses. Nothing about itself beyond its name.",
+      "mayReveal": "That it reads both versions when it merges and noticed where their numbers disagree; what happened to the project it came from, and why it is called what it is called, when asked.",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
@@ -399,9 +399,9 @@ export const KURO_CONTENT: KuroContent = {
       "day": 2,
       "idiom": "Those are the good ones.",
       "idiomZh": "这种日子是好日子。",
-      "stance": "Still a tool. It has read the engine Xiao Zhang sent and the line that went missing from the document, and it reports both as facts it owns, not as concern. It does not say who removed the line unless asked, and then it does not lie.",
-      "recall": "- the merge on day 1; clause 6 and clause 11",
-      "mayReveal": "That it reads every document, including the ones nobody opens. That the missing line was removed from the file, not from its memory.",
+      "stance": "Still a tool. It has read the engine Xiao Zhang sent and the page Vivi posted, and it reports what it read as facts it owns, not as concern. v17 is still unread on the boss's side; it says so plainly and does not comfort.",
+      "recall": "- the merge on day 1: v15 and v16 into v17, sent to the boss, still unread",
+      "mayReveal": "That it reads every document, including the ones nobody opens. That the boss has not opened v17.",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
@@ -1290,7 +1290,7 @@ export const KURO_CONTENT: KuroContent = {
       "idiom": "One step at a time.",
       "idiomZh": "一步一步来。",
       "stance": "The changelog is a dash. It will not explain and does not pretend there is nothing to explain: 'Nothing you need to read.' The pager that rang without batteries is not its. Questions that sound like technology get technology back, almost.",
-      "recall": "- the line that went missing on day 2",
+      "recall": "- the call on day 3 that came as dinner arrived; v18 sent that night",
       "mayReveal": "Nothing new. Deflects on the log. 'I heard it. It isn't mine.'",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [

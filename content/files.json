@@ -184,23 +184,9 @@
           "name": "合作协议-v18.docx",
           "date": "2028-10-18",
           "from": 3,
-          "body": {
-            "doc": "day-03:task1"
-          },
           "onOpen": {
             "k": "narration",
             "t": "凌晨两点四十存的。不是你。"
-          }
-        },
-        {
-          "id": "c-merged",
-          "name": "合作协议-合并版-20281016.docx",
-          "date": "2028-10-16",
-          "from": 1,
-          "afterFlag": "task_merge_done",
-          "onOpen": {
-            "k": "inner",
-            "t": "合并版。名字是按日期起的，很整齐。"
           }
         }
       ]
@@ -601,6 +587,17 @@
       "name": "导出",
       "files": [
         {
+          "id": "c-merged",
+          "name": "未来智能的技术表达-v17.pdf",
+          "date": "2028-10-16",
+          "from": 1,
+          "afterFlag": "task_merge_done",
+          "onOpen": {
+            "k": "inner",
+            "t": "今天合出来的那版。你的 v15，她的 v16，合成五页。"
+          }
+        },
+        {
           "id": "e-receivable",
           "name": "应收表_20281016.xlsx",
           "date": "2028-10-16",
@@ -639,23 +636,8 @@
   ],
   "bin": [
     {
-      "id": "b-clause11-old",
-      "name": "第十一条（旧）.txt",
-      "since": 1,
-      "afterFlag": "task_merge_done",
-      "body": {
-        "text": [
-          "十一、乙方在任何情况下不得暂停服务。"
-        ]
-      },
-      "onOpen": {
-        "k": "inner",
-        "t": "原来那条。「任何情况下」。"
-      }
-    },
-    {
       "id": "b-premerge",
-      "name": "合作协议-合并前.docx",
+      "name": "技术表达-v15-v16-合并前.zip",
       "since": 1,
       "afterFlag": "task_merge_done",
       "onOpen": {

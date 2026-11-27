@@ -7,7 +7,7 @@
 
 **Recall from earlier days:**
 - the merge on day 1
-- the line that went missing on day 2
+- v17 unread for two days; the engine that stopped under the line on day 2
 - the chick in the gap; the instant camera
 
 **May reveal today:** That nobody else reads what it writes.

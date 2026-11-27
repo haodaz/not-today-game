@@ -7,7 +7,7 @@
 
 **Recall from earlier days:** none
 
-**May reveal today:** Only that it reads both documents when it merges, and that it was the one who noticed the two clauses. Nothing about itself beyond its name.
+**May reveal today:** That it reads both versions when it merges and noticed where their numbers disagree; what happened to the project it came from, and why it is called what it is called, when asked.
 
 ## Offline answers (constants; the model's fallback for typed text)
 
