@@ -332,15 +332,15 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     // world-prompts R2 (supersedes R6's player box): the box keeps Kuro's line and portrait; the
     // player's options are the column on the right.
     expect(out).toContain("kuro-portrait");
-    expect(out).toMatch(new RegExp(`data-action="kuro-q" data-q="101"[^>]*><i class="dc-ic ask"[\\s\\S]*?</i><span class="dc-l">${escapeHtml(day.starters[0]!.zh)}</span></button>`));
-    r.act("kuro-q", { q: "101" });
+    expect(out).toMatch(new RegExp(`data-action="kuro-q" data-q="104"[^>]*><i class="dc-ic ask"[\\s\\S]*?</i><span class="dc-l">${escapeHtml(day.starters[0]!.zh)}</span></button>`));
+    r.act("kuro-q", { q: "104" });
     out = r.out();
     expect(boxes(out)).toBe(1);
     expect(out).toContain("kuro-portrait");
     // The core's tier (2026-11-09): day 1 q1's low tier, never the idiom.
-    const tier = day.layered.find((l) => l.unlock === 101)!;
+    const tier = day.layered.find((l) => l.unlock === 104)!;
     const ev = r.store.getEvents().find((e) => e.kind === "chat")!;
-    expect(ev).toMatchObject({ q: 101 });
+    expect(ev).toMatchObject({ q: 104 });
     if (ev.kind === "chat" && ev.taboo !== "flicker") {
       expect(ev.answer!.startsWith(tier.zh!.low)).toBe(true);
       expect(ev.answer).not.toBe(day.idiom);
@@ -348,7 +348,7 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     // Read on: the player's turn again; the asked question stays in the pool.
     r.act("loop-advance");
     expect(r.out()).toContain('data-action="kuro-q"');
-    expect(r.out()).toContain('data-q="101"');
+    expect(r.out()).toContain('data-q="104"');
   });
 });
 
