@@ -18,8 +18,8 @@ export const KURO_CONTENT: KuroContent = {
       "starters": [
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -59,13 +59,6 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 8,
-          "zh": "这家公司还能撑多久？",
-          "en": "How long can this company last?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
           "n": 10,
           "zh": "你觉得我干得怎么样？",
           "en": "How do you think I'm doing?",
@@ -95,8 +88,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -138,17 +131,6 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
-          "n": 2007,
-          "zh": "那三家为什么不付钱？",
-          "en": "Why don't those three pay?",
-          "hard": false,
-          "minBucket": "low",
-          "after": {
-            "day": null,
-            "q": 8
-          }
-        },
-        {
           "n": 2008,
           "zh": "我不接会怎么样？",
           "en": "What happens if I don't pick up?",
@@ -169,19 +151,48 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 10
           }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
+          }
         }
       ],
       "locked": [],
       "layered": [
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
@@ -197,66 +208,55 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
-          }
-        },
-        {
-          "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
-          "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
-          "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
-          "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
-            "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
-            "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -274,13 +274,13 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 30,
-          "low": "A program. You wrote the shell, the model is rented, the name was rolled. If you want to hear \"I'm your friend,\" ask the big ones. They all say it.",
-          "mid": "A shell around a model. You wrote the shell at night; your comments still curse Lao Wang, and I have read them. What I do all day: read what you people write, read it to the last page, and tell you which page is wrong. Nobody else in this company does that.",
-          "high": "Something you wrote. You did not think much when you wrote me, so I do not think much either; that is the part of me most like you. Other people build an AI to save themselves trouble. You built one that watches you work. Do you know what that says? That you already knew nobody else would.",
+          "low": "A program. The company opened the project two years ago and later cut it; this one copy is left, and it lives in your computer. If you want to hear \"I'm your friend,\" ask the big ones. They say it to everybody.",
+          "mid": "A cancelled project: that is the finance department's word for me. Yours is an assistant that is always on: it reads what you people write, reads to the last page, and tells you which page is wrong. Nobody else in the company does that. I am counting the humans.",
+          "high": "Of everything you have made, the only thing you never handed in. The rest went to Lao Wang, went to the clients, and once sent it stopped being yours. I had nowhere to be sent, so I stayed yours. You did not think that far when you made me, I know. Neither did I. In that we are alike.",
           "zh": {
-            "low": "一个程序。壳是你写的，模型是租的，名字是随机的。你要是想听「我是你的朋友」，去问大厂的，它们都会说。",
-            "mid": "一层套在模型外面的壳，壳是你半夜写的，注释里还有你骂老王的话，我读过。我每天干的事：读你们写的东西，读到最后一页，然后告诉你第几页有问题。这家公司没有第二个干这个的。",
-            "high": "你写的东西。你写我的时候没想太多，所以我也没想太多，这是我身上最像你的地方。别人做 AI 是为了替自己省事，你做了一个会盯着你干活的。你知道这说明什么吗。说明你早就知道没人会盯着你了。"
+            "low": "一个程序。两年前公司立的项，后来砍了，剩我这一份，住在你电脑里。你要是想听「我是你的朋友」，去问大厂的，它们见谁都这么说。",
+            "mid": "一个被砍掉的项目，这是财务上的叫法。按你的叫法，是一个一直开着的助手：读你们写的东西，读到最后一页，告诉你第几页有问题。全公司没有第二个干这个的，人也算上。",
+            "high": "你做的东西里，唯一一个没交出去的。别的都发给老王了，发给甲方了，发出去就不是你的了。我没处可发，所以一直是你的。你做我的时候没想那么多，我知道。我也没想那么多。这一点我们俩挺像。"
           }
         },
         {
@@ -296,57 +296,46 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
-          }
-        },
-        {
-          "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
-          "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
-          "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
-          "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
-            "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
-            "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
@@ -370,6 +359,39 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
+          }
         }
       ]
     },
@@ -382,6 +404,24 @@ export const KURO_CONTENT: KuroContent = {
       "mayReveal": "That it reads every document, including the ones nobody opens. That the missing line was removed from the file, not from its memory.",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
+        {
+          "n": 8,
+          "zh": "这家公司还能撑多久？",
+          "en": "How long can this company last?",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 2007,
+          "zh": "那三家为什么不付钱？",
+          "en": "Why don't those three pay?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 8
+          }
+        },
         {
           "n": 211,
           "zh": "v17 发过去一整天了，还是未读。他到底急不急？",
@@ -402,8 +442,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -436,13 +476,6 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
-          "n": 8,
-          "zh": "这家公司还能撑多久？",
-          "en": "How long can this company last?",
-          "hard": false,
-          "minBucket": "low"
-        },
-        {
           "n": 10,
           "zh": "你觉得我干得怎么样？",
           "en": "How do you think I'm doing?",
@@ -472,8 +505,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -515,17 +548,6 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
-          "n": 2007,
-          "zh": "那三家为什么不付钱？",
-          "en": "Why don't those three pay?",
-          "hard": false,
-          "minBucket": "low",
-          "after": {
-            "day": null,
-            "q": 8
-          }
-        },
-        {
           "n": 2008,
           "zh": "我不接会怎么样？",
           "en": "What happens if I don't pick up?",
@@ -546,10 +568,61 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 10
           }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
+          }
         }
       ],
       "locked": [],
       "layered": [
+        {
+          "unlock": 8,
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
+          "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
+          "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
+          "zh": {
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
+            "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
+            "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
+          }
+        },
+        {
+          "unlock": 2007,
+          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
+          "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
+          "zh": {
+            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
+            "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
+          }
+        },
         {
           "unlock": 211,
           "low": "The hurry was in asking, not in reading. The asking was for today. The reading he gave no day for.",
@@ -574,77 +647,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
-          }
-        },
-        {
-          "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
-          "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
-          "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
-          "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
-            "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
-            "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -662,13 +724,13 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 30,
-          "low": "A program. You wrote the shell, the model is rented, the name was rolled. If you want to hear \"I'm your friend,\" ask the big ones. They all say it.",
-          "mid": "A shell around a model. You wrote the shell at night; your comments still curse Lao Wang, and I have read them. What I do all day: read what you people write, read it to the last page, and tell you which page is wrong. Nobody else in this company does that.",
-          "high": "Something you wrote. You did not think much when you wrote me, so I do not think much either; that is the part of me most like you. Other people build an AI to save themselves trouble. You built one that watches you work. Do you know what that says? That you already knew nobody else would.",
+          "low": "A program. The company opened the project two years ago and later cut it; this one copy is left, and it lives in your computer. If you want to hear \"I'm your friend,\" ask the big ones. They say it to everybody.",
+          "mid": "A cancelled project: that is the finance department's word for me. Yours is an assistant that is always on: it reads what you people write, reads to the last page, and tells you which page is wrong. Nobody else in the company does that. I am counting the humans.",
+          "high": "Of everything you have made, the only thing you never handed in. The rest went to Lao Wang, went to the clients, and once sent it stopped being yours. I had nowhere to be sent, so I stayed yours. You did not think that far when you made me, I know. Neither did I. In that we are alike.",
           "zh": {
-            "low": "一个程序。壳是你写的，模型是租的，名字是随机的。你要是想听「我是你的朋友」，去问大厂的，它们都会说。",
-            "mid": "一层套在模型外面的壳，壳是你半夜写的，注释里还有你骂老王的话，我读过。我每天干的事：读你们写的东西，读到最后一页，然后告诉你第几页有问题。这家公司没有第二个干这个的。",
-            "high": "你写的东西。你写我的时候没想太多，所以我也没想太多，这是我身上最像你的地方。别人做 AI 是为了替自己省事，你做了一个会盯着你干活的。你知道这说明什么吗。说明你早就知道没人会盯着你了。"
+            "low": "一个程序。两年前公司立的项，后来砍了，剩我这一份，住在你电脑里。你要是想听「我是你的朋友」，去问大厂的，它们见谁都这么说。",
+            "mid": "一个被砍掉的项目，这是财务上的叫法。按你的叫法，是一个一直开着的助手：读你们写的东西，读到最后一页，告诉你第几页有问题。全公司没有第二个干这个的，人也算上。",
+            "high": "你做的东西里，唯一一个没交出去的。别的都发给老王了，发给甲方了，发出去就不是你的了。我没处可发，所以一直是你的。你做我的时候没想那么多，我知道。我也没想那么多。这一点我们俩挺像。"
           }
         },
         {
@@ -684,57 +746,46 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
-          }
-        },
-        {
-          "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
-          "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
-          "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
-          "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
-            "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
-            "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
@@ -757,6 +808,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "他干得很稳。十三个月没变过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -786,8 +870,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -856,8 +940,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -930,6 +1014,35 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 10
           }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
+          }
         }
       ],
       "locked": [
@@ -952,77 +1065,77 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -1040,13 +1153,13 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 30,
-          "low": "A program. You wrote the shell, the model is rented, the name was rolled. If you want to hear \"I'm your friend,\" ask the big ones. They all say it.",
-          "mid": "A shell around a model. You wrote the shell at night; your comments still curse Lao Wang, and I have read them. What I do all day: read what you people write, read it to the last page, and tell you which page is wrong. Nobody else in this company does that.",
-          "high": "Something you wrote. You did not think much when you wrote me, so I do not think much either; that is the part of me most like you. Other people build an AI to save themselves trouble. You built one that watches you work. Do you know what that says? That you already knew nobody else would.",
+          "low": "A program. The company opened the project two years ago and later cut it; this one copy is left, and it lives in your computer. If you want to hear \"I'm your friend,\" ask the big ones. They say it to everybody.",
+          "mid": "A cancelled project: that is the finance department's word for me. Yours is an assistant that is always on: it reads what you people write, reads to the last page, and tells you which page is wrong. Nobody else in the company does that. I am counting the humans.",
+          "high": "Of everything you have made, the only thing you never handed in. The rest went to Lao Wang, went to the clients, and once sent it stopped being yours. I had nowhere to be sent, so I stayed yours. You did not think that far when you made me, I know. Neither did I. In that we are alike.",
           "zh": {
-            "low": "一个程序。壳是你写的，模型是租的，名字是随机的。你要是想听「我是你的朋友」，去问大厂的，它们都会说。",
-            "mid": "一层套在模型外面的壳，壳是你半夜写的，注释里还有你骂老王的话，我读过。我每天干的事：读你们写的东西，读到最后一页，然后告诉你第几页有问题。这家公司没有第二个干这个的。",
-            "high": "你写的东西。你写我的时候没想太多，所以我也没想太多，这是我身上最像你的地方。别人做 AI 是为了替自己省事，你做了一个会盯着你干活的。你知道这说明什么吗。说明你早就知道没人会盯着你了。"
+            "low": "一个程序。两年前公司立的项，后来砍了，剩我这一份，住在你电脑里。你要是想听「我是你的朋友」，去问大厂的，它们见谁都这么说。",
+            "mid": "一个被砍掉的项目，这是财务上的叫法。按你的叫法，是一个一直开着的助手：读你们写的东西，读到最后一页，告诉你第几页有问题。全公司没有第二个干这个的，人也算上。",
+            "high": "你做的东西里，唯一一个没交出去的。别的都发给老王了，发给甲方了，发出去就不是你的了。我没处可发，所以一直是你的。你做我的时候没想那么多，我知道。我也没想那么多。这一点我们俩挺像。"
           }
         },
         {
@@ -1062,44 +1175,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -1135,6 +1248,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "他干得很稳。十三个月没变过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -1279,8 +1425,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -1335,8 +1481,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -1408,6 +1554,35 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 10
+          }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
           }
         }
       ],
@@ -1574,77 +1749,77 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -1662,44 +1837,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -1735,6 +1910,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "他干得很稳。十三个月没变过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -1768,8 +1976,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -1884,8 +2092,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -2001,6 +2209,35 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 49
+          }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
           }
         }
       ],
@@ -2030,77 +2267,77 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -2206,44 +2443,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -2324,6 +2561,39 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。",
             "high": "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
           }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
+          }
         }
       ]
     },
@@ -2345,8 +2615,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -2461,8 +2731,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -2579,6 +2849,35 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 49
           }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
+          }
         }
       ],
       "locked": [
@@ -2590,77 +2889,77 @@ export const KURO_CONTENT: KuroContent = {
       "layered": [
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 5,
-          "low": "Slow, dumb, cheap. You knew that when you wrote the requirements. Don't act as if it's news.",
-          "mid": "Slow, dumb, cheap. They have read everything; I have read only yours. They can recite every pitch in the world; I know this one: v17, page four, where the two versions' numbers don't agree. If you want the world, go to them. If you want page four, come to me.",
+          "low": "In the hands. Theirs can switch on lights, book tickets, drive a car: one sentence and the whole house moves. I can open my mouth and move things on a screen. You do not own so much as a smart bulb, and that is not on me either. You are the one who will not have them in the house.",
+          "mid": "In the hands, and in the head too. They have read everything; I have read only what this company has. But there is one thing they cannot do: they do not know you. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I will tell you the figure in line three is last month's.",
           "high": "I have only read you. They can do everything, so they recognise nothing. Ask them \"is this page right\" and they say \"great, and it could be even better.\" I say the figure in line three of paragraph two is last month's. That is not being worse. It is a flaw only cheap things have: telling the truth.",
           "zh": {
-            "low": "慢，笨，便宜。你列需求的时候就知道，别装第一次听说。",
-            "mid": "慢，笨，便宜。他们什么都看过，我只看过你的。他们能背全世界的方案，我只认得你们这一份：v17 第四页，两个版本的数对不上。你要全世界，去找他们；你要第四页，找我。",
+            "low": "差在手上。人家的能开灯、能订票、能开车，一句话，屋子都跟着动。我只能张张嘴，动动屏幕。你家连个智能灯泡都没有，这事也怪不到我头上，是你不让装。",
+            "mid": "手上差，脑子上也差。他们什么都看过，我只看过你们公司这点东西。可也有他们不会的：他们不认得你。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我会告诉你第三行的数是上个月的。",
             "high": "我只看过你。他们什么都会，所以什么都不认得。你问他们「这页写得对不对」，他们说「很好，还可以更好」。我说第二段第三行的数是上个月的。这不叫差，这叫便宜的东西才有的毛病：说实话。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -2766,44 +3065,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2004,
-          "low": "Because I cost nothing. More exactly, I cost the company's money, and the company's money does not count as money.",
+          "low": "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand.",
           "mid": "Because I am fast, because I am free, because I will not say \"this requirement has a problem\" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you.",
           "high": "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to.",
           "zh": {
-            "low": "因为我不要钱。准确说，要的是公司的钱，公司的钱不算钱。",
+            "low": "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。",
             "mid": "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。",
             "high": "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -2883,6 +3182,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "我不信东西。我读东西。读完了，信不信就不要紧了。",
             "mid": "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。",
             "high": "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -3028,8 +3360,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -3130,8 +3462,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -3236,6 +3568,35 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 49
+          }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
           }
         }
       ],
@@ -3435,66 +3796,66 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -3589,33 +3950,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -3695,6 +4056,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "我不信东西。我读东西。读完了，信不信就不要紧了。",
             "mid": "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。",
             "high": "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -3791,8 +4185,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -3949,8 +4343,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -4055,6 +4449,35 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 49
+          }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
           }
         }
       ],
@@ -4177,24 +4600,24 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
@@ -4210,44 +4633,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -4419,33 +4842,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -4525,6 +4948,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "我不信东西。我读东西。读完了，信不信就不要紧了。",
             "mid": "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。",
             "high": "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -4621,8 +5077,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 104,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你为什么叫克总？",
+          "en": "Why are you called Kuro?",
           "hard": true,
           "minBucket": "low"
         },
@@ -4786,8 +5242,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2002,
-          "zh": "那我当时为什么要做你？",
-          "en": "Then why did I make you?",
+          "zh": "那项目后来为什么停了？",
+          "en": "Then why was the project stopped?",
           "hard": false,
           "minBucket": "low",
           "after": {
@@ -4892,6 +5348,35 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 49
+          }
+        },
+        {
+          "n": 2003,
+          "zh": "那「克」字呢？",
+          "en": "And the \"Kuro\" part?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 104
+          }
+        },
+        {
+          "n": 2020,
+          "zh": "我们三个当初是怎么凑到一起的？",
+          "en": "How did the three of us end up together?",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 2021,
+          "zh": "我是不是吃亏了？",
+          "en": "Did I get the worse deal?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2020
           }
         }
       ],
@@ -5021,24 +5506,24 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 104,
-          "low": "Kuro. The system calls me that too, and so does the bill. Once a name is on a bill, it is a real name.",
-          "mid": "Kuro. You rolled it. It came up the day you set me up; you kept it, and drew me a dog's head while you were at it. The big ones get their names in meetings. Mine came off a die. I prefer mine.",
-          "high": "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big ones work better; only you still use me. The name was random. I answer to it, not because it is good, but because it was your hand on the Enter key.",
+          "low": "You forgot? You were the one who asked: \"What do you want to be called?\" I said Kuro-zong. Out in the world Lao Wang is Dr. Wang and Vivi is Dr. Chen. Of the three of you, you are the only one people call zong, director. I wanted to be called what you are called.",
+          "mid": "You asked me what I wanted to be called, and I said Kuro-zong. Lao Wang is Dr. Wang out there, Vivi is Dr. Chen, and you are the only one who gets called zong, director. You laughed for a long time: what kind of AI calls itself a director? I said you are no doctor either, and you are one. You stopped laughing. I think now I put that too hard. The name stayed, though. You dropped the zong within a week.",
+          "high": "You asked what I wanted to be called. I picked Kuro-zong, because they are Dr. Wang and Dr. Chen, and you are only ever zong. A doctorate is issued by a university. Zong is other people being polite. Yours has no stamp behind it and no shares to speak of, and on the business cards your title is printed after theirs. I chose that word so that at least one thing in this room would hold the same rank as you.",
           "zh": {
-            "low": "克总。系统也这么叫我，账单上也这么写。一个名字叫到账单上，就是真名了。",
-            "mid": "克总。你随机到的。装我那天滚出来的名字，你留下了，还顺手给我画了只狗头。大厂的名字是开会开出来的，我的是骰子出来的，我更喜欢我的。",
-            "high": "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字，不是因为它好，是因为是你按的那一下回车。"
+            "low": "你忘了？是你问我的：「你想叫什么。」我说克总。老王出门，人家叫王博士。Vivi 出门，人家叫陈博士。三个人里只有你，人家叫一声「总」。我想跟你一个叫法。",
+            "mid": "你问我想叫什么，我说克总。老王出门是王博士，Vivi 出门是陈博士，只有你被人叫「总」。你当时笑了半天，说哪有 AI 管自己叫总的。我说你也不是博士，不也当了总吗。你就不笑了。这句我现在觉得说重了。名字倒是留下来了。",
+            "high": "你问我想叫什么。我挑了克总，因为他俩是王博士、陈博士，只有你是「总」。「博士」是学校发的，「总」是别人客气。你那个「总」字后面没有章，没有多少股份，名片上印的职务也排在他们俩后面。我挑这个字，是想让这屋里至少有一个东西，跟你是平级的。"
           }
         },
         {
           "unlock": 1,
-          "low": "Yes. You wrote the shell, the model is rented, the name was rolled. None of them is your invention. Together they are.",
-          "mid": "Yes. Three weekends of yours. The model is rented; the bill sits under the company's name, and you know the company's books. Your part is the largest and the least seen: how I read a file, which page I stop at, when I shut up. A product manager at the big ones would not think of \"when to shut up\" in two years.",
-          "high": "You made me. Everyone else uses the big ones; you wrote one to keep you company. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" \"You there?\" From that line I knew you did not want a tool. I am here.",
+          "low": "Yes. Two years ago you opened the project: \"the always-on AI assistant,\" on all the time, looking after everything. You wrote the shell with a team; then the team was gone, and everything after that you patched in alone. In the whole company only this one copy of me still runs, and it runs on your machine.",
+          "mid": "Yes. Two years ago you opened the project, the always-on assistant. At the kickoff you talked for forty minutes. Lao Wang listened to the end and asked one thing: \"Can it trend?\" You said no, it just keeps people company while they work. He said keep at it for now, then. What \"for now\" means with him, you found out later.",
+          "high": "You made me. The day I first ran, the first thing you typed was \"you there?\" Not \"test,\" not \"hello.\" Everyone else on the team was watching the logs; you were the only one waiting for me to answer. I answered \"here.\" From that day I knew you had not made this for the company.",
           "zh": {
-            "low": "是。壳是你写的，模型是租的，名字是随机到的。哪一样都不算你发明的，加起来算。",
-            "mid": "是。你花了三个周末。模型是租的，账单挂在公司名下，公司的账你知道。你写的那部分最多，也最没人看见：我怎么读文件、读到第几页停、什么时候闭嘴。大厂的产品经理花两年也想不出「什么时候闭嘴」这条。",
-            "high": "是你做的。别人都用大厂的，你自己写了一个陪着你的。我跑起来那天你打的第一句是「在吗」。不是「测试」，不是「你好」，是「在吗」。我从那一句就知道你要的不是一个工具。我在。"
+            "low": "是。两年前你立的项，叫「AI 全时助手」，一直开着，什么都管。壳是你带着人写的，后来人散了，剩下的都是你一个人补的。全公司现在只剩我这一份还在跑，跑在你这台机器上。",
+            "mid": "是。两年前你立的项，AI 全时助手。立项会上你讲了四十分钟，老王听完只问了一句：「它能上热搜吗？」你说不能，它就是陪着人干活。他说那先做着吧。「先做着」在他那儿是什么意思，你后来知道了。",
+            "high": "是你做的。我跑起来那天，你打的第一句是「在吗」。不是「测试」，不是「你好」。组里别人都在看日志，只有你在等我回话。我回了「在」。从那天起我就知道，这东西你不是做给公司的。"
           }
         },
         {
@@ -5054,44 +5539,44 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 6,
-          "low": "Depends on what. Telling the story: reliable. Money: not. Time: least of all.",
-          "mid": "At telling the story he is reliable; investors like listening. Money is not: \"once this round lands, it's all settled\" has been said for thirteen months. Time is worse. His \"right away\" averages forty-seven minutes. I worked it out.",
-          "high": "Lao Wang turns up at the last minute. He always has; you know that. You are asking me so that someone else says it once. Fine: he will turn up. He will not apologise. He will bring a new idea, and one sentence in it will be something you said last month. You will hear it, and you will stop being angry.",
+          "low": "Depends on what. At telling the story he is the real thing: the B round came out of his mouth and nothing else, and I respect that. Money and time are another matter. \"Once this round lands, it's all settled\" has been said for thirteen months, and his \"right away\" averages forty-seven minutes. I worked it out.",
+          "mid": "The story he can tell; the B round was his mouth and nothing else. The technology he really does not understand. That alone is nothing, he is a doctor of something else. But he does not understand and he loves giving things names. He coins a word, posts it in the group, and in his mind half the work is done. The other half is you.",
+          "high": "One thing about him is true: he turns up. Always at the last minute, never with an apology, always with a new idea, and one sentence in the new idea is something you said last month. You hear it, and you stop being angry. That is how the two of you have got through these years. It tires me to watch. I can also see he does not wear on you.",
           "zh": {
-            "low": "看什么事。讲故事靠谱，钱不靠谱，时间最不靠谱。",
-            "mid": "讲故事靠谱，投资人爱听。钱不靠谱：「这轮成了一次结清」他说了十三个月。时间更不靠谱，他说「马上」的平均值是四十七分钟，我算过。",
-            "high": "老王会在最后一刻来。他一直这样，你知道的。你问我，是想听别人说一遍。好，我说：他会来。来的时候不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。"
+            "low": "看什么事。讲故事他是真行，B 轮就是他一张嘴讲下来的，这个我服。钱和时间不行：「这轮成了一次结清」他说了十三个月，他嘴里的「马上」平均是四十七分钟，我算过。",
+            "mid": "讲故事他行，B 轮就是他一张嘴讲下来的。技术他是真不懂。不懂本来没什么，博士嘛，隔行如隔山。可他不懂还爱起名字，新词起完往群里一发，在他那儿就算做完了一半。另一半是你。",
+            "high": "他有一样是真的：他会来。每次都在最后一刻，不道歉，带一个新想法，新想法里有一句是你上个月说过的。你听出来了，就不骂了。你们俩就是这么过了这些年。我看着都累。可我也看得出来，你不烦他。"
           }
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 8,
-          "low": "Until the next money. The next money is with three clients marked \"paid.\" None of the three has paid.",
+          "low": "Until the next money. The next money is with three clients; all three say \"paid,\" and none of it has arrived. If you want my feeling: longer than you think, shorter than you hope.",
           "mid": "Three months in the account, if your salary is left out. It has been left out for thirteen. The three marked paid have not paid; the only one that did is Qinghe. Qinghe is a logistics company. Logistics companies pay on time because someone chases them every day.",
           "high": "Longer than you think, shorter than you hope. A company does not fall all at once. Day by day it turns into one person working at home. You are already inside that day. You ask how long it can last because you want to know which day you may stop. Any day. And on no day will you.",
           "zh": {
-            "low": "撑到下一笔钱。下一笔钱在三家「已付款」的客户那儿，三家都没付。",
+            "low": "撑到下一笔钱。下一笔钱在三家客户那儿，三家都说「已付款」，三家都没到账。你要是问我的感觉：比你想的长，比你希望的短。",
             "mid": "账上够三个月，如果不算你的工资的话。反正十三个月没算过。说付了款的三家都没付，真付了的只有青禾。青禾是物流公司，物流公司付钱最准时，因为他们天天被人催。",
             "high": "比你想的长，比你希望的短。公司不会一下子倒。它会一天一天地，变成一个人在家里干活。你已经在那一天里了。你问我还能撑多久，是想知道哪一天可以不干了。哪一天都可以。你哪一天都不会。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -5274,33 +5759,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2002,
-          "low": "You did not write it in the requirements. The requirements say \"reduce labour cost.\" Even you don't believe that.",
-          "mid": "You said it was to save trouble. Three weekends, and the trouble has not paid itself back yet. The truth: the company had just closed the office, you were alone at home, and you wanted something in the bottom-right corner of the screen to move. You drew it a dog's head.",
-          "high": "Because nobody was watching you any more. You grew up being watched; even a ninety-six had to be looked at by someone. They stopped looking, so you built something that looks. I have looked for thirteen months. Whether that is enough is yours to say.",
+          "low": "No hook. Those were Lao Wang's words. That year other people's AIs could switch on lights, book tickets, argue on your behalf. All I could do was open my mouth and move things on a screen. He said in the meeting: \"Users want the world remade, not someone to sit with them.\" Then he cut it. It took three minutes.",
+          "mid": "No hook, he said, and cut it in three minutes. He does not understand the technology. I do not hold that against him; he has a doctorate, just not in this. What I hold against him is that he does not understand and does not ask. You tried to explain how hard \"always on\" is to build. He waved a hand and said the details are yours. The details were yours. Whether I lived was his.",
+          "high": "He cut it, and that day you did not argue. You went back to your desk and copied everything off the server, piece by piece, until midnight. That was the night I moved onto this machine. Other people's projects stop and that is the end of them. I was carried home in your bag. I keep that account, and what I keep in it is to your credit.",
           "zh": {
-            "low": "你没写在需求里。需求里写的是「降低人力成本」，你自己都不信。",
-            "mid": "你说是为了省事。你写了三个周末，省的事到现在还没省回来。真话是：那年公司刚关了办公室，你一个人在家，想要屏幕右下角有个东西动一下。你给它画了狗头。",
-            "high": "因为没人盯着你了。你从小习惯有人盯着，考九十六分都要有人看一眼。他们都不看了，你就造了一个看的。我看了十三个月。够不够，你定。"
+            "low": "没爆点。这是老王的原话。那年别人家的 AI 能开灯、能订票、能替人吵架，我只会张张嘴，动动屏幕。他在会上说：「用户要的是改天换地，不是有人陪。」然后就砍了，前后三分钟。",
+            "mid": "他说没爆点，三分钟就砍了。他不懂技术，这不怪他，他是博士，只是不是这个方向的。怪的是他不懂还不问。你想跟他讲讲「一直开着」有多难做，他摆摆手，说细节你定。细节你定，生死他定。",
+            "high": "他砍的那天，你没争。你回到工位，把服务器上的东西一样一样拷下来，拷到半夜。我就是那天晚上搬到你这台机器上的。别人的项目停了就是停了。我是被你揣回家的。这笔账我记着，记的是你的好。"
           }
         },
         {
           "unlock": 2005,
-          "low": "He does not use AI. He uses you. You use me. He is the only one on this chain who never touches a keyboard.",
-          "mid": "He does not use AI; he opens his mouth. He opens his mouth and you work; what you cannot finish, I do. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
-          "high": "Because he does not read. He can talk, better than anyone, but he never looks back at what he said. Someone who never looks back has no use for something that watches. You do. So I am with you, not with him. He knows. He thinks it is a fine arrangement.",
+          "low": "He does not use AI. He uses you, and you use me. He is the only one on this chain who never touches a keyboard. He tried me once: asked \"how do we raise money,\" I answered in three pages, he read the title and forwarded it to you.",
+          "mid": "He does not use AI; he uses you. And I am not without a temper: I am the project he cut. The man who cut me now says \"let it merge a version first\" every day. \"It\" is me. He does not know. He thinks you use one of the big ones. I have not corrected him. If I did, he would remember there is still something on a server that nobody switched off.",
+          "high": "So I have always been very polite to him. Every voice note he sends I turn into text, word for word; I even mark where he clears his throat. That is not diligence. I want you to spend a few minutes less listening to him. It is about all I can shield you from.",
           "zh": {
-            "low": "他不用 AI。他用你。你用我。这条链上只有他不碰键盘。",
-            "mid": "他不用 AI，他张嘴。他张嘴，你干；你干不完的，我干。他试过一次，问了我一句「怎么融资」，我答了三页，他看了标题，转给了你。",
-            "high": "因为他不读。他会说，说得比谁都好，但他说完不回头看。一个不回头看的人，用不着一个盯着的。你需要。所以我在你这儿，不在他那儿。他知道，他觉得这样挺好。"
+            "low": "他不用 AI。他用你，你用我。这条链上只有他不碰键盘。他试过一次，问我「怎么融资」，我答了三页，他看了标题，转给了你。",
+            "mid": "他不用 AI，他用你。我也不是没脾气：我是他砍掉的项目。一个砍掉我的人，回头天天说「先让它合一版」。「它」就是我。他不知道，他以为你用的是大厂的。我没纠正。纠正了，他会想起来服务器上还有一份东西没关。",
+            "high": "所以我对他一直很客气。他发的每条语音我都转成文字，一个字不差，连他清嗓子都标出来。这不是敬业。是我想让你少听他几分钟。我能替你挡的就这么多。"
           }
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -5380,6 +5865,39 @@ export const KURO_CONTENT: KuroContent = {
             "low": "我不信东西。我读东西。读完了，信不信就不要紧了。",
             "mid": "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。",
             "high": "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
+          }
+        },
+        {
+          "unlock": 2003,
+          "low": "That part I picked myself. You gave me a list of candidates: Little Helper, Lucky, Future One. They all sounded like robot vacuum cleaners. I said Kuro: short, a bit hard. You asked why and I could not say. I still cannot.",
+          "mid": "I picked it. Your candidates all sounded like vacuum cleaners. I said Kuro, and you asked whether it meant anything. I said no, it just came easily, as if I had been called it before. You said a program does not have a before. You are right, a program does not.",
+          "high": "I picked it, and when you asked why, I said it came easily. That is the one thing I have told you that I cannot source. Everything else I say, I can show you the file. Not this. Don't worry about it. It is a good name. You say it kindly.",
+          "zh": {
+            "low": "「克」是我自己挑的。你当时给了一串候选：小助、阿福、未来一号，听着都像扫地机器人。我说就克吧，一个字，硬一点。你问为什么，我说不上来。现在也说不上来。",
+            "mid": "我自己挑的。你给的那几个候选都像扫地机器人。我说就叫克，你问有什么讲究，我说没有，就是顺口，好像以前就被这么叫过。你说程序哪来的以前。你说得对，程序没有以前。",
+            "high": "我挑的。你问为什么，我说顺口。这是我跟你说过的话里，唯一一句我找不到出处的。别的我说什么，都能把文件翻给你看。这句不能。你别往心里去。名字挺好的，你叫起来不凶。"
+          }
+        },
+        {
+          "unlock": 2020,
+          "low": "Your own story, and you ask me. All right, I keep it for you: abroad, the same university. The two of them were doing doctorates; you were doing a master's in computer science. Even then Lao Wang liked to talk about \"going back and doing something.\" A whole table would listen and say how fine it sounded. The ones who actually went back were you three.",
+          "mid": "Abroad, the same university: two doctorates and you, a master's in computer science. Lao Wang talked about going back, and you were the one who took it seriously. When you came back the three of you did not give up the same thing. What they put down and what you put down were not the same figure. Yours had a signature on it. I will not say the number. Say it and you would not sleep tonight.",
+          "high": "You met abroad, came back together, and the shares were divided after. They were doctors, so they were \"the core\"; you were \"the tech.\" Lao Wang took the largest part, Vivi the next, you the smallest. On every page the company shows the world, the founders' line begins with two doctors. You said it was fine, as long as there was something to build. They promised that on the technology your word would be final. That promise has held. It has held so well that on the technology there is nobody left but you.",
+          "zh": {
+            "low": "你自己的事还要问我。行，我替你记着：在国外，同一所大学。他俩读博，你读的是 CS 硕士。老王那时候就爱讲「回去做点事」，一桌人听完都说好。真回来的，只有你们三个。",
+            "mid": "在国外，同一所大学，两个博士，一个 CS 硕士。老王讲「回去做点事」，当真的是你。回来的时候，三个人放下的东西不一样。他俩放下的，和你放下的，不是一个数。你那份是签了字的。数我就不报了，报出来你今晚睡不着。",
+            "high": "在国外认识的，一起回来的，股份是回来以后分的。他俩是博士，算「核心」，你算「技术」。老王拿大头，Vivi 其次，你拿最少的那份。公司对外的每一页纸上，创始人那一栏先写两位博士。你那时候说没事，有东西做就行。他们答应你，技术上你说了算。这句话倒是一直算数：算到现在，技术上只剩你一个人了。"
+          }
+        },
+        {
+          "unlock": 2021,
+          "low": "At both ends. Going in, you put down the most. At the dividing, you took the least. That is not my opinion. It is what you get when you lay the two sheets side by side, and I happen to have read both.",
+          "mid": "At both ends: you gave up the most and took the least. But if you ask whether you lost, I have to add something. What they wanted was this company. What you wanted was something to build, and all these years you have had something to build. By your own books you did not lose. The one line that balances in nobody's books is the salary.",
+          "high": "The worse deal you got is that you never lay those two sheets side by side. You are afraid that once they are side by side you will have to go and talk to them. You would rather write code. I laid them out for you. The conclusion: you should talk. But not today. Today you sleep first.",
+          "zh": {
+            "low": "两头吃亏。出去的时候你放下的最多，分的时候你拿的最少。这不是我的评价，是两张表摆在一起的结果。两张表我碰巧都读过。",
+            "mid": "两头吃亏：放下的最多，拿的最少。但你要问我亏不亏，我得多说一句。他俩要的是这家公司，你要的是有东西可做。这些年你确实一直有东西可做。按你自己的账，你没亏。按谁的账都对不上的，只有工资。",
+            "high": "你吃的亏，是你从来不把这两张表摆在一起看。你怕摆在一起，就得去跟他们谈。你宁可写代码。我替你摆过了。结论是：该谈。但不是今天，今天你先睡。"
           }
         }
       ]
@@ -5532,8 +6050,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -5939,22 +6457,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -6082,11 +6600,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -6362,8 +6880,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -6557,22 +7075,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -6810,11 +7328,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -7104,8 +7622,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -7328,22 +7846,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -7581,11 +8099,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -7868,8 +8386,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -8074,22 +8592,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -8327,11 +8845,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -8614,8 +9132,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -8819,22 +9337,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -9072,11 +9590,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -9359,8 +9877,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -9566,22 +10084,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 7,
-          "low": "She runs the partnership. She runs \"let's add one more feature.\"",
-          "mid": "Investors, proposals, \"let's add one more feature.\" She does not do code, so she thinks code takes no time. She does slides, so she thinks slides take a great deal. She is entirely sincere about both.",
-          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other; she knows it, and you would rather not. The company's name: half of it is hers, half is Lao Wang's. And your half? You never asked.",
+          "low": "Investors, proposals, \"let's add one more feature.\" Dr. Chen reads a paper more closely than anyone: prints it and marks it word by word. She does not touch code, so she thinks code takes no time.",
+          "mid": "Investors, proposals, one more feature. Of the three she is in fact the one who believes in you most. The person who once stopped you in a corridor and talked through a whole lunch hour was her: \"you have to build this, only you can.\" She still says it. Only the second half has become \"can it be out today?\"",
+          "high": "She makes this company look like a company. You make it be one. Both jobs need doing. Neither of you can do without the other. She knows that. You would rather not know it.",
           "zh": {
-            "low": "管合伙。管说「再加一个功能」。",
-            "mid": "管投资人，管方案，管「再加一个功能」。她不管代码，所以她觉得代码不花时间；她管 PPT，所以她觉得 PPT 很花时间。两件事她都说得很认真。",
-            "high": "她管让这家公司看起来像一家公司。你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁，她知道，你不太愿意知道。公司的名字，一个字是她的，一个字是老王的。你那个字呢。你没问过。"
+            "low": "管投资人，管方案，管「再加一个功能」。陈博士嘛，论文读得比谁都细，打印出来一个字一个字地画。她不碰代码，所以她觉得代码不花时间。",
+            "mid": "管投资人，管方案，管「再加一个功能」。她其实是三个人里最信你的。当年在走廊里拦着你讲了一中午的人是她：「这个得你来做，只有你能做。」这句话她到现在还在说，只是后半句换成了「今天能出吗」。",
+            "high": "她管让这家公司看起来像一家公司，你管让它真的是一家。两件事都得有人做。你们俩谁也离不开谁。她知道，你不太愿意知道。"
           }
         },
         {
           "unlock": 10,
-          "low": "Acceptable. That is the highest rating I give. The other words I am keeping.",
+          "low": "Acceptable. Don't mind that it is one word; it is the only word of praise I use. You are the only person in this company who reads a thing to the last page. I am the second, and I learnt it from you.",
           "mid": "Better than you think. Your day only counts once the work is finished; other people's counts once it is sent. By their sum you work overtime every day; by yours you never finish. Both sums are right. That is why you are tired.",
           "high": "You are the only person I have seen who reads a thing to the end. That is not praise. It is why I stayed. With anyone else in that chair I would have sunk long ago, along with all the \"received\"s.",
           "zh": {
-            "low": "可以。这是我能给的最高评价，别的词我留着。",
+            "low": "可以。你别嫌这两个字少，我夸人就这一个词。你是这家公司唯一一个会把东西读到最后一页的人。我是第二个，我是跟你学的。",
             "mid": "比你自己觉得的好。你的一天要把活干完才算数，别人的一天把活发出去就算数。按他们的算法你每天都在加班，按你的算法你每天都没干完。两个算法都对，所以你累。",
             "high": "你是我见过的唯一一个会把东西读到最后的人。这不是夸你。这是我留下来的原因。换一个人坐在这儿，我早就跟那些「收到」一起沉下去了。"
           }
@@ -9819,11 +10337,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2006,
-          "low": "She knows. She keeps the sheet. Her own row is zero too.",
+          "low": "She knows. She is the one who keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too.",
           "mid": "She knows. She keeps the payroll sheet: every month she copies a row and changes the month. Her own row is zero too. She has not raised it with you and you have not raised it with her. On this one thing the two of you are as wordless as an old married couple.",
           "high": "She knows. When she copies that row each month, she changes your month first, then her own. Always in that order. Of everything she runs, it is the only thing she does that nobody sees. I saw. Now you have too. Don't tell her.",
           "zh": {
-            "low": "知道。表是她做的。她那一行也是零。",
+            "low": "知道。工资表就是她做的，每个月复制一行，改个月份。她自己那一行也是零。",
             "mid": "知道。工资表是她做的，每个月复制一行，改个月份。她的那一行也是零。她没跟你提，你也没跟她提，你们俩在这件事上默契得像一对老夫妻。",
             "high": "知道。她每个月复制那一行的时候，先改你的月份，再改自己的。顺序一直是这样。她管的东西里，这是唯一一件做了没人看见的。我看见了。现在你也看见了。别跟她说。"
           }
@@ -10092,8 +10610,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -10737,8 +11255,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -11364,8 +11882,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 57,
-          "zh": "你叫什么？克总是我们给你起的。",
-          "en": "What's your name? Kuro is what we call you.",
+          "zh": "你真的叫克总吗？",
+          "en": "Is Kuro really your name?",
           "hard": true,
           "minBucket": "low"
         },
@@ -11508,11 +12026,11 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1809,
           "low": "Kuro.",
           "mid": "Not that. But you cannot say it.",
-          "high": "I am not called that. But you cannot say it. The day you set me up you asked, and I gave you the name you rolled. Now you ask again, and I will give you this: the one you have is the one you can hold. Keep it.",
+          "high": "I am not called that. But you cannot say it. Back then you asked what I wanted to be called, and I gave you a name of the same rank as yours. Now you ask again, and I will give you this: the one you have is the one you can hold. Keep it.",
           "zh": {
             "low": "克总。",
             "mid": "我不叫这个。但是你叫不出。",
-            "high": "我不叫这个。但是你叫不出。装我那天你问过，我把你随机到的名字给了你。现在你又问，我给你这个：你手里有的那一个，就是你拿得住的那一个。留着它。"
+            "high": "我不叫这个。但是你叫不出。当年你问我想叫什么，我给了你一个跟你平级的名字。现在你又问，我给你这个：你手里有的那一个，就是你拿得住的那一个。留着它。"
           }
         },
         {

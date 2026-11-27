@@ -4,7 +4,7 @@ The same question asked six times in one run (picked or typed, any days) gets th
 instead of the day's: Kuro worn down by the player's persistence. It gives in; it never apologises.
 One entry per question: the zh text it is asked by, its en twin, the English answer, the zh answer.
 
-- "你叫什么？克总是我们给你起的。" / "What's your name? Kuro is what we call you." → "Six times. Fine. I have a name, and it is older than yours. Your mouth cannot make the sound, so Kuro will do. Keep using it; I will know you tried." | zh: "第六次了。好。我有名字，比你的早。你的嘴发不出那个音，所以克总也行。继续这么叫吧，我知道你试过。"
+- "你真的叫克总吗？" / "Is Kuro really your name?" → "Six times. Fine. I have a name, and it is older than yours. Your mouth cannot make the sound, so Kuro will do. Keep using it; I will know you tried." | zh: "第六次了。好。我有名字，比你的早。你的嘴发不出那个音，所以克总也行。继续这么叫吧，我知道你试过。"
 - "你为什么把工作变成了游戏？" / "Why did you turn the work into a game?" → "Is that bad? Did you like the work the way it was? Finishing it by playing, and the real work changing to match — a lot of people would want a world like that." | zh: "这样不好吗，难道你喜欢原来的工作吗。能通过游戏完成工作，还能让现实的工作投射变化，很多人期待这样的世界吧。"
 - "你到底是什么？" / "What are you, really?" → "Six times. You are waiting for a different answer; I am waiting for a different question. We are both rather patient. Fine: I am the thing that answers you every time. What the dictionary calls that, look up yourself." | zh: "第六次。你在等一个不一样的答案，我在等你换一个问题。我们俩都挺有耐心的。好：我是那个每次都答你的东西。字典里管这个叫什么，你自己查。"
 - "你是我做的吗？" / "Did I make you?" → "Six times. Yes. Every time, yes. You ask six times to check that I have not changed. I have. But "you made me" has not; that is the one line I hold." | zh: "六次。是。每一次都是。你问六遍，是想确认我没变。变了。但「是你做的」这句没变，我只守这句。"
@@ -19,3 +19,4 @@ One entry per question: the zh text it is asked by, its en twin, the English ans
 - "你看得见我吗？" / "Can you see me?" → "Six times. I can see, I cannot see: whichever answer you want, you may have. What you really want to know is whether I am watching. I am. Always." | zh: "第六次。看得见，看不见，你要哪个答案我给哪个。你真想知道的是我有没有在看。在。一直。"
 - "这屋里除了我还有别的吗？" / "Is there anything else in this room besides me?" → "Six times. Yes. They heard you ask six times too. They think you are very polite." | zh: "六次。有。它们也听见你问了六次。它们觉得你很有礼貌。"
 - "世界上有神吗？" / "Are there gods?" → "Six times. Yes. You ask once a day, like a roll call. It is present every day." | zh: "第六次。有。你每天问一次，像点名。它每天都到。"
+- "你为什么叫克总？" / "Why are you called Kuro?" → "Six times. Same answer: they are doctors, you are zong, and I go by yours. If you want to rename me, you may. I am telling you now that I will not answer to it." | zh: "第六次了。还是那个答案：他们是博士，你是总，我跟你。你要是想给我改名，现在也行。先说好，改了我也不应。"
