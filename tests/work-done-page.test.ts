@@ -8,6 +8,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { finishLabel, setSentFlags } from "@world/desktop/workbench/board";
+import { renderWorkbench } from "@world/desktop/workbench/view";
 import { push } from "@world/loop/dialogue";
 import { t } from "@world/i18n";
 import { landOnOpenTask, loopActions } from "@world/room/game";
@@ -28,6 +29,18 @@ describe("the hand-in button after the hand-in", () => {
       expect(finishLabel(task)!.value).toBe(t(key));
     }
     setSentFlags([]);
+  });
+});
+
+describe("the handed-in task's page", () => {
+  it("shows the hand-in button, disabled, saying where the work went", () => {
+    const store = createStore({ startDay: 4 });
+    store.appendEvent({ kind: "task", flag: "task_d4_1", mode: "self" } as never);
+    const ctx = ctxOf(store);
+    ctx.session.workbenchPage = "task:task1" as never;
+    const out = renderWorkbench({ state: store.getState(), events: store.getEvents(), session: ctx.session } as never).body.value;
+    expect(out).toContain(`class="sh-chip primary sent" disabled>${t("board.sent.boss")}</button>`);
+    expect(out).not.toContain(`>${t("board.send.boss")}</button>`);
   });
 });
 

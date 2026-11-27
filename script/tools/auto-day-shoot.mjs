@@ -599,7 +599,10 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); note(`   handin: after 退出工作模式 · ${await st()}`); }
         // read the closing lines only (settle would also run the interrupts, which open Vivi's unread pages when the
         // landing is the group thread and walk the screen away before the frame is taken)
-        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread"); await settle(); await toRoom();
+        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread");
+        // author 2026-11-27: back on 工作台 after the hand-in — the task's own page, the button saying it was sent
+        if (await sel("[data-action=dock][data-app=workbench]", 1.5)) { note(`   handin: 工作台 again · ${await st()} · ${await ev("(()=>{const b=[...document.querySelectorAll('[data-action=board-print]')].filter(__vis).map(__txt); return JSON.stringify(b)})()")}`); await shotStep("handin-workbench"); }
+        await settle(); await toRoom();
       } else
       if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
         // launch (author 2026-11-11): the task's opening page first (Kuro's ask was answered by settle on the row click)
@@ -759,7 +762,10 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); note(`   handin: after 退出工作模式 · ${await st()}`); }
         // read the closing lines only (settle would also run the interrupts, which open Vivi's unread pages when the
         // landing is the group thread and walk the screen away before the frame is taken)
-        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread"); await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
+        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread");
+        // author 2026-11-27: back on 工作台 after the hand-in — the task's own page, the button saying it was sent
+        if (await sel("[data-action=dock][data-app=workbench]", 1.5)) { note(`   handin: 工作台 again · ${await st()} · ${await ev("(()=>{const b=[...document.querySelectorAll('[data-action=board-print]')].filter(__vis).map(__txt); return JSON.stringify(b)})()")}`); await shotStep("handin-workbench"); }
+        await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
         results.push; 
       } else {
       ok = await sel("[data-action=wb-send]", 1.5); if (!ok) ok = await key("Enter") || true;

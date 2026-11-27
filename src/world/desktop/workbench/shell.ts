@@ -426,6 +426,8 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
     }
     // work-mode §4: a table or meeting board has no chips here — the hand-in and 让它补全 are on the stage.
   }
+  // author 2026-11-27: handed in — the page keeps its hand-in button, saying where the work went (it does nothing more)
+  if (!live && board && taskSent(task)) chips = html`<button type="button" class="sh-chip primary sent" disabled>${finishLabel(task)}</button>`;
   return html`<div class="sh-conv"><div class="sh-thread">${rows}${dots}</div><div class="sh-composer">${chips}</div></div>`;
 }
 
