@@ -88,6 +88,7 @@ Written for people who have never seen it, one picture set each, on X (@vibeddin
 | 2026-11-16 | [In 1997 every kid in China wanted a Tamagotchi](https://x.com/vibedding/status/2122321184628904280) — night one, the author's own childhood |
 | 2026-11-17 | [The promo video, and an honest ask](https://x.com/vibedding/status/2122694594387235108) — the 98 s promo video; the game cost far more than planned, so a Ko-fi link |
 | 2026-11-17 | [NOT TODAY in Kiro's #built-with-kiro](https://discord.com/channels/1374034175430230016/1572388159344607272) (Discord) — the game, why it matters, how Kiro kept a long, changing design straight; the 98 s promo video |
+| 2026-11-27 | [The song, the whole of it](https://x.com/vibedding/status/2126462913053602150) — the full video (4:51): the old things, the work, the games, the dragon, and the theme song played to its end |
 
 ## Licence
 
