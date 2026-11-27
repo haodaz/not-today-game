@@ -17,6 +17,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { taskForId } from "@state/days/board";
+import { PORTRAITS, type Portrait } from "@state/events";
 import { queueLaunchIntro } from "@world/desktop/workbench/actions";
 import { debugStartDay } from "@state/clock";
 import { syncProfile, withCloud } from "./ui/profile-sync";
@@ -283,6 +284,13 @@ if (jump !== null) {
   // Dev only, beside ?day=N (2026-11-09): `&seed=san:80,affinity:70,assimilation:10,shook:1,recognised:all,flags:a+b`
   // lays meters, flags and recognised objects over the fresh state (to stand on day 17/18 and see the ending).
   const store = createStore({ startDay: jump, ...(import.meta.env.DEV ? { patch: debugSeed(params.get("seed")) } : {}) });
+  // Dev only, beside ?day=N (2026-11-27, for recording takes): `&names=login|nick|calledBy|bossCalls|she|p1` gives the jump run
+  // the names a real run gets from the title, so no line falls back to a default name.
+  const namesParam = import.meta.env.DEV ? params.get("names") : null;
+  if (namesParam) {
+    const [login = "", nick = "", calledBy = "", bossCalls = "", pronoun = "", portrait = "p1"] = namesParam.split("|");
+    store.appendEvent({ kind: "names", names: { login, nick, calledBy, bossCalls, pronoun: pronoun === "she" || pronoun === "he" ? pronoun : null, portrait: (PORTRAITS as readonly string[]).includes(portrait) ? (portrait as Portrait) : "p1" } });
+  }
   // Dev only, beside ?day=N: `&found=chick,pager` takes those out of the box first (to try them in hand).
   if (import.meta.env.DEV) for (const id of (params.get("found") ?? "").split(",").filter(Boolean)) store.appendEvent({ kind: "openLayer", objectId: id });
   // Dev only, after ?found=: `&upgraded=chick,pager` upgrades those today (to look at the upgraded screens).

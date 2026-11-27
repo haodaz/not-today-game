@@ -529,8 +529,11 @@
 .dlg-choices .dc-l{flex:1 1 auto;min-width:0;padding:8px 0}
 .dlg-choices .dc-field{cursor:text}
 .dlg-choices .dc-field .kuro-in{flex:1 1 auto;min-width:0;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:4px 0}
-/* A story masks the stage (dialogue addition 2026-11-02): 40 % dim under the box; a click on it reads on. */
-.dlg-layer .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}
+/* A story masks the stage (dialogue addition 2026-11-02): a dim under the box; a click on it reads on.
+   2026-11-27 (author: 人不该在里面 / 页面黑黑的): the mask is the lowest thing in the layer (z-index -1 inside the layer's own
+   stacking context), so the standing figures, which come before it in the markup, are over it in full colour, and the box
+   over them; the dim itself is 30 %, not 40 %. */
+.dlg-layer .story-mask{position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.3);cursor:pointer}
 /* playtest-1105 R2: while any box is up the mask takes every click; a fragment's mask is clear, and
    at a choice (or the player's box) it only holds the screen. */
 .dlg-layer .story-mask.clear{background:transparent}

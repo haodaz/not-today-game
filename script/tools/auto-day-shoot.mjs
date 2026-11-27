@@ -30,7 +30,9 @@ const folderOf = (fid) => filesJson.folders.find((f) => f.files.some((x) => x.id
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 fs.rmSync(`/tmp/nt-auto-${day}`, { recursive: true, force: true }); // a fresh profile: no state from an earlier run of this day
 const port = 9334 + day;
-const chrome = spawn(CHROME, ["--headless=new", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--hide-scrollbars", "--mute-audio", "--disk-cache-size=1", "--media-cache-size=1", "--disable-gpu-shader-disk-cache", `--remote-debugging-port=${port}`, "--window-size=1600,900", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=/tmp/nt-auto-${day}`, "about:blank"], { stdio: "ignore" });
+// LOOK=real (video takes): the game as a player sees it: GPU, shaders, 3D desk, cuts. Default stays the fast test look.
+const REAL = process.env.LOOK === "real";
+const chrome = spawn(CHROME, ["--headless=new", ...(REAL ? ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"] : ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"]), "--hide-scrollbars", "--mute-audio", "--disk-cache-size=1", "--media-cache-size=1", "--disable-gpu-shader-disk-cache", `--remote-debugging-port=${port}`, ...(process.env.REC ? ["--window-size=1600,987", `--force-device-scale-factor=${Number(process.env.SCALE) || 1.2}`] : ["--window-size=1600,900"]), "--autoplay-policy=no-user-gesture-required", `--user-data-dir=/tmp/nt-auto-${day}`, "about:blank"], { stdio: "ignore" });
 const sleep = (s) => new Promise((r) => setTimeout(r, s * 1000));
 process.on("exit", () => { try { chrome.kill("SIGKILL"); } catch {} }); for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => process.exit(1)); process.on("uncaughtException", (e) => { console.error(e); process.exit(1); });
 let targets;
@@ -39,7 +41,7 @@ const ws = new WebSocket(targets.find((t) => t.type === "page").webSocketDebugge
 await new Promise((r) => (ws.onopen = r));
 ws.onclose = () => console.log("   (cdp: the socket closed)");
 let id = 0; const pending = new Map(); const errors = [];
-ws.onmessage = (m) => { const j = JSON.parse(m.data); if (j.id && pending.has(j.id)) { pending.get(j.id)(j); pending.delete(j.id); } else if (j.method === "Runtime.exceptionThrown") errors.push((j.params.exceptionDetails.exception?.description || "").split("\n")[0].slice(0, 160)); };
+ws.onmessage = (m) => { const j = JSON.parse(m.data); if (j.id && pending.has(j.id)) { pending.get(j.id)(j); pending.delete(j.id); } else if (j.method === "Page.screencastFrame") onFrame(j.params); else if (j.method === "Runtime.exceptionThrown") errors.push((j.params.exceptionDetails.exception?.description || "").split("\n")[0].slice(0, 160)); };
 // a reply can be lost (seen 2026-11-26: the run sat 10 min on one evaluate): give up after 30 s, say so, go on
 const send = (method, params = {}) => new Promise((r) => { const i = ++id;
   const t = setTimeout(() => { if (pending.delete(i)) { console.log(`   (cdp: no reply to ${method} in 30 s)`); r({}); } }, 30000);
@@ -59,8 +61,15 @@ window.__choices = () => [...document.querySelectorAll('[data-action=loop-choice
 window.__events = () => { try { const find = (o, d = 0) => !o || typeof o !== 'object' || d > 4 ? null : Array.isArray(o.events) ? o.events : Object.values(o).map((v) => find(v, d + 1)).find(Boolean) || null; return find(JSON.parse(localStorage.getItem('nt_run') || 'null')) || []; } catch { return []; } };
 `;
 await send("Page.enable"); await send("Runtime.enable");
-await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 900, deviceScaleFactor: process.env.HIRES ? 2 : 1, mobile: false });
-await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}&splat=0&fast=1&fx=0&desk=photo${process.env.FOUND ? "&found=" + process.env.FOUND : ""}${process.env.SEED ? "&seed=" + process.env.SEED.replace(/\+/g, "%2B") : ""}` }); // SEED=flags:a+b,san:80 lays earlier days' flags over a mid-run start (see main.ts debugSeed) // fx=0: the collapse shader stalls SwiftShader
+// REC=<file.mp4>: record the page while the walk runs. Frames arrive only when the picture changes; ffmpeg stamps them by
+// arrival and fills to 30 fps. <file>.marks.txt lists every note with its second in the recording, to find a moment later.
+const REC = process.env.REC || ""; let recProc = null, recT0 = 0, recFrames = 0;
+function onFrame(f) { send("Page.screencastFrameAck", { sessionId: f.sessionId }); if (!recProc) return; if (!recT0) recT0 = Date.now(); recFrames++; try { recProc.stdin.write(Buffer.from(f.data, "base64")); } catch {} }
+const recStop = () => new Promise((r) => { if (!recProc) return r(); const pr = recProc; recProc = null; pr.on("close", r); try { pr.stdin.end(); } catch { r(); } });
+if (REC) { recProc = spawn(process.env.FFMPEG || "/Users/aisandbox/Documents/companydata/node_modules/ffmpeg-static/ffmpeg", ["-loglevel", "error", "-y", "-f", "image2pipe", "-use_wallclock_as_timestamps", "1", "-c:v", "mjpeg", "-i", "-", "-vf", "fps=30,crop=trunc(iw/2)*2:trunc(ih/2)*2:0:0", "-c:v", "libx264", "-preset", "veryfast", "-crf", process.env.REC_CRF || "17", "-pix_fmt", "yuv420p", "-movflags", "frag_keyframe+empty_moov+default_base_moof", REC], { stdio: ["pipe", "ignore", "inherit"] }); fs.writeFileSync(REC + ".marks.txt", ""); }
+// a recording takes its size from the window (1600×900 page × SCALE: 1.2 → 1920×1080, 2 → 3200×1800); the override would hand the screencast unscaled frames
+if (!REC) await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 900, deviceScaleFactor: Number(process.env.SCALE) || (process.env.HIRES ? 2 : 1), mobile: false });
+await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}${REAL ? "&fast=1" : "&splat=0&fast=1&fx=0&desk=photo"}${process.env.FOUND ? "&found=" + process.env.FOUND : ""}${process.env.NAMES ? "&names=" + encodeURIComponent(process.env.NAMES) : ""}${process.env.SEED ? "&seed=" + process.env.SEED.replace(/\+/g, "%2B") : ""}` }); // SEED=flags:a+b,san:80 lays earlier days' flags over a mid-run start (see main.ts debugSeed) // fx=0: the collapse shader stalls SwiftShader
 for (let i = 0; i < 40; i++) { if ((await ev("document.readyState")) === "complete") break; await sleep(0.25); }
 // Storage turned out to be shared between headless profiles on this machine: start every day from nothing.
 await ev("localStorage.clear(); sessionStorage.clear(); location.reload(); 'cleared'");
@@ -69,7 +78,12 @@ await sleep(2.5); await ev(HELPERS);
 console.log(`storage at start: ${await ev("JSON.stringify(Object.keys(localStorage))")}`);
 
 const log = [];
-const note = (s) => { log.push(s); console.log(s); };
+const note = (s) => { log.push(s); console.log(s); if (REC && recT0) fs.appendFileSync(REC + ".marks.txt", `${((Date.now() - recT0) / 1000).toFixed(1).padStart(7)}  ${s}\n`); };
+if (REC) await send("Page.startScreencast", { format: "jpeg", quality: Number(process.env.REC_Q) || 88, everyNthFrame: 1 });
+// fast=1 (short waits) also turns the cuts off; a real-look take wants them back
+if (REAL) await ev("(()=>{const s=window.__nt&&window.__nt.session; if(s) s.cutsOn = true; return 1;})()");
+// PACE=<seconds>: stay on each line that long before pressing on (a viewer has to be able to read it)
+const PACE = Number(process.env.PACE) || 0;
 const key = async (k) => { const code = k === " " ? "Space" : k; await send("Input.dispatchKeyEvent", { type: "keyDown", key: k, code }); await send("Input.dispatchKeyEvent", { type: "keyUp", key: k, code }); await sleep(0.35); };
 const click = async (sub, wait = 1.2) => { const ok = await ev(`__click(${JSON.stringify(sub)})`); await sleep(wait); await ev(HELPERS); return ok; };
 const sel = async (s, wait = 1.2) => { await unmask(); const ok = await ev(`__sel(${JSON.stringify(s)})`); await sleep(wait); await ev(HELPERS); return ok; };
@@ -150,7 +164,7 @@ const settle = async (rightOption = null) => {
     const choices = await ev("JSON.stringify(__choices())").then(JSON.parse);
     if (process.env.CHAT && chattedDay !== day && choices.some((c) => c.includes(S("kuro.yes")))) { chattedDay = day; note("   choice → ◇" + S("kuro.yes")); await click(choices.find((c) => c.includes(S("kuro.yes")))); await chatTurns(Number(process.env.CHAT)); quiet = 0; continue; }
     if (choices.length) { await shotStep("choice"); const pick = (rightOption && choices.find((c) => c.includes(rightOption))) || choices.find((c) => c.includes(S("kuro.notNow"))) || choices.find((c) => c.includes(S("room.bed.sleep"))) || choices[0]; note(`   choice → ${pick}`); await click(pick); quiet = 0; continue; }
-    if (await has(".dlg-layer .story-mask")) { await ev("document.querySelector('.dlg-layer .story-mask').click()"); await sleep(0.4); quiet = 0; continue; }
+    if (await has(".dlg-layer .story-mask")) { if (PACE) await sleep(PACE); await ev("document.querySelector('.dlg-layer .story-mask').click()"); await sleep(0.4); quiet = 0; continue; }
     const t = await text();
     if (/[▶▼]/.test(t)) { await key(" "); await sleep(0.25); quiet = 0; } else { await key(" "); quiet++; }
   }
@@ -951,5 +965,6 @@ if (!nextDay || day >= LAST) break;
 day += 1; loadDay(); note(`\n######## continuing into day ${day}`);
 await sleep(3); await ev(HELPERS);
 }
+if (REC) { await send("Page.stopScreencast"); await recStop(); console.log(`recorded ${recFrames} frames, ${((Date.now() - recT0) / 1000).toFixed(0)} s → ${REC}`); }
 ws.close(); chrome.kill(); await sleep(1); try { fs.rmSync(`/tmp/nt-auto-${dayArg}`, { recursive: true, force: true }); } catch {} // the profile is ~200 MB a run; the disk filled up once (2026-11-04)
 process.exit(0);
