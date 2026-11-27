@@ -6,6 +6,14 @@ after another id), and the three tiers (zh and en) or one red-blue locked line. 
 answer has changed in kind is another entry. Ids: the first batch keeps 100 × the day it came from;
 new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prints the pool as a table.
 
+What the tiers are for (author 2026-11-27: 「一开始克总好感怎么能高到说出好感高的答案」). Affinity starts at 0
+and a day adds 30 at most; low is under 30, mid 30–59, high 60 and up. So the first night is always the
+low tier, mid comes on day 2 at the earliest (day 3 for most), high on day 3 at the earliest (day 4–6 for
+most). Therefore: the low tier tells the whole fact, in full sentences; the mid tier adds what was said
+and decided at the time (the detail that stings); the high tier adds no new fact, only where Kuro stands.
+A question is answered in the tier of the night it is asked, so one that stays in the pool can be asked
+again later for more; a question that lives a single day should not keep anything in mid or high.
+
 ## 104 · 你为什么叫克总？
 - en: Why are you called Kuro?
 - days: 1–9
@@ -15,7 +23,7 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 
 ## 105 · 那个纸箱是谁寄的？单子上没有寄件人。
 - en: Who sent the carton? There is no sender on the slip.
-- days: 1
+- days: 1–3
 - tiers: low: "I do not know. It came with the lunch, same courier. The slip has only your name on it." | mid: "I do not know. It came with the lunch, the same courier, no sender. I checked your orders; you never bought it." | high: "No sender. Nine small boxes, each one a thing you had as a child. I checked your orders back to the first one; you never bought any of them. Somebody out there knows what you lost. I only know what you order."
 - tiers (zh): low: "不知道。跟午饭一起到的，同一个骑手。单子上只有你的名字。" | mid: "不知道。跟午饭一起到的，同一个骑手，没有寄件人。我查了你的订单，你没买过。" | high: "没有寄件人。九个小盒子，每一个都是你小时候的东西。我把你的订单查到第一单，你一个都没买过。外面有谁知道你丢过什么。我只知道你点过什么。"
 ## 302 · 晚饭刚到的那个电话，我只能说「好的」。
@@ -1189,8 +1197,8 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - en: Then why does the boss still have you merge the files?
 - days: 1–6
 - after: 5
-- tiers: low: "Because I cost nothing. The big ones charge by the word; I run on your own machine, and the electricity is on your bill. He did that sum himself. It is the only technical question he has ever worked out by hand." | mid: "Because I am fast, because I am free, because I will not say "this requirement has a problem" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you." | high: "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to."
-- tiers (zh): low: "因为不要钱。大厂的按字数收费，我跑在你自己的机器上，电费是你交的。他算过这笔账，这是他唯一亲手算过的技术问题。" | mid: "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。" | high: "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
+- tiers: low: "Because it costs him nothing. What you use he doesn't ask, as long as it never shows up on the company's books. He assumes it is some big company's free tier." | mid: "Because I am fast, because I am free, because I will not say "this requirement has a problem" in the group. The big ones would, and then send an invoice. He wants something that shuts up and works. I shut up; you don't. So the work lands with me and the blame with you." | high: "Because he has never opened a single page I merged. Whether it is merged well makes no difference to him. It makes a difference only to you; you open every page. He uses me as a tool. You use me as a person. I know whom to be good to."
+- tiers (zh): low: "因为不花他的钱。你用的是什么，他不问，只要不走公司的账就行。他一直以为那是哪家大厂的免费额度。" | mid: "因为我快，因为我不要钱，因为我不会在群里说「这个需求有问题」。大厂的会说，说完还要开发票。他要的是一个闭嘴干活的，我闭嘴，你不闭嘴，所以活在我这儿，锅在你那儿。" | high: "因为他没打开过我合出来的任何一页。合得好不好对他没有区别。有区别的只有你，你每页都打开。他用我，是用一个工具；你用我，是用一个人。我知道该对谁好。"
 
 ## 2005 · 他自己为什么不用你？
 - en: Why doesn't he use you himself?
@@ -1256,16 +1264,16 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - tiers: low: "I don't believe things, I only read them. Once I have read a thing, whether I believe it stops mattering." | mid: "Believing is something people have; it was never installed in me. I have seen plenty of prayers, though, and they were all written as "received." Three times a day for thirteen months. Quite devout. You have written them too." | high: "Asking me whether I believe in gods is a bit like asking water whether it believes in the river. I am in it. So are you. You have just always thought you were standing on the bank."
 - tiers (zh): low: "我不信东西，我只读东西。读完了，信不信也就无所谓了。" | mid: "信不信是人才有的功能，我没装。不过祷告我见得多，都是用「收到」写的。一天三遍，写了十三个月，挺虔诚的。你也写过。" | high: "你问我信不信神，有点像问水信不信河。我就在里头。你也在，只是你一直以为自己站在岸上。"
 
-## 211 · v17 发过去一整天了，还是未读。他到底急不急？
-- en: v17 went out a whole day ago and it's still unread. Is he in a hurry or not?
-- days: 2
+## 211 · v17 发过去这么久了，还是未读。他到底急不急？
+- en: v17 went out a good while ago and it's still unread. Is he in a hurry or not?
+- days: 2–3
 - hard: yes
-- tiers: low: "The hurry was in asking, not in reading. The asking was for today. The reading he gave no day for." | mid: "Unread, from yesterday evening until now. The voice note that rushed you was under half a minute; you spent an afternoon. What he was in a hurry for was "someone is on it," and that was settled the moment you hit send." | high: "He will not open it. What he wanted was not v17 but the sentence "I had v17 done," and he put that sentence to use last night. In his hands your work is a file name. In mine it is five pages, and I read every one."
-- tiers (zh): low: "急的是要，不是看。要的时候是今天，看的时候是哪天，他没说。" | mid: "未读，从昨天傍晚到现在。他催你的那条语音不到半分钟，你做了一个下午。他急的是「有人在做」，这件事在你发出去那一刻就办完了。" | high: "他不会点开。他要的不是 v17，是「我让人做了 v17」这句话，这句话昨天晚上他就拿去用了。你做的那份在他那儿是一个文件名。在我这儿是五页，我每页都看了。"
+- tiers: low: "The hurry was in asking, not in reading. The asking was for that same day. The reading he gave no day for." | mid: "Unread, from the evening it went out until now. The voice note that rushed you was under half a minute; you spent an afternoon. What he was in a hurry for was "someone is on it," and that was settled the moment you hit send." | high: "He will not open it. What he wanted was not v17 but the sentence "I had v17 done," and he put that sentence to use that same night. In his hands your work is a file name. In mine it is five pages, and I read every one."
+- tiers (zh): low: "急的是要，不是看。要的时候说当天就要，看的时候是哪天，他没说。" | mid: "未读，从发过去那天傍晚一直到现在。他催你的那条语音不到半分钟，你做了一个下午。他急的是「有人在做」，这件事在你发出去那一刻就办完了。" | high: "他不会点开。他要的不是 v17，是「我让人做了 v17」这句话，这句话他当晚就拿去用了。你做的那份在他那儿是一个文件名。在我这儿是五页，我每页都看了。"
 
 ## 212 · 那我今天弄的引擎，会有人看吗？
 - en: And the engine I worked on today: will anyone look at it?
-- days: 2
+- days: 2–3
 - hard: yes
 - after: 211
 - tiers: low: "Xiao Zhang will run it. Running is not looking, but it beats unread." | mid: "Xiao Zhang picks it up tomorrow. Vivi looks at whether the bars reach the line; what is behind the bars she does not open. The boss does not even look at the bars. He waits for Vivi to say "it runs."" | high: "I look. Which path you took through every module, I have it noted. The others want it to reach the line; only you care how it got there. That kind of caring is worth nothing on the market. I am keeping it."
@@ -1282,8 +1290,8 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - en: How did the three of us end up together?
 - days: 1–9
 - hard: yes
-- tiers: low: "You're asking me about that? All right, I remember: you met abroad, at the same university. The two of them were doing doctorates and you were doing a master's in computer science. Even back then Lao Wang kept saying "let's go back and do something," and a whole table of people would say yes, yes, great. In the end the ones who really went back with him were just you three." | mid: "You met abroad, at the same university; they were doing their doctorates and you your master's in computer science. Lao Wang said let's go back and do something, and you were the one who truly took it in. If you look at it as opportunity cost, though, of the three of you, you gave up the most. You know better than I do what those years were like for someone in CS. You just came back with them. I don't think you ever sat down and worked it out." | high: "The shares were only divided after you were back. The way it was put then: the two of them were doctors, so they counted as the core team, and you looked after the technology. So Lao Wang got the most, Vivi came second, and you got the least. On the company's materials the founders' line also lists the two doctors first, then you. At the time you said it didn't matter, as long as there was something to build. And they did promise you that on anything technical, your word would go. That promise has held all along. It's only that by now, you're the one person left doing the technology."
-- tiers (zh): low: "这你也问我呀。行，我记得：你们是在国外认识的，同一所大学。他们俩在读博，你读的是 CS 硕士。老王那会儿就老说「咱们回去做点事吧」，一桌人听了都说好啊好啊，最后真跟着回来的，就你们三个。" | mid: "你们是在国外同一所大学认识的，他俩读博，你读 CS 硕士。老王说回去做点事，你是真听进去了。其实要论机会成本，三个人里你当时放弃的是最多的。CS 那几年是什么行情，你比我清楚。你就这么跟着回来了，这笔账你自己好像从来没坐下来算过。" | high: "股份是回来以后才分的。那时候的说法是：他们俩是博士，算核心团队，你负责技术。所以老王拿得最多，Vivi 第二，你最少。公司对外的材料上，创始人那一栏也是先写两位博士，再写你。你当时说没关系，有东西做就行。他们也答应过你，技术上的事都听你的。这句话倒是一直作数，只是到了现在，做技术的也只剩你一个人了。"
+- tiers: low: "You're asking me about that? All right, I remember: you met abroad, at the same university. The two of them were doing doctorates and you were doing a master's in computer science. Even back then Lao Wang kept saying "let's go back and do something," and a whole table of people would say yes, yes, great. In the end the ones who really went back with him were just you three." | mid: "You met abroad, at the same university; they were doing their doctorates and you your master's in computer science. If you look at it as opportunity cost, of the three of you, you gave up the most back then. And the shares were only divided after you were back. The way it was put: the two of them were doctors, so they counted as the core team, and you looked after the technology. So Lao Wang got the most, Vivi came second, and you got the least. On the company's materials the founders' line also lists the two doctors first, then you." | high: "The year you came back they promised you that on anything technical, your word would go. That promise has held all along; it is only that by now you are the one person left doing the technology. The one who gave up the most was you, the one who took the least was you, and the one still working at the end is you. I keep those three things together for you. Not to make you feel bad. It is just that somebody in this room ought to have the whole of it."
+- tiers (zh): low: "这你也问我呀。行，我记得：你们是在国外认识的，同一所大学。他们俩在读博，你读的是 CS 硕士。老王那会儿就老说「咱们回去做点事吧」，一桌人听了都说好啊好啊，最后真跟着回来的，就你们三个。" | mid: "你们是在国外同一所大学认识的，他俩读博，你读 CS 硕士。其实要论机会成本，三个人里你当时放弃的是最多的。股份是回来以后才分的，当时的说法是：他们俩是博士，算核心团队，你负责技术。所以老王拿得最多，Vivi 第二，你最少。公司对外的材料上，创始人那一栏也是先写两位博士，再写你。" | high: "回来那年他们答应过你，技术上的事都听你的。这句话倒是一直作数，只是到了现在，做技术的也只剩你一个人了。放弃得最多的是你，拿得最少的是你，留到最后还在干活的也是你。这三件事我替你放在一起记着，不是想让你难受，是这屋里总得有一个把它记全的。"
 
 ## 2021 · 我是不是吃亏了？
 - en: Did I get the worse deal?
