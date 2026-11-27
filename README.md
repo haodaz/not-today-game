@@ -18,6 +18,8 @@ npm run validate     # content checks: day files, objects, missing English strin
 
 Play it at [not-today-game.vercel.app](https://not-today-game.vercel.app) (deployed from `main` on every push). English is the default; 中文 is in settings.
 
+Watch it: [the three-minute video](https://youtu.be/48MAyjnVzHU), or [the full version with the whole theme song](https://youtu.be/JC9WQKW4gEk) (4:51).
+
 The game is fully playable offline: Kuro's evening talk falls back to scripted lines from `content/`. With a `.env.local` (see `.env.example`) the client in `src/net/` talks to the Kuro backend, a Supabase Edge Function in [`supabase/functions/kuro-chat`](supabase/functions/kuro-chat) (shared code in `supabase/functions/_shared/kuro/`): it answers from the day's authored material (`content/kuro-days`, profile, rubric), rolls Kuro's only randomness, and keeps the judgement that becomes the credits. `npm run bundle:kuro` packs the content into the function; `npx supabase functions deploy kuro-chat` ships it.
 
 ## How it was built with Kiro
