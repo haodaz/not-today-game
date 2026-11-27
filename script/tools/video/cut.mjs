@@ -1,7 +1,7 @@
 // cut.mjs <edl.json> <out.mp4>: lays clips and black title cards end to end over the song.
 // An entry is { src, ss, dur, speed?, zoom?: [x, y, w, h] (source pixels), fadeIn?, fadeOut?, note? }
 // or { card: "line one\nline two", dur, size?, fadeIn?, fadeOut? }. `at` (seconds) on an entry is checked against the running clock.
-import fs from "node:fs"; import { spawnSync } from "node:child_process"; import path from "node:path";
+import fs from "node:fs"; import { compArgs } from "./comp.mjs"; import { spawnSync } from "node:child_process"; import path from "node:path";
 const [edlPath, out] = process.argv.slice(2); const edl = JSON.parse(fs.readFileSync(edlPath, "utf8"));
 const FF = "/Users/aisandbox/Documents/companydata/node_modules/ffmpeg-static/ffmpeg", W = 1920, H = 1080, FPS = 30;
 const FONT = edl.font || "/System/Library/Fonts/Supplemental/Georgia.ttf";
@@ -16,6 +16,8 @@ edl.clips.forEach((c, i) => {
     const lines = c.card.split("\n"), size = c.size || 72, gap = Math.round(size * 1.5), top = Math.round(H / 2 - (lines.length * gap) / 2 + gap * 0.15);
     const draw = lines.map((l, k) => { const tf = path.join(tmp, `t${i}_${k}.txt`); fs.writeFileSync(tf, l); return `drawtext=fontfile='${FONT}':textfile='${tf}':fontcolor=0xEDE6D8:fontsize=${size}:x=(w-text_w)/2:y=${top + k * gap}`; });
     run(["-f", "lavfi", "-i", `color=c=0x050507:s=${W}x${H}:r=${FPS}:d=${c.dur}`, "-vf", [...(c.card ? draw : []), ...fades].join(",") || "null", "-t", String(c.dur), ...enc, f]);
+  } else if (c.comp !== undefined) {
+    run([...compArgs(c, i, { W, H, FPS, FONT, tmp, base: path.dirname(edlPath), fades }), "-t", String(c.dur), ...enc, f]);
   } else if (c.img !== undefined) {
     // a still: fitted on the dark ground, with a slow push-in (or none: zoomTo 1)
     const z = c.zoomTo ?? 1.06, n = Math.round(c.dur * FPS);
@@ -28,7 +30,7 @@ edl.clips.forEach((c, i) => {
   }
   // a source that runs out gives a short or empty part, and the copy-concat then drifts or stops: say so
   { const pr = spawnSync(FF, ["-hide_banner", "-i", f], { encoding: "utf8" }).stderr.match(/Duration: (\d+):(\d+):([\d.]+)/); const got = pr ? +pr[1] * 3600 + +pr[2] * 60 + +pr[3] : 0; if (Math.abs(got - c.dur) > 0.1) log.push(`!! entry ${i} (${c.note || c.src}) is ${got.toFixed(2)} s long, wanted ${c.dur} s: the source ends early`); }
-  parts.push(f); log.push(`${clock.toFixed(2).padStart(7)}  +${String(c.dur).padEnd(5)} ${c.card !== undefined ? "[card] " + c.card.replace(/\n/g, " / ") : c.img !== undefined ? "[still] " + c.img : c.src + " @" + c.ss}${c.note ? "  · " + c.note : ""}`); clock += c.dur;
+  parts.push(f); log.push(`${clock.toFixed(2).padStart(7)}  +${String(c.dur).padEnd(5)} ${c.card !== undefined ? "[card] " + c.card.replace(/\n/g, " / ") : c.comp !== undefined ? "[comp] " + (c.comp.caption || "").replace(/\n/g, " / ") : c.img !== undefined ? "[still] " + c.img : c.src + " @" + c.ss}${c.note ? "  · " + c.note : ""}`); clock += c.dur;
 });
 const list = path.join(tmp, "list.txt"); fs.writeFileSync(list, parts.map((p) => `file '${p}'`).join("\n"));
 const audio = edl.audio ? ["-i", path.resolve(path.dirname(edlPath), edl.audio)] : [];

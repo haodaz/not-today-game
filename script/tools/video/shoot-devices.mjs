@@ -1,0 +1,38 @@
+// shoot-devices.mjs <outdir>: each old object's drawn, interactive device on its own, as a PNG with a transparent ground.
+// The object is picked up in the game, everything else on the page is hidden, and the device's box is captured at 3x.
+import { spawn } from "node:child_process"; import fs from "node:fs";
+const out = process.argv[2]; fs.mkdirSync(out, { recursive: true });
+const LANG = process.env.LANG_ || "en", port = 9392, prof = `/tmp/nt-dev-${process.pid}`;
+const chrome = spawn("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", ["--headless=new", "--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist", "--hide-scrollbars", "--mute-audio", `--remote-debugging-port=${port}`, "--window-size=1600,987", "--force-device-scale-factor=3", `--user-data-dir=${prof}`, "about:blank"], { stdio: "ignore" });
+const sleep = (s) => new Promise((r) => setTimeout(r, s * 1000)); process.on("exit", () => { try { chrome.kill("SIGKILL"); } catch {} try { fs.rmSync(prof, { recursive: true, force: true }); } catch {} });
+let targets; for (let i = 0; i < 40; i++) { try { targets = await (await fetch(`http://localhost:${port}/json`)).json(); break; } catch { await sleep(0.25); } }
+const ws = new WebSocket(targets.find((t) => t.type === "page").webSocketDebuggerUrl); await new Promise((r) => (ws.onopen = r));
+let id = 0; const pending = new Map(); ws.onmessage = (m) => { const j = JSON.parse(m.data); if (j.id && pending.has(j.id)) { pending.get(j.id)(j); pending.delete(j.id); } };
+const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+const ev = async (expression) => (await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true })).result?.result?.value;
+const has = (q) => ev(`[...document.querySelectorAll(${JSON.stringify(q)})].some(e=>e.getClientRects().length>0)`);
+const click = (q, n = 0) => ev(`(()=>{const e=[...document.querySelectorAll(${JSON.stringify(q)})].filter(e=>e.getClientRects().length>0)[${n}]; if(!e) return false; e.click(); return true;})()`);
+const read = async (n = 80) => { for (let i = 0; i < n && (await has(".dlg-layer .story-mask, .objbar-host .story-mask")); i++) { await ev("(document.querySelector('.objbar-host .story-mask')||document.querySelector('.dlg-layer .story-mask'))?.click()"); await sleep(0.5); } };
+await send("Page.enable"); await send("Runtime.enable");
+await send("Emulation.setDefaultBackgroundColorOverride", { color: { r: 0, g: 0, b: 0, a: 0 } });
+const ORDER = ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"];
+for (const oid of (process.env.OBJ || ORDER.join(",")).split(",")) {
+  // one page per object, holding only that object: nothing of another device can be left in hand
+  await send("Page.navigate", { url: `http://localhost:5180/?lang=${LANG}&day=9&view=desk&seed=found:${oid},recognised:${oid}&names=Robin%7Csweetpea%7Cchief%7Crockstar%7Cshe%7Cp1` });
+  await sleep(1); for (let i = 0; i < 60; i++) { if ((await ev("document.readyState")) === "complete") break; await sleep(0.25); } await sleep(3.5); await read();
+  await ev("(()=>{const s=document.createElement('style'); s.textContent='html.__solo,html.__solo body{background:transparent!important} html.__solo *{visibility:hidden!important} html.__solo .__keep,html.__solo .__keep *{visibility:visible!important} html.__solo .__keep [data-action=obj-flip],html.__solo .__keep .obj-hint{visibility:hidden!important}'; document.head.appendChild(s); return 1})()");
+  await click("[data-action=items-toggle]"); await sleep(1.0); await click("[data-action=items-pick]", 0); await sleep(0.9);
+  const held = await ev(`(()=>{const all=[...document.querySelectorAll('[data-action=loop-hold]')].filter(e=>e.getClientRects().length); const b=all.find(e=>e.dataset.id===${JSON.stringify(oid)})||all[all.length-1]; if(!b) return 'none of '+all.length; b.click(); return b.dataset.id||'?';})()`); await sleep(1.8); await read(8); await sleep(0.6);
+  if (process.env.DEBUG) console.log("   dom:", await ev("(()=>{const e=[...document.querySelectorAll('.dev-shell')].find(x=>x.getClientRects().length); if(!e) return 'none'; const cs=(x)=>{const c=getComputedStyle(x); return x.className+'{'+c.display+',op'+c.opacity+',vis'+c.visibility+','+Math.round(x.getBoundingClientRect().width)+'x'+Math.round(x.getBoundingClientRect().height)+'}'}; let p=e, chain=[]; for(let i=0;i<7&&p;i++){chain.push(p.className+'|'+getComputedStyle(p).transform.slice(0,60)); p=p.parentElement} return JSON.stringify({kids:[...e.children].map(cs), chain, faces:[...document.querySelectorAll('.held-layer .face')].map(cs)})})()"));
+  const state = await ev("JSON.stringify({keys:[...document.querySelectorAll('[data-action=obj-key]')].filter(e=>e.getClientRects().length).map(e=>e.dataset.key).slice(0,12), shell:[...document.querySelectorAll('.dev-shell')].map(e=>e.className)})"); console.log("  ", oid, "held:", held, state);
+  // the device: the smallest box that holds every key of the object (and its screen), walking up from the first key
+  const info = await ev(`(()=>{ const vis=(q)=>[...document.querySelectorAll(q)].find(e=>e.getClientRects().length); let el=vis('.dev-shell')||vis('.held.obj .face.front')||vis('.held-layer .face'); if(!el) return null; if (el.classList.contains('calc')) { const c=el.cloneNode(true); c.classList.remove('dark'); c.style.cssText='position:fixed;left:560px;top:160px;z-index:99999;transform:none'; c.id='__calc'; document.body.appendChild(c); el=c; } document.querySelectorAll('.__keep').forEach(e=>e.classList.remove('__keep')); el.classList.add('__keep'); const r=el.getBoundingClientRect(); return JSON.stringify({cls:String(el.className).slice(0,80), chain:(()=>{const a=[];let e=el;for(let i=0;i<5&&e;i++){a.push(e.tagName+'.'+String(e.className).slice(0,40));e=e.parentElement}return a})(), x:r.x,y:r.y,w:r.width,h:r.height}); })()`);
+  if (!info) { console.log(oid, "no device found"); continue; } const r = JSON.parse(info);
+  await ev("document.documentElement.classList.add('__solo')"); await sleep(0.4);
+  // the solar calculator is a dark slab away from the light: for its picture, show it lit (the same markup without .dark)
+  if (oid === "calculator") await ev("(()=>{const e=document.querySelector('.dev-shell.calc'); if(e) e.classList.remove('dark'); return !!e})()");
+  const pad = 90, shot = await send("Page.captureScreenshot", { format: "png", clip: { x: Math.max(0, r.x - pad), y: Math.max(0, r.y - pad), width: r.w + pad * 2, height: r.h + pad * 2, scale: 1 } });
+  fs.writeFileSync(`${out}/${oid}.png`, Buffer.from(shot.result.data, "base64")); console.log(oid, Math.round(r.w) + "x" + Math.round(r.h), r.chain.join(" < "));
+  await ev("document.documentElement.classList.remove('__solo')");
+}
+ws.close(); process.exit(0);

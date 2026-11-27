@@ -202,7 +202,7 @@ function face(w, h, bg, draw) {
 }
 
 // ---------- the shader patch: collapse and unreality are computed, not painted ----------
-const U = { uCollapse: { value: 0 }, uWhite: { value: 0 }, uPixel: { value: 0 }, uTime: { value: 0 } };
+const U = { uCollapse: { value: 0 }, uWhite: { value: 0 }, uPixel: { value: 0 }, uTime: { value: 0 }, uSwimAmp: { value: 1 }, uSwimRate: { value: 1 }, uSwimLead: { value: 0 } }; // uSwim*: the greater one's swimming (1, 1, 0 in the game; a film take turns them up, see ?great=1 and window.proto.U)
 const NOISE = /* glsl */ `
 uniform float uCollapse;
 uniform float uWhite;
@@ -2708,9 +2708,9 @@ function buildGreat() {
   G.visible = false; scene.add(G); G.add(H);
   // he swims: everything on him is carried by one slow wave that grows toward the tail; the vines have their own as well
   const swim = (m, vine) => { const base = m.onBeforeCompile; m.onBeforeCompile = (sh) => { if (base) base(sh); Object.assign(sh.uniforms, U);
-    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nuniform float uTime;\n" + (vine ? "attribute vec3 aW;\n" : ""))
-      .replace("#include <begin_vertex>", "#include <begin_vertex>\n" + (vine ? "{ float w = aW.x * aW.x * aW.z; transformed.y += sin(uTime * 0.55 + aW.y - aW.x * 6.0) * w; transformed.z += cos(uTime * 0.43 + aW.y * 1.7 - aW.x * 5.0) * w; }\n" : "")
-        + "{ float sa = clamp((-transformed.x - 60.0) / 180.0, 0.0, 1.0); transformed.y += sin(uTime * 0.3 + transformed.x * 0.022) * 9.0 * sa; transformed.z += cos(uTime * 0.23 + transformed.x * 0.017) * 6.0 * sa; }\n"); };
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nuniform float uTime;\nuniform float uSwimAmp;\nuniform float uSwimRate;\nuniform float uSwimLead;\n" + (vine ? "attribute vec3 aW;\n" : ""))
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\n" + (vine ? "{ float w = aW.x * aW.x * aW.z; transformed.y += sin(uTime * 0.55 * uSwimRate + aW.y - aW.x * 6.0) * w; transformed.z += cos(uTime * 0.43 * uSwimRate + aW.y * 1.7 - aW.x * 5.0) * w; }\n" : "")
+        + "{ float sa = clamp((-transformed.x - 60.0 + uSwimLead) / 180.0, 0.0, 1.6); transformed.y += sin(uTime * 0.3 * uSwimRate + transformed.x * 0.022) * 9.0 * uSwimAmp * sa; transformed.z += cos(uTime * 0.23 * uSwimRate + transformed.x * 0.017) * 6.0 * uSwimAmp * sa; }\n"); };
     m.customProgramCacheKey = () => "great" + (vine ? "V" : "B") + m.type; return m; };
   const hide = hideMap.clone(); hide.repeat.set(8, 3); hide.needsUpdate = true;
   const hideV = hideMap.clone(); hideV.repeat.set(7, 1); hideV.needsUpdate = true; /* (author: 它不是光滑的，而是某种血肉感) wet, pocked, red in the creases */
@@ -2886,9 +2886,9 @@ function updateCondense(s) {
   FAR.gKey.intensity = 13 * show; FAR.gFill.intensity = 6.5 * show;
   FAR.gRed.intensity = 9 * Math.pow(3 * S, 1.2) * smooth(0.4, 0.8, t); FAR.gRed.distance = 7 * S;
   FAR.gMaw.intensity = 0; FAR.gMaw.distance = 16 * S;
-  FAR.murk.visible = show > 0; FAR.murk.quaternion.copy(CON.q); FAR.murk.position.copy(camera.position).addScaledVector(CON.left, -(((s * 9) % 600) - 300)); for (const sp of FAR.murk.children) sp.material.opacity = sp.userData.o * smooth(0.4, 1, t);
+  FAR.murk.visible = show > 0; FAR.murk.quaternion.copy(CON.q); FAR.murk.position.copy(camera.position).addScaledVector(CON.left, -(((s * (CON.murkV ?? 9)) % 600) - 300)); for (const sp of FAR.murk.children) sp.material.opacity = sp.userData.o * smooth(0.4, 1, t);
   FAR.dust.visible = show > 0; FAR.dust.material.opacity = 0.5 * smooth(0.5, 1, t);
-  FAR.dust.quaternion.copy(CON.q); FAR.dust.position.copy(camera.position).addScaledVector(CON.left, -((s * 14) % 400)); // it passes him, front to back
+  FAR.dust.quaternion.copy(CON.q); FAR.dust.position.copy(camera.position).addScaledVector(CON.left, -((s * (CON.dustV ?? 14)) % 400)); // it passes him, front to back
   FAR.eye2.visible = true; FAR.eye2.quaternion.copy(camera.quaternion);
   FAR.eye2.position.copy(G.position).addScaledVector(CON.fwd, -1.05 * S);
   const d = 1.5 * S * (1 + 2.2 * (1 - smooth(0.3, 0.7, t))); FAR.eye2.scale.set(d * 1.15, d, 1); FAR.eye2.material.opacity = smooth(0.3, 0.56, t) * (1 - smooth(0.56, 0.7, t)) * 0.9; /* only a flare over the moment the world turns into an eye */
@@ -3452,7 +3452,7 @@ function command(m) {
 }
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
-window.proto = { BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+window.proto = { CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
 
 // ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws
 // the eye away and back, a drag carries it along him. Not used by the game.

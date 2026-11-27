@@ -91,8 +91,8 @@ const gameHold = async (name) => {
   if (name === "pacman" && process.env.PAC_BOT) {
     note("   game on screen: pacman (played by the bot)"); await ev(fs.readFileSync(new URL("./pacbot.js", import.meta.url), "utf8")); let lastN = -1;
     for (let i = 0; i < 240; i++) { await sleep(0.5);
-      const st = await ev("(()=>{const g=window.__nt.session.pacman; return g? JSON.stringify({eaten:window.__pacSwallows||0,lines:g.lines.filter(v=>v<0).length,done:g.done,over:g.over,running:g.running}) : ''})()"); if (!st) break; const j = JSON.parse(st);
-      if (j.eaten !== lastN) { lastN = j.eaten; note(`   pacman: swallowed ${j.eaten} · lines ${j.lines}/5`); }
+      const st = await ev("(()=>{const g=window.__nt.session.pacman; return g? JSON.stringify({eaten:(window.__pacLog||[]).length,log:window.__pacLog||[],lines:g.lines.filter(v=>v<0).length,done:g.done,over:g.over,running:g.running}) : ''})()"); if (!st) break; const j = JSON.parse(st);
+      if (j.eaten !== lastN) { for (const e of j.log.slice(Math.max(0, lastN))) note(`   pacman-swallow who=${e.who} t=${((e.at - recT0) / 1000).toFixed(2)} x=${e.x} y=${e.y}`); lastN = j.eaten; note(`   pacman: swallowed ${j.eaten} · lines ${j.lines}/5`); }
       if (j.over) { note("   pacman: caught, again"); await sel("[data-action=pacman-start]", 1); }
       if (j.done) { note("   pacman: corridor cleared"); await sleep(2.5); break; } }
     await ev("clearInterval(window.__pacbot); window.__pacbot = 0"); return;
