@@ -224,7 +224,7 @@
         },
         {
           "t": "14:10",
-          "text": "{calledBy}, did you rename that field in the data model?",
+          "text": "{calledBy}, was it you who switched on those modules in the backend? I can see a few more than before",
           "kind": "work"
         },
         {
@@ -288,7 +288,7 @@
           {
             "who": "xiaozhang",
             "t": "14:12",
-            "text": "I'll go with the old one for now, tell me if it's wrong"
+            "text": "I'll leave it alone for now, tell me if that's wrong"
           }
         ]
       },

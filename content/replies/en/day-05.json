@@ -120,6 +120,11 @@
           "kind": "work"
         },
         {
+          "t": "10:01",
+          "text": "They want a look inside the backend. Set them up an account, an admin one, so they don't have to keep asking.",
+          "kind": "work"
+        },
+        {
           "t": "16:00",
           "text": "Line 3 is a different font size, make it match",
           "kind": "work",
@@ -402,7 +407,7 @@
         },
         {
           "t": "08:48",
-          "text": "It's urgent at home. The day the company pays what it owes, you're the first I pay back",
+          "text": "It's urgent at home. I'll pay you back by the end of the month, I promise",
           "kind": "money"
         },
         {

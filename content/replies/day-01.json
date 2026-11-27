@@ -244,7 +244,7 @@
       "incoming": [
         {
           "t": "15:30",
-          "text": "{calledBy}早！字段名我按旧的写还是等你",
+          "text": "{calledBy}，Vivi 群里发的那个网页你看了吗，她让我们照着搞一个",
           "kind": "work"
         },
         {
@@ -285,7 +285,7 @@
           {
             "who": "xiaozhang",
             "t": "09:43",
-            "text": "那我按旧字段写了哈"
+            "text": "那我先自己试试哈"
           }
         ],
         "effects": {

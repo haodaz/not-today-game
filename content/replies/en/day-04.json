@@ -30,6 +30,11 @@
           "t": "09:13",
           "text": "(Transcript) Today is consciousness. Whether AI has consciousness, we say first. That company talks ontology; we talk consciousness, one level up. Put the consciousness section in.",
           "kind": "work"
+        },
+        {
+          "t": "09:14",
+          "text": "Vivi has forwarded you the due-diligence list. Whatever they want to look at, let them look. Open every permission.",
+          "kind": "work"
         }
       ],
       "fine": {
@@ -92,11 +97,11 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[Card] Export spec · Forwarded",
+          "text": "[Card] Investors' due-diligence list · Forwarded",
           "kind": "work",
           "card": {
             "type": "file",
-            "name": "导出规范.docx",
+            "name": "投资人尽调清单.docx",
             "size": "186 KB",
             "ext": "doc"
           },
@@ -119,7 +124,7 @@
           {
             "who": "partner",
             "t": "09:30",
-            "text": "[Card] Export spec · Forwarded"
+            "text": "[Card] Investors' due-diligence list · Forwarded"
           }
         ]
       },
