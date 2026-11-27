@@ -122,11 +122,33 @@ const flushLines = async () => { if (!TRANSCRIPT) return; const rec = await ev("
 const shotStep = async (name) => { const r = await send("Page.captureScreenshot", process.env.HIRES ? { format: "png" } : { format: "jpeg", quality: 60 }); const base = `d${String(day).padStart(2, "0")}-${String(++stepNo).padStart(2, "0")}-${name}`; fs.writeFileSync(`${shotdir}/${base}.${process.env.HIRES ? "png" : "jpg"}`, Buffer.from(r.result.data, "base64"));
   if (TRANSCRIPT) { const tx = await ev("(document.body.innerText||'').replace(/[ \\t]+/g,' ').replace(/\\n\\s*\\n+/g,'\\n')"); if (typeof tx === "string") fs.writeFileSync(`${TRANSCRIPT}/${base}.txt`, tx); await flushLines(); } };
 // Press the box through; answer a pending choice (the recognise question by its right option, else the first).
+// CHAT=<n> (2026-11-27): when Kuro asks 要和克总聊聊吗, say 聊聊 and ask n questions (once a day): the list of
+// questions on offer is noted each turn, the first is asked, then whatever is new in the list (a follow-up)
+// before the rest. The answers land in lines.txt with the other box lines.
+let chattedDay = 0;
+const chatTurns = async (turns) => {
+  let asked = 0; let seen = new Set();
+  for (let k = 0; k < turns; k++) {
+    const up = await waitFor("[data-action=kuro-q]", 14, async () => { await ev("__sel('[data-action=loop-advance]')"); });
+    if (!up) { note(`   chat: no questions after ${asked} turns · ${(await text()).slice(0, 80)}`); break; }
+    const list = JSON.parse((await ev("JSON.stringify([...document.querySelectorAll('[data-action=kuro-q]')].filter(__vis).map(e=>e.dataset.q+' '+__txt(e)))")) || "[]"); if (!list.length) break;
+    note(`   chat: on offer · ${list.join(" | ").slice(0, 400)}`);
+    const fresh = list.find((x) => seen.size > 0 && !seen.has(x.split(" ")[0])); const pick = fresh || list[k % list.length]; const q = pick.split(" ")[0];
+    for (const x of list) seen.add(x.split(" ")[0]);
+    await sel(`[data-action=kuro-q][data-q='${q}']`, 1.5); asked++; note(`   chat: asked ${pick.slice(0, 40)}`);
+    await shotStep(`chat-q${q}`);
+    for (let n = 0; n < 14 && !(await has("[data-action=kuro-q]")) && !(await has("[data-action=taboo-error-ok]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.6); }
+    let errs = 0; while (await has("[data-action=taboo-error-ok]")) { await sel("[data-action=taboo-error-ok]", 0.2); errs++; if (errs > 30) break; }
+    if (errs) break;
+  }
+  await key("Escape"); await sleep(0.8);
+};
 const settle = async (rightOption = null) => {
   let quiet = 0;
   for (let i = 0; i < 24 && quiet < 2; i++) {
     await interrupts();
     const choices = await ev("JSON.stringify(__choices())").then(JSON.parse);
+    if (process.env.CHAT && chattedDay !== day && choices.some((c) => c.includes(S("kuro.yes")))) { chattedDay = day; note("   choice → ◇" + S("kuro.yes")); await click(choices.find((c) => c.includes(S("kuro.yes")))); await chatTurns(Number(process.env.CHAT)); quiet = 0; continue; }
     if (choices.length) { await shotStep("choice"); const pick = (rightOption && choices.find((c) => c.includes(rightOption))) || choices.find((c) => c.includes(S("kuro.notNow"))) || choices.find((c) => c.includes(S("room.bed.sleep"))) || choices[0]; note(`   choice → ${pick}`); await click(pick); quiet = 0; continue; }
     if (await has(".dlg-layer .story-mask")) { await ev("document.querySelector('.dlg-layer .story-mask').click()"); await sleep(0.4); quiet = 0; continue; }
     const t = await text();

@@ -156,7 +156,7 @@
       "dinner": {
         "outside": "Footsteps.",
         "bag": "Warm.",
-        "receipt": "Wontons · To: {login} · Typo: Wontons → Wantons",
+        "receipt": "Wontons · To: {login} · Thank you, plaese come again",
         "anomaly": "There is a typo on the receipt."
       }
     },

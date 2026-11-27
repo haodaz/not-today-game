@@ -144,12 +144,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The thing in the little box is a clamshell, silver-grey, the hinge a little loose.",
+          "t": "The thing in today's little box has a loose hinge; it springs open as you pick it up.",
           "me": "carton"
-        },
-        {
-          "k": "narration",
-          "t": "Switched on, the screen is grey-green, the letters dot-matrix."
         },
         {
           "k": "inner",
