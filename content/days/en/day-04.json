@@ -90,13 +90,13 @@
           "backdrop": "/room/dream/payphone.jpg"
         },
         {
-          "k": "narration",
-          "t": "Eight to a dormitory, lights out at half past nine. After lights out somebody would cry under a quilt, very quietly, and the next day nobody said who."
-        },
-        {
           "k": "speaker",
           "who": "小卖部老板",
           "t": "Five yuan. Fifty minutes. Make it last."
+        },
+        {
+          "k": "narration",
+          "t": "Eight to a dormitory, lights out at half past nine. After lights out somebody would cry under a quilt, very quietly, and the next day nobody said who."
         },
         {
           "k": "narration",
