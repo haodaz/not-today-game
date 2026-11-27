@@ -336,6 +336,8 @@ const currentLine = async () => {
     // checklist.waitIdle (no id, no 前往): that is a wait, not a missing line
     const v = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now, .wait-card .it.now')].find(__vis); return e ? JSON.stringify({ id: e.dataset.id || (e.classList.contains('idle') ? '__wait' : ''), text: e.innerText.replace(/\\s+/g,' ').replace(/前往›?/,'').trim() }) : ''})()");
     if (v) return JSON.parse(v);
+    // the boss's call has no line on the card (checklist.ts skips __call): it waits on 屏幕, so look there
+    if (file.call && k === 0) { note(`   (no line on the card; the day has a call at ${file.call.at}: looking on the screen)`); await toDesktop(); await sleep(1); await shotStep("call-screen"); await interrupts(); await readLines(); }
     await interrupts(); await toRoom();
   }
   return null;

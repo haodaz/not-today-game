@@ -228,28 +228,32 @@
       "portrait": "/npc/father_young.png",
       "avatar": "/npc/father_young_av.png",
       "stand": "/npc/stand/father_young.webp",
-      "poses": ["pager", "smile"]
+      "poses": ["pager", "smile"],
+      "idle": true
     },
     "mother_young": {
       "name": "msgs.mother",
       "portrait": "/npc/mother_young.png",
       "avatar": "/npc/mother_young_av.png",
       "stand": "/npc/stand/mother_young.webp",
-      "poses": ["firm", "sigh", "tired"]
+      "poses": ["firm", "sigh", "tired"],
+      "idle": true
     },
     "father_mid": {
       "name": "msgs.father",
       "portrait": "/npc/father_mid.png",
       "avatar": "/npc/father_mid_av.png",
       "stand": "/npc/stand/father_mid.webp",
-      "poses": ["gruff"]
+      "poses": ["gruff"],
+      "idle": true
     },
     "mother_mid": {
       "name": "msgs.mother",
       "portrait": "/npc/mother_mid.png",
       "avatar": "/npc/mother_mid_av.png",
       "stand": "/npc/stand/mother_mid.webp",
-      "poses": ["phone", "worry"]
+      "poses": ["phone", "worry"],
+      "idle": true
     }
   },
   "silhouettes": [
