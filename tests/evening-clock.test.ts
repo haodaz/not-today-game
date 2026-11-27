@@ -11,6 +11,7 @@ import { createStore } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
+import { sentFiles, transcript, type Bubble } from "@world/desktop/messages/transcript";
 import { callAnswerTime, callConnectTime, callEndTime, callPhase } from "@world/loop/call";
 import { syncLoop } from "@world/loop/runtime";
 
@@ -48,6 +49,20 @@ describe("day 3's evening keeps time", () => {
     const done = [...ended, { kind: "task", flag: "task_d3_3", mode: "self" }];
     expect(clockAfter(done)).toBe("22:30");
     expect(clockAfter([...done, { kind: "give", deliverableId: "d3-theory", t: "22:30" }])).toBe("22:45");
+  });
+  it("in the boss's thread: the v18 card at 22:30, then 收到。 and the rest, once the clock has gone on to 22:45", () => {
+    const store = createStore({ startDay: 3 });
+    for (const e of [...EVENING, { kind: "callAnswer" }, { kind: "callEnded" }, { kind: "task", flag: "task_d3_3", mode: "self" }, { kind: "give", deliverableId: "d3-theory", t: "22:30" }]) store.appendEvent(e as never);
+    const at = (time: string) =>
+      transcript({ conversation: "boss", state: store.getState(), replies: [], clock: { beat: "desk", time }, progress: new Map(), files: sentFiles(store.getEvents()) })
+        .filter((b): b is Extract<Bubble, { kind: "msg" }> => b.kind === "msg")
+        .map((b) => `${b.t} ${b.side} ${b.body.type === "text" ? b.body.text : b.body.raw}`);
+    const late = at("22:45");
+    const card = late.findIndex((l) => l.startsWith("22:30 me"));
+    expect(card).toBeGreaterThanOrEqual(0);
+    expect(late.slice(card + 1)).toEqual(["22:40 them 收到。", "22:41 them 这版肯定没问题，18，数字吉利。"]);
+    // before the clock gets there (the evening that did not keep time): the card alone
+    expect(at("22:30").some((l) => l.includes("收到。"))).toBe(false);
   });
   it("老王 answers at 22:40, in two messages, in both languages", () => {
     for (const file of [zh, en]) {
