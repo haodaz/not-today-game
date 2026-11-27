@@ -12,7 +12,7 @@ const poster = (d, mark, dur) => clip(`launch-d${String(d).padStart(2, "0")}`, m
 const cleanAt = (name) => Number(fs.readFileSync(new URL(`./raw/clean-${name}.mp4.marks.txt`, import.meta.url), "utf8").match(/([\d.]+)\s+clean/)[1]) + 0.6;
 const view = (name, off, dur, o = {}) => clip(`clean-${name}`, cleanAt(name) + off, dur, o);
 // the drawn devices, cut out (stills/devices/<id>.png: the device's own box × 3 with 90 css px of room for its shadow on every side)
-const CSS = { chick: [324, 389], camera: [389, 324], pager: [389, 192], iccard: [440, 316], tape: [356, 270], dictionary: [464, 270], calculator: [292, 446], phone: [440, 458] };
+const CSS = { chick: [324, 389], "chick-grave": [324, 389], camera: [389, 324], pager: [389, 192], iccard: [440, 316], tape: [356, 270], dictionary: [464, 270], calculator: [292, 446], phone: [440, 458] };
 const dev = (id, vis, x, y, o = {}) => ({ img: `stills/devices/${id}.png`, h: Math.round(vis * (CSS[id][1] + 180) / CSS[id][1]), x, y, ...o });
 const fit = (id, box) => Math.round(Math.min(box, box * CSS[id][1] / CSS[id][0])); // the device inside a box × box square
 const stand = (name, o = {}) => ({ img: `${P}/npc/stand/${name}.webp`, h: 1040, x: 960, y: 610, ...o });
@@ -36,7 +36,7 @@ comp(4.5, { bg: DREAM("campus_2000"), cy: 0.3, dim: 0.05, layers: [{ img: `${P}/
 comp(4.5, { bg: DREAM("classroom"), dim: 0.1, layers: [{ img: `${P}/room/props/exam_96.png`, h: 720, x: 960, y: 450 }], caption: "Ninety-six. My first paper under a hundred." });
 comp(4.0, { bg: DREAM("classroom"), dim: 0.1, layers: [stand("teacher", { at: undefined })], caption: "“Toys rot the mind.”", capY: 0.9 });
 comp(4.5, { bg: DREAM("home_dinner"), dim: 0.08, layers: [stand("mother_young_firm", { at: undefined })], caption: "“It’s a game. Nobody starves. Eat.”", capY: 0.9 });
-comp(5.5, { layers: [dev("chick", 600, 960, 420)], caption: "It came back at the end of term. I had never stopped feeding it.\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 1.0 });
+comp(5.5, { layers: [dev("chick-grave", 600, 960, 420)], caption: "It came back at the end of term. I had never stopped feeding it.\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 1.0 });
 
 S("C · verse 2: the old things", 42.6);
 for (const [id, bg, cap] of [["dictionary", "classroom_high", "An e-dictionary with a game hidden inside.\nConfiscated twice."], ["calculator", "home_90s", "A solar calculator. No light, no numbers."], ["tape", "balcony", "A walkman and a dubbed tape.\nSide B ran out before I finished the sentence."], ["pager", "payphone", "A pager. Whoever paged you was a string of digits."]])

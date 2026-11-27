@@ -1,6 +1,6 @@
 // edl-short.mjs from edl-v4.mjs: the cut under three minutes. The song loses its repeated stretches (verse 2, the instrumental
 // and verse 3, the second chorus: song-short.m4a, 178.4 s, joined on the beat), and the picture follows:
-//   3.1–42.765 intro + verse 1 · 74.975–103.65 chorus 1 · 149.305–202.09 verse 4 + bridge · 230.725–288.0 verse 5, outro, tail
+//   3.1–42.15 intro + verse 1 · 74.36–103.65 chorus 1 (in on the bar before, fading up) · 149.305–202.09 verse 4 + bridge · 230.725–288.0 verse 5, outro, tail
 import fs from "node:fs";
 let s = fs.readFileSync("edl-v4.mjs", "utf8"); const cut = (from, to) => { const a = s.indexOf(from), b = s.indexOf(to); if (a < 0 || b < 0) throw new Error("short: " + from.slice(0, 30)); s = s.slice(0, a) + s.slice(b); };
 const block = (from, to, repl) => { const a = s.indexOf(from), b = s.indexOf(to); if (a < 0 || b < 0) throw new Error("short: " + from.slice(0, 30)); s = s.slice(0, a) + repl + s.slice(b); };
@@ -13,9 +13,10 @@ for (const id of ["chick", "dictionary", "calculator"]) comp(1.5, { layers: [dev
 
 `);
 s = s.replace('S("B · verse 1: the chick", 14.1);', 'S("B · verse 1: the chick", 11.0);');
-s = s.replace('caption: "It came back at the end of term. I had never stopped feeding it.\\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 1.0 });', 'caption: "It came back at the end of term. I had never stopped feeding it.\\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 0.8 }); c[c.length - 1].dur = 5.665; // to the cut at 42.765');
+s = s.replace('caption: "It came back at the end of term. I had never stopped feeding it.\\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 1.0 });', 'caption: "It came back at the end of term. I had never stopped feeding it.\\nThe screen showed a small grave.", capY: 0.84 }, { fadeIn: 0.5, fadeOut: 0.8 }); c[c.length - 1].dur = 5.05; // to the cut at 42.15 (before the first word of the next verse)');
 cut('S("C · verse 2', 'S("D · chorus 1');
-s = s.replace('S("D · chorus 1: work, prosperous, lonely, my own", 74.8);', 'S("D · chorus 1: work, prosperous, lonely, my own", 39.665);');
+s = s.replace('S("D · chorus 1: work, prosperous, lonely, my own", 74.8);', 'S("D · chorus 1: work, prosperous, lonely, my own", 39.05);');
+s = s.replace('card("Now that you work,\\nhave you done these?", 3.0);', 'card("Now that you work,\\nhave you done these?", 3.615);');
 s = s.replace('view("d05-desk", 0, 4.5, { note: "the desk with the old things" });', 'view("d05-desk", 0, 4.475, { note: "the desk with the old things" });');
 cut('S("E · instrumental', 'S("G · verse 4');
 s = s.replace('S("G · verse 4: my AI says, and the games themselves", 149.6);', 'S("G · verse 4: my AI says, and the games themselves", 68.34);');
