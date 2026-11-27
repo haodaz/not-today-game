@@ -571,7 +571,7 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (typeof readOn === "function") await readOn();
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         if (deferred) ok = true; else { ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`); }
-        await settle(); await toRoom();
+        await settle(); await sleep(2.5); await shotStep("handin-thread"); await toRoom();
       } else
       if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
         // launch (author 2026-11-11): the task's opening page first (Kuro's ask was answered by settle on the row click)
@@ -725,7 +725,7 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (typeof readOn === "function") await readOn();
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
-        await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
+        await settle(); await sleep(2.5); await shotStep("handin-thread"); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
         results.push; 
       } else {
       ok = await sel("[data-action=wb-send]", 1.5); if (!ok) ok = await key("Enter") || true;

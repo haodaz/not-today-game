@@ -70,6 +70,14 @@
           "backdrop": "/room/dream/classroom_high.jpg"
         },
         {
+          "k": "narration",
+          "t": "It was bought for you before tenth grade began. Your mother said \"it's for learning English.\" The salesman said \"it plays games too.\" The two sentences crossed a counter and neither answered the other."
+        },
+        {
+          "k": "narration",
+          "t": "There were four or five in the whole class. Whoever had one found a hand reaching under the desk every period."
+        },
+        {
           "k": "speaker",
           "who": "高中同桌",
           "t": "Lend it to me for one period. You never play it anyway."
@@ -82,6 +90,10 @@
         {
           "k": "narration",
           "t": "The one she confiscated was somebody else's. Yours only ever did one thing: English in, Chinese out. One word a day, written on the last page."
+        },
+        {
+          "k": "narration",
+          "t": "The keys were rubber and made no sound. The screen showed four lines at a time; a longer entry meant holding the down key and waiting, line by line. You liked the waiting. While you waited, you were the only person looking at that word."
         },
         {
           "k": "speaker",
@@ -97,6 +109,10 @@
           "t": "The last word you looked up that year was alone."
         },
         {
+          "k": "narration",
+          "t": "You had caught it from a song. The song was leaking out of someone else's earphones, and it was the only word you made out."
+        },
+        {
           "k": "speaker",
           "who": "文曲星",
           "t": "alone  adj. by oneself; lonely.  adv. on one's own."
@@ -109,6 +125,10 @@
         {
           "k": "inner",
           "t": "I knew it. I looked it up to see if it had any other meaning."
+        },
+        {
+          "k": "inner",
+          "t": "It had no other meaning. Four lines and it was done; below them, nothing. I pressed the down key once anyway."
         },
         {
           "k": "narration",

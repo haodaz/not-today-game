@@ -90,6 +90,10 @@
           "backdrop": "/room/dream/payphone.jpg"
         },
         {
+          "k": "narration",
+          "t": "Eight to a dormitory, lights out at half past nine. After lights out somebody would cry under a quilt, very quietly, and the next day nobody said who."
+        },
+        {
           "k": "speaker",
           "who": "小卖部老板",
           "t": "Five yuan. Fifty minutes. Make it last."
@@ -97,6 +101,10 @@
         {
           "k": "narration",
           "t": "The payphones stood by the gate, three in a row, a queue behind them. One call a week, three minutes each."
+        },
+        {
+          "k": "narration",
+          "t": "The receiver was cold, with the last caller's sweat still on it. You pushed the card in; the screen showed the balance first, then you dialled home, seven digits, right even with your eyes shut."
         },
         {
           "k": "speaker",
@@ -121,6 +129,10 @@
         {
           "k": "narration",
           "t": "The number on the screen dropped one tick at a time. You lined up what you had to say, the most important first."
+        },
+        {
+          "k": "narration",
+          "t": "Which was the most urgent, you had not worked out by the time you got there. \"I miss home\" was not in the line. Say those words and everyone queuing behind you would hear."
         },
         {
           "k": "narration",

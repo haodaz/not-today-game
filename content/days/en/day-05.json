@@ -54,13 +54,29 @@
           "backdrop": "/room/dream/balcony.jpg"
         },
         {
+          "k": "narration",
+          "t": "The balcony faced west; after four in the afternoon the sun made you squint. The walkman was a hand-me-down from her cousin: the fast-forward key stuck down and had to be picked up with a fingernail. The tape was recorded off the radio, so every song was missing its first half-line and ended under the presenter reading the time."
+        },
+        {
+          "k": "narration",
+          "t": "The earphone cord was short. Two heads had to stay close and neither could move first; move, and the other side fell out."
+        },
+        {
           "k": "speaker",
           "who": "小满初中",
           "t": "Listen to this bit. This bit's the best."
         },
         {
+          "k": "inner",
+          "t": "I couldn't hear what made it the best. What I heard was her humming along, half a beat ahead of the tape."
+        },
+        {
           "k": "narration",
           "t": "Side A done, flip to side B. The end of side B had a stretch of nothing."
+        },
+        {
+          "k": "narration",
+          "t": "Blank tape makes a thin hiss as it turns, like rain a long way off."
         },
         {
           "k": "speaker",
@@ -75,6 +91,10 @@
           "k": "speaker",
           "who": "小满初中",
           "t": "Anything. What you'll be when you grow up. Say it and I'll keep it. I'll play it back to you one day and we'll see if you made it."
+        },
+        {
+          "k": "narration",
+          "t": "She held the walkman up to your mouth, the two little wheels turning. Her other hand was over her own mouth, in case her laughing got recorded."
         },
         {
           "k": "narration",
@@ -99,7 +119,15 @@
         },
         {
           "k": "narration",
+          "t": "What you did for the rest of that day, you don't remember. Only that after the sun went down the balcony rail was still hot."
+        },
+        {
+          "k": "narration",
           "t": "She changed schools in ninth grade. The tape stayed with you."
+        },
+        {
+          "k": "narration",
+          "t": "Before she left she said to keep the tape for now; she would come for it when she had a new walkman. She never came. Which year the tape went missing, you can't recall."
         },
         {
           "k": "narration",
