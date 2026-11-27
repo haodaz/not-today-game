@@ -270,7 +270,7 @@ function debugSeed(raw: string | null): Partial<State> | undefined {
   for (const pair of raw.split(",")) {
     const [k, v] = pair.split(":");
     if (!k || v === undefined) continue;
-    if (k === "san" || k === "affinity" || k === "assimilation") out[k] = Number(v);
+    if (k === "san" || k === "affinity" || k === "assimilation" || k === "fullness") out[k] = Number(v); // fullness (2026-11-27): a jump start that has eaten, so 开始工作 is not held
     else if (k === "flags") out.flags = v.split(/[+ ]/).filter(Boolean); // a "+" in a query string reads as a space: both split
     else if (k === "shook" && v === "1") out.flags = [...((out.flags as string[]) ?? []), "shook_hand"];
     else if (k === "recognised") out.recognised = v === "all" ? ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] : v.split("+").filter(Boolean);
