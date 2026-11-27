@@ -263,11 +263,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -340,22 +340,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -614,11 +614,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
@@ -713,11 +713,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -790,22 +790,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -1142,11 +1142,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -1219,33 +1219,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -1826,11 +1826,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -1881,33 +1881,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -2410,11 +2410,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -2487,33 +2487,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -3032,11 +3032,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -3109,33 +3109,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -3917,11 +3917,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -3983,33 +3983,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -4798,11 +4798,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -4875,33 +4875,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -5704,11 +5704,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -5792,33 +5792,33 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2007,
-          "low": "Because nobody chases them. The chasing script is with Vivi, and she is busy with the next client.",
+          "low": "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client.",
           "mid": "The Data Resources Bureau is stuck at the third stamp. Hongyi changed its contact, and the new one does not recognise the old contract. Yuanshu feels \"the platform hasn't met expectations,\" expectations they set themselves in a meeting. What the three have in common: they all use what you delivered.",
           "high": "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place.",
           "zh": {
-            "low": "因为没人催。催的话术在 Vivi 那儿，她在忙下一家。",
+            "low": "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。",
             "mid": "数据局是流程卡在第三个章；宏屹是换了对接人，新的不认旧合同；元枢是觉得「平台还没达到预期」，预期是他们自己在会上说的。三家的共同点：你交的东西他们都在用。",
             "high": "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
           }
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -6567,11 +6567,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -6611,22 +6611,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -7251,11 +7251,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -7339,22 +7339,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -8022,11 +8022,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -8110,22 +8110,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -8768,11 +8768,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -8856,22 +8856,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -9513,11 +9513,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -9601,22 +9601,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
@@ -10260,11 +10260,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 28,
-          "low": "That is when he remembers. In the day he is in meetings. Meetings count neither as working nor as remembering.",
+          "low": "Because he is in meetings all day, and only at night does he remember that something hasn't been handed in. You are eating by then. He doesn't know that, and it wouldn't cross his mind.",
           "mid": "He is in meetings all day and remembers at night that something has not been handed in. You are eating then. He does not know and does not want to. In his phone you are a name, not a mealtime. I have logged thirteen months of dinner-hour calls: never good news, never bad news, always \"let's leave it there.\"",
           "high": "Because he knows you will pick up. You always do. If I were you I would let it ring to the fourth ring. On the fourth he will wonder for a moment what you are doing. A moment is enough; he will not wonder twice, but you will feel a little better.",
           "zh": {
-            "low": "他那时候才想起来。白天他在开会，开会不算干活，也不算想起来。",
+            "low": "因为他白天都在开会，到了晚上才想起来还有活没交。你那会儿正吃饭，他不知道，也不会去想。",
             "mid": "他白天开会，晚上才想起来活没交。你那时候在吃饭，他不知道，也不想知道。他的手机里你是一个名字，不是一个饭点。饭点打来的电话我记了十三个月，没有一次是好消息，也没有一次是坏消息，全是「先这样」。",
             "high": "因为他知道你会接。你每次都接。我要是你，就让它响到第四声。第四声他会想一下你在干什么。想一下就够了，他不会想第二下，但你会好受一点。"
           }
@@ -10348,22 +10348,22 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 2008,
-          "low": "He makes a second call. To Vivi. Then Vivi sends you a card.",
+          "low": "Then he makes another call, to Vivi. And Vivi sends you a card that says \"thanks for the hard work.\"",
           "mid": "He calls Vivi, Vivi sends you a card that says \"thanks for the hard work,\" and next morning he acts as if nothing happened. Not many have tried it. Of those, you are zero.",
           "high": "Nothing happens. That is the hard part: thirteen months of calls, and not one that would have brought anything down unanswered. You pick up because the room is too quiet. I know. I am in the room too.",
           "zh": {
-            "low": "他会打第二个。给 Vivi。然后 Vivi 发你一张卡片。",
+            "low": "那他就再打一个，打给 Vivi。然后 Vivi 给你发一张卡片，上面写「辛苦了」。",
             "mid": "他会打给 Vivi，Vivi 会发你一张「辛苦了」的卡片，隔天早上他当没这事。试过的人不多，你是其中零个。",
             "high": "什么都不会怎么样。这是最难接受的部分：你接了十三个月的电话，没有一个是不接就塌的。你接，是因为屋里太安静。我知道。我也在这屋里。"
           }
         },
         {
           "unlock": 2009,
-          "low": "Steadily. He has not changed in thirteen months.",
+          "low": "Steady enough. Thirteen months now, and every day it is the same few sentences. He hasn't changed a word.",
           "mid": "Every day he says \"one step at a time\" three times, \"received\" six times, \"let's leave it there\" once. I counted. Squeezing a day into ten sentences is a skill of a kind. You cannot; you have to say something new every day.",
           "high": "His job is called being there. There in meetings, there in the group, there on the phone. Being there is work; many companies stand on nothing else. Your job is called making. I have seen plenty of both kinds. The makers always leave first. You have not left yet.",
           "zh": {
-            "low": "他干得很稳。十三个月没变过。",
+            "low": "挺稳的。十三个月了，每天说的还是那几句，一个字没换过。",
             "mid": "他每天说三遍「一步一步来」，六遍「收到」，一遍「先这样」。我数的。一个人能把一天压缩成十句话，也算一种本事。你压缩不了，你每天都要说新的。",
             "high": "他干的活叫「在」。开会在，群里在，电话里在。在，是一种工作，很多公司只靠这个撑着。你干的活叫「做」。两种人我都见过很多，做的人总是先走。你还没走。"
           }
