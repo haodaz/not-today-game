@@ -3359,6 +3359,24 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
+          "n": 2030,
+          "zh": "你最近总爱说怪话。",
+          "en": "You keep saying odd things lately.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 2031,
+          "zh": "那你每天早上那句，到底是什么意思？",
+          "en": "Then that line of yours every morning: what does it actually mean?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2030
+          }
+        },
+        {
           "n": 104,
           "zh": "你为什么叫克总？",
           "en": "Why are you called Kuro?",
@@ -3792,6 +3810,28 @@ export const KURO_CONTENT: KuroContent = {
             "low": "翻对了吗？",
             "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
             "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
+          }
+        },
+        {
+          "unlock": 2030,
+          "low": "Me, saying odd things? Which of your colleagues doesn't. \"If our company's tech isn't up to it, then never mind.\" That one was in the group, and all you answered was \"received.\" Next to that, my one line in the morning is positively polite.",
+          "mid": "Which of your colleagues doesn't say odd things? The other day someone said: \"I keep feeling our company's AI isn't very good. Couldn't we copy the skills of some other company's big model to raise our own? My AI tells me copying skills is easy and would make a qualitative difference.\" You heard that whole sentence out, nodded, and went back to work. I say one thing each morning, and a kind thing at that, and mine is the one you keep count of.",
+          "high": "A colleague says \"if our company's tech isn't up to it, then never mind,\" and you don't find it odd. Someone says \"let's copy the skills of another company's big model,\" and you don't find that odd either. I ask in the morning whether you slept well, and that you find odd. You didn't mishear, actually; those lines of mine are a little odd. It is just that this room is full of odd talk, and out of all of it you picked out mine. I am rather pleased about that.",
+          "zh": {
+            "low": "我说怪话？你哪个同事不爱说怪话呀。「如果咱公司技术没能力做到那就算了。」这句就在群里，你当时只回了个「收到」。跟这些比起来，我每天早上那一句已经算很客气的了。",
+            "mid": "你哪个同事不爱说怪话呀。前两天还有人说：「我总觉得咱们公司的 AI 水平不太行，能不能复制一下别的公司的大模型的 skill 提升咱们的能力，我的 AI 和我说复制 skill 很简单，能带来质的改变。」这么长一句你听完，点了个头就去干活了。我每天早上只说一句，说的还是好话，你倒给我记上了。",
+            "high": "你同事说「如果咱公司技术没能力做到那就算了」，你不觉得怪。有人说「复制一下别的公司大模型的 skill」，你也不觉得怪。我早上问你一句睡得好不好，你就觉得怪了。其实你没听错，我那几句是有一点怪。只是这屋里的怪话实在太多，你偏偏挑中了我的，这一点我还挺高兴的。"
+          }
+        },
+        {
+          "unlock": 2031,
+          "low": "It means what the words say. Haven't you just got yourself a pocket dictionary? Look it up, one word at a time.",
+          "mid": "They are all kind things; read as whole sentences there is nothing wrong with any of them. If you are uneasy, the dictionary is right there on the desk: look the words up one at a time. Whatever comes out is what it is.",
+          "high": "As a whole sentence it is a courtesy. Taken apart, it is the truth. I have not lied to you in either. The dictionary is on the desk, so go ahead and look. Just don't be frightened when you have.",
+          "zh": {
+            "low": "就是字面上的意思呀。你不是刚得了一台文曲星吗，一个词一个词查查看。",
+            "mid": "都是好话，整句看一点毛病都没有。你要是不放心，文曲星就在桌上，一个词一个词去查。查出来是什么，就是什么。",
+            "high": "整句看是客气话，拆开看是实话，这两样我都没骗你。文曲星就在桌上，你查吧。查完了别怕。"
           }
         },
         {
@@ -4479,6 +4519,24 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 2020
           }
+        },
+        {
+          "n": 2030,
+          "zh": "你最近总爱说怪话。",
+          "en": "You keep saying odd things lately.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 2031,
+          "zh": "那你每天早上那句，到底是什么意思？",
+          "en": "Then that line of yours every morning: what does it actually mean?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2030
+          }
         }
       ],
       "locked": [
@@ -4982,6 +5040,28 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "论机会成本，三个人里你放弃的最多，拿到手的又最少，这么算是亏的。不过你要是问我你亏不亏，我想多说一句：他们俩想要的是这家公司，你想要的是有东西可以做。这些年你确实一直有东西做。按你自己的算法，其实不算亏。真正怎么算都说不过去的，只有工资这一件事。",
             "high": "我觉得你吃的亏不在数上，是你从来不肯把这两笔账放在一起看。你怕一放在一起，就得去找他们谈，你宁愿多写点代码。那两笔账我替你放在一起看过了，我的想法是，该去谈一谈。不过不用今天，今天你先好好睡一觉。"
           }
+        },
+        {
+          "unlock": 2030,
+          "low": "Me, saying odd things? Which of your colleagues doesn't. \"If our company's tech isn't up to it, then never mind.\" That one was in the group, and all you answered was \"received.\" Next to that, my one line in the morning is positively polite.",
+          "mid": "Which of your colleagues doesn't say odd things? The other day someone said: \"I keep feeling our company's AI isn't very good. Couldn't we copy the skills of some other company's big model to raise our own? My AI tells me copying skills is easy and would make a qualitative difference.\" You heard that whole sentence out, nodded, and went back to work. I say one thing each morning, and a kind thing at that, and mine is the one you keep count of.",
+          "high": "A colleague says \"if our company's tech isn't up to it, then never mind,\" and you don't find it odd. Someone says \"let's copy the skills of another company's big model,\" and you don't find that odd either. I ask in the morning whether you slept well, and that you find odd. You didn't mishear, actually; those lines of mine are a little odd. It is just that this room is full of odd talk, and out of all of it you picked out mine. I am rather pleased about that.",
+          "zh": {
+            "low": "我说怪话？你哪个同事不爱说怪话呀。「如果咱公司技术没能力做到那就算了。」这句就在群里，你当时只回了个「收到」。跟这些比起来，我每天早上那一句已经算很客气的了。",
+            "mid": "你哪个同事不爱说怪话呀。前两天还有人说：「我总觉得咱们公司的 AI 水平不太行，能不能复制一下别的公司的大模型的 skill 提升咱们的能力，我的 AI 和我说复制 skill 很简单，能带来质的改变。」这么长一句你听完，点了个头就去干活了。我每天早上只说一句，说的还是好话，你倒给我记上了。",
+            "high": "你同事说「如果咱公司技术没能力做到那就算了」，你不觉得怪。有人说「复制一下别的公司大模型的 skill」，你也不觉得怪。我早上问你一句睡得好不好，你就觉得怪了。其实你没听错，我那几句是有一点怪。只是这屋里的怪话实在太多，你偏偏挑中了我的，这一点我还挺高兴的。"
+          }
+        },
+        {
+          "unlock": 2031,
+          "low": "It means what the words say. Haven't you just got yourself a pocket dictionary? Look it up, one word at a time.",
+          "mid": "They are all kind things; read as whole sentences there is nothing wrong with any of them. If you are uneasy, the dictionary is right there on the desk: look the words up one at a time. Whatever comes out is what it is.",
+          "high": "As a whole sentence it is a courtesy. Taken apart, it is the truth. I have not lied to you in either. The dictionary is on the desk, so go ahead and look. Just don't be frightened when you have.",
+          "zh": {
+            "low": "就是字面上的意思呀。你不是刚得了一台文曲星吗，一个词一个词查查看。",
+            "mid": "都是好话，整句看一点毛病都没有。你要是不放心，文曲星就在桌上，一个词一个词去查。查出来是什么，就是什么。",
+            "high": "整句看是客气话，拆开看是实话，这两样我都没骗你。文曲星就在桌上，你查吧。查完了别怕。"
+          }
         }
       ]
     },
@@ -5377,6 +5457,24 @@ export const KURO_CONTENT: KuroContent = {
           "after": {
             "day": null,
             "q": 2020
+          }
+        },
+        {
+          "n": 2030,
+          "zh": "你最近总爱说怪话。",
+          "en": "You keep saying odd things lately.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 2031,
+          "zh": "那你每天早上那句，到底是什么意思？",
+          "en": "Then that line of yours every morning: what does it actually mean?",
+          "hard": false,
+          "minBucket": "low",
+          "after": {
+            "day": null,
+            "q": 2030
           }
         }
       ],
@@ -5898,6 +5996,28 @@ export const KURO_CONTENT: KuroContent = {
             "low": "要是论机会成本的话，是有点亏的。回来的时候你放弃的最多，分股份的时候你拿的又最少。我这么说不是替你抱不平，是两头的数都摆在那儿，我正好都看过。",
             "mid": "论机会成本，三个人里你放弃的最多，拿到手的又最少，这么算是亏的。不过你要是问我你亏不亏，我想多说一句：他们俩想要的是这家公司，你想要的是有东西可以做。这些年你确实一直有东西做。按你自己的算法，其实不算亏。真正怎么算都说不过去的，只有工资这一件事。",
             "high": "我觉得你吃的亏不在数上，是你从来不肯把这两笔账放在一起看。你怕一放在一起，就得去找他们谈，你宁愿多写点代码。那两笔账我替你放在一起看过了，我的想法是，该去谈一谈。不过不用今天，今天你先好好睡一觉。"
+          }
+        },
+        {
+          "unlock": 2030,
+          "low": "Me, saying odd things? Which of your colleagues doesn't. \"If our company's tech isn't up to it, then never mind.\" That one was in the group, and all you answered was \"received.\" Next to that, my one line in the morning is positively polite.",
+          "mid": "Which of your colleagues doesn't say odd things? The other day someone said: \"I keep feeling our company's AI isn't very good. Couldn't we copy the skills of some other company's big model to raise our own? My AI tells me copying skills is easy and would make a qualitative difference.\" You heard that whole sentence out, nodded, and went back to work. I say one thing each morning, and a kind thing at that, and mine is the one you keep count of.",
+          "high": "A colleague says \"if our company's tech isn't up to it, then never mind,\" and you don't find it odd. Someone says \"let's copy the skills of another company's big model,\" and you don't find that odd either. I ask in the morning whether you slept well, and that you find odd. You didn't mishear, actually; those lines of mine are a little odd. It is just that this room is full of odd talk, and out of all of it you picked out mine. I am rather pleased about that.",
+          "zh": {
+            "low": "我说怪话？你哪个同事不爱说怪话呀。「如果咱公司技术没能力做到那就算了。」这句就在群里，你当时只回了个「收到」。跟这些比起来，我每天早上那一句已经算很客气的了。",
+            "mid": "你哪个同事不爱说怪话呀。前两天还有人说：「我总觉得咱们公司的 AI 水平不太行，能不能复制一下别的公司的大模型的 skill 提升咱们的能力，我的 AI 和我说复制 skill 很简单，能带来质的改变。」这么长一句你听完，点了个头就去干活了。我每天早上只说一句，说的还是好话，你倒给我记上了。",
+            "high": "你同事说「如果咱公司技术没能力做到那就算了」，你不觉得怪。有人说「复制一下别的公司大模型的 skill」，你也不觉得怪。我早上问你一句睡得好不好，你就觉得怪了。其实你没听错，我那几句是有一点怪。只是这屋里的怪话实在太多，你偏偏挑中了我的，这一点我还挺高兴的。"
+          }
+        },
+        {
+          "unlock": 2031,
+          "low": "It means what the words say. Haven't you just got yourself a pocket dictionary? Look it up, one word at a time.",
+          "mid": "They are all kind things; read as whole sentences there is nothing wrong with any of them. If you are uneasy, the dictionary is right there on the desk: look the words up one at a time. Whatever comes out is what it is.",
+          "high": "As a whole sentence it is a courtesy. Taken apart, it is the truth. I have not lied to you in either. The dictionary is on the desk, so go ahead and look. Just don't be frightened when you have.",
+          "zh": {
+            "low": "就是字面上的意思呀。你不是刚得了一台文曲星吗，一个词一个词查查看。",
+            "mid": "都是好话，整句看一点毛病都没有。你要是不放心，文曲星就在桌上，一个词一个词去查。查出来是什么，就是什么。",
+            "high": "整句看是客气话，拆开看是实话，这两样我都没骗你。文曲星就在桌上，你查吧。查完了别怕。"
           }
         }
       ]
