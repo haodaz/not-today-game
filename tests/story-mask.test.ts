@@ -84,13 +84,13 @@ async function mounted(view: Session["view"], dialogue: DialogueState) {
 }
 
 describe("on the stage", () => {
-  it("a 40 % dim under the box, in the box's fixed layer; a clear one for a one-line fragment (playtest-1105 R2)", async () => {
+  it("a 30 % dim under the box (40 % until 2026-11-27, author: 页面黑黑的), in the box's fixed layer; a clear one for a one-line fragment (playtest-1105 R2)", async () => {
     const masked = await mounted("room", story(3));
     const mask = masked.root.querySelector<HTMLElement>(".story-mask")!;
     expect(mask).not.toBeNull();
     expect(mask.parentElement!.classList.contains("dlg-layer")).toBe(true);
     expect(mask.nextElementSibling?.classList.contains("dlg")).toBe(true);
-    expect(getComputedStyle(mask).backgroundColor.replace(/\s/g, "")).toMatch(/^rgba\(0,0,0,0?\.4\)$/);
+    expect(getComputedStyle(mask).backgroundColor.replace(/\s/g, "")).toMatch(/^rgba\(0,0,0,0?\.3\)$/);
     destroy!();
     document.body.innerHTML = "";
     const plain = await mounted("room", story(1));
