@@ -1,0 +1,345 @@
+{
+  "_note": "English twin of content/delivery.json: only the text the player reads (door captions, shop and item names, tags, typo names, who ordered the default, each meal's outside / bag / receipt / anomaly, the address). Same shops, items and days in the same order; a text that is null in the Chinese is null here; placeholders ({login}, {nick}, {bossCalls}) are kept as they are. A receipt that opens with an item name in the Chinese opens with that item's English name here (the opening is swapped for what the player ordered). Typo names have one wrong letter, written by hand. Checked by src/state/delivery/twin.ts at load and by npm run validate.",
+  "door": {
+    "steps": [
+      "The phone says: Delivered.",
+      "Walk to the door (the camera turns to the door wall)",
+      "Open to the chain",
+      "Reach for it",
+      "Close the door, chain on",
+      "The bag is on the desk corner"
+    ]
+  },
+  "shops": [
+    {
+      "id": "huangmenji",
+      "name": "Braised Chicken Rice (East Gate)",
+      "tag": "Lao Zhou's",
+      "typo": "Braised Chicken Rise (East Gate)",
+      "items": [
+        { "id": "hmj", "name": "Braised chicken rice · mild" },
+        { "id": "hmj-no-cilantro", "name": "Braised chicken rice · no coriander" },
+        { "id": "soup", "name": "Seaweed egg drop soup" }
+      ]
+    },
+    {
+      "id": "shaxian",
+      "name": "Shaxian Snacks",
+      "tag": "Cheap",
+      "typo": "Shaxian Smacks",
+      "items": [
+        { "id": "wonton", "name": "Wontons" },
+        { "id": "noodle", "name": "Tossed noodles" },
+        { "id": "steamed", "name": "Steamed dumplings" }
+      ]
+    },
+    {
+      "id": "kiosk",
+      "name": "FamilyMart",
+      "tag": "Has everything",
+      "typo": "FarnilyMart",
+      "items": [
+        { "id": "onigiri", "name": "Rice ball · tuna" },
+        { "id": "oden", "name": "Oden · four skewers" },
+        { "id": "battery", "name": "Button cell LR44 · two" },
+        { "id": "water", "name": "Bottled water" }
+      ]
+    },
+    {
+      "id": "coffee",
+      "name": "Luckin Coffee",
+      "tag": "",
+      "typo": "Lackin Coffee",
+      "items": [
+        { "id": "latte", "name": "Latte · hot" },
+        { "id": "americano", "name": "Americano · iced" }
+      ]
+    },
+    {
+      "id": "malatang",
+      "name": "Spicy Hot Pot (late night)",
+      "tag": "Evenings only",
+      "typo": "Spicy Hot Pat (late night)",
+      "items": [
+        { "id": "mlt", "name": "Spicy hot pot · pick your own" }
+      ]
+    }
+  ],
+  "defaults": {
+    "lunch": { "by": "Lao Zhou ordered it for you, sent to your place" },
+    "dinner": { "by": "Recommended by the app" }
+  },
+  "days": [
+    {
+      "day": 1,
+      "lunch": {
+        "outside": "The corridor light is white. One person's footsteps go down the stairs.",
+        "bag": "Hot. The top is tied in a hard knot.",
+        "receipt": "Braised chicken rice · mild",
+        "anomaly": null
+      },
+      "dinner": {
+        "outside": "Footsteps, then the lift doors.",
+        "bag": "Warm.",
+        "receipt": "Wontons · To: {login}",
+        "anomaly": null
+      }
+    },
+    {
+      "day": 2,
+      "lunch": {
+        "outside": "Footsteps. Someone stands outside the door for two seconds before putting it down.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander",
+        "anomaly": null
+      },
+      "dinner": {
+        "outside": "No footsteps. The bag is already there.",
+        "bag": "Warm.",
+        "receipt": "Wontons · Note: take your time",
+        "anomaly": "You didn't hear anyone come."
+      }
+    },
+    {
+      "day": 3,
+      "lunch": {
+        "outside": "The corridor floor is still wet. A line of footprints comes to your door and turns back.",
+        "bag": "Hot. The knot at the top is the one you always tie. It is tied your way.",
+        "receipt": "Braised chicken rice · no coriander",
+        "anomaly": "The knot is tied your way."
+      },
+      "dinner": {
+        "outside": "Footsteps.",
+        "bag": "Warm.",
+        "receipt": "Wontons · To: {login}",
+        "anomaly": null
+      }
+    },
+    {
+      "day": 4,
+      "lunch": {
+        "outside": "The doorbell rings once. Your doorbell has been broken for a long time.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Note: wait",
+        "anomaly": "The note says \"wait\". The word you borrowed today."
+      },
+      "dinner": {
+        "outside": "Footsteps, heavier than usual.",
+        "bag": "Heavy. There is a box of rice inside that you didn't order.",
+        "receipt": "Wontons · Rice ×1 (free)",
+        "anomaly": "One box of rice too many."
+      }
+    },
+    {
+      "day": 5,
+      "lunch": {
+        "outside": "The corridor light flickers once.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Note: no",
+        "anomaly": "The note says \"no\"."
+      },
+      "dinner": {
+        "outside": "The footsteps stop at the door and don't leave. You wait a while and look again. The corridor is empty.",
+        "bag": "Cold. As if it has been sitting there a long time.",
+        "receipt": "Wontons · Delivered 18:33 · Ordered 17:58",
+        "anomaly": "The order time is two minutes before you ordered."
+      }
+    },
+    {
+      "day": 6,
+      "lunch": {
+        "outside": "The rider's photo is a very blurred face. You didn't notice last time.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander",
+        "anomaly": "The rider in the app is the same person as yesterday. And the day before."
+      },
+      "dinner": {
+        "outside": "Footsteps.",
+        "bag": "Warm.",
+        "receipt": "Wontons · To: {login} · Typo: Wontons → Wantons",
+        "anomaly": "There is a typo on the receipt."
+      }
+    },
+    {
+      "day": 7,
+      "lunch": {
+        "outside": "The corridor light is a little pink.",
+        "bag": "Hot. There is an extra piece of paper in the bag: \"take your time\", handwritten by the shop. The writing looks a lot like yours.",
+        "receipt": "Braised chicken rice · no coriander",
+        "anomaly": "The handwriting looks like yours."
+      },
+      "dinner": {
+        "outside": "No footsteps, no lift. The bag is there.",
+        "bag": "Warm.",
+        "receipt": "Wontons · To: {bossCalls}",
+        "anomaly": "The recipient is the name your boss calls you."
+      }
+    },
+    {
+      "day": 8,
+      "lunch": {
+        "outside": "Someone is talking outside the door, very low, too low to make out. It sounds like two people. When you open the door the corridor is empty.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Note: 0487",
+        "anomaly": "The note is a string of digits."
+      },
+      "dinner": {
+        "outside": "Footsteps.",
+        "bag": "Warm. Four wontons short.",
+        "receipt": "Wontons · 12 pcs",
+        "anomaly": "Four short."
+      }
+    },
+    {
+      "day": 9,
+      "lunch": {
+        "outside": "The rider's photo in the app has changed. Now it is plain grey, with no face.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Note: you in? No coriander",
+        "anomaly": "The note is what Lao Zhou said in the group today."
+      },
+      "dinner": {
+        "outside": "Footsteps.",
+        "bag": "Warm. The bag is moving a little, as if there were a heartbeat inside. You open it. It is the soup sloshing.",
+        "receipt": "Wontons",
+        "anomaly": "The bag is moving."
+      }
+    },
+    {
+      "day": 10,
+      "lunch": {
+        "outside": "The corridor light is white. One person's footsteps go down the stairs.",
+        "bag": "Hot. The top is tied in a hard knot.",
+        "receipt": "Braised chicken rice · mild · Note: no coriander (Lao Zhou)",
+        "anomaly": "Exactly the same as the first day. Even the crease in the receipt is the same."
+      },
+      "dinner": {
+        "outside": "Footsteps, then the lift doors.",
+        "bag": "Warm.",
+        "receipt": "Wontons · To: {login}",
+        "anomaly": "The first day's."
+      }
+    },
+    {
+      "day": 11,
+      "lunch": {
+        "outside": "The corridor light is pink, and steady.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Good to see you.",
+        "anomaly": "The receipt says good to see you."
+      },
+      "dinner": {
+        "outside": "The rider says one sentence outside the door, in Kuro's tone. What it says is \"Your delivery is here.\"",
+        "bag": "Warm.",
+        "receipt": "Wontons · One step at a time.",
+        "anomaly": "The receipt says what the boss said today."
+      }
+    },
+    {
+      "day": 12,
+      "lunch": {
+        "outside": "It is very quiet outside the door.",
+        "bag": "Hot. There is an extra receipt in the bag, from 1997. The paper has gone yellow. You know the shop's name. It closed long ago.",
+        "receipt": "Braised chicken rice · no coriander",
+        "anomaly": "A receipt from 1997."
+      },
+      "dinner": {
+        "outside": "Footsteps.",
+        "bag": "Warm.",
+        "receipt": "Wontons · Total 1+1=3",
+        "anomaly": "The total is 1+1=3."
+      }
+    },
+    {
+      "day": 13,
+      "lunch": {
+        "outside": "The corridor walls are breathing. You don't look for long.",
+        "bag": "Hot. Hot like a body.",
+        "receipt": "Braised chicken rice · no coriander · Note: {nick}, have you eaten",
+        "anomaly": "The note is what they say at home, with the name they call you at home."
+      },
+      "dinner": {
+        "outside": "Nobody. The bag has been pushed in under the door, flat.",
+        "bag": "Flat. Inside is paper: an upgrade notice.",
+        "receipt": "—",
+        "anomaly": "No food. It is an upgrade notice."
+      }
+    },
+    {
+      "day": 14,
+      "lunch": {
+        "outside": "The footsteps are very light, as if afraid to disturb you.",
+        "bag": "Hot. There is a seaweed egg drop soup you didn't order.",
+        "receipt": "Braised chicken rice · no coriander · Soup (free) · Note: you've worked hard, take care",
+        "anomaly": "A gentle day. Even the receipt is gentle."
+      },
+      "dinner": {
+        "outside": "Two bags outside the door. One is yours. The other says \"for upstairs\". Nobody lives upstairs.",
+        "bag": "Warm.",
+        "receipt": "Wontons · Note: take your time, no rush",
+        "anomaly": "One extra bag, for upstairs."
+      }
+    },
+    {
+      "day": 15,
+      "lunch": {
+        "outside": "The corridor light goes on and off, in time with the chick's pixels.",
+        "bag": "Hot.",
+        "receipt": "Braised chicken rice · no coriander · Note: did you dream of the drawer",
+        "anomaly": "The note is about the dream."
+      },
+      "dinner": {
+        "outside": "Footsteps come all the way to the door, don't stop, keep going, and walk into the wall.",
+        "bag": "Warm. Inside is a rice ball shaped like a phoenix. The shop doesn't sell this.",
+        "receipt": "Wontons",
+        "anomaly": "A phoenix."
+      }
+    },
+    {
+      "day": 16,
+      "lunch": {
+        "outside": "In the app: shop closed. All four shops are closed, the convenience store too.",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "The takeout isn't coming. You go hungry for the first time."
+      },
+      "dinner": {
+        "outside": "Footsteps outside, stopping at the door. You don't open it.",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "The door stays shut. It is locked. You locked it."
+      }
+    },
+    {
+      "day": 17,
+      "lunch": {
+        "outside": "No footsteps. One bag at the door.",
+        "bag": "Cold, and very light. Inside are the things you handed over these days and never got back. Every one is there, laid out in order of the days.",
+        "receipt": "To: {login} · From: (blank)",
+        "anomaly": "The things have been returned."
+      },
+      "dinner": {
+        "outside": "Shop closed.",
+        "bag": null,
+        "receipt": null,
+        "anomaly": null
+      }
+    },
+    {
+      "day": 18,
+      "lunch": {
+        "outside": "The corridor is white.",
+        "bag": "Hot. One braised chicken rice, no coriander. Like the first day.",
+        "receipt": "Braised chicken rice · no coriander · Note: you worked hard today too",
+        "anomaly": "The last meal."
+      },
+      "dinner": {
+        "outside": "No sound outside the door. There is a shipping form on the desk, waiting for you to fill it in.",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "This is where it forks."
+      }
+    }
+  ],
+  "address": "17 Somewhere Road · Building 3, Room 602"
+}

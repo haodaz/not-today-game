@@ -40,10 +40,14 @@ export function arrivalOf(day: number, meal: Meal, order: OrderRecord | undefine
   return deliveryTable.windows[meal][1];
 }
 
-/** Every item name in the table, longest first, for receipt matching. */
-const itemNames: readonly string[] = deliveryTable.shops
-  .flatMap((s) => s.items.map((it) => it.name))
-  .sort((a, b) => b.length - a.length);
+/**
+ * Every item name in the table, longest first, for receipt matching. Read at each call: the names
+ * follow the content locale (the English twin), and so does the receipt they are matched against.
+ */
+const itemNames = (): string[] =>
+  deliveryTable.shops
+    .flatMap((s) => s.items.map((it) => it.name))
+    .sort((a, b) => b.length - a.length);
 
 /**
  * E6. For display only: if the receipt starts with an item name, that prefix becomes the chosen
@@ -52,7 +56,7 @@ const itemNames: readonly string[] = deliveryTable.shops
  */
 export function composeReceipt(receipt: string | null, chosenName: string | null): string | null {
   if (receipt === null || chosenName === null) return receipt;
-  const prefix = itemNames.find((name) => receipt.startsWith(name));
+  const prefix = itemNames().find((name) => receipt.startsWith(name));
   return prefix ? chosenName + receipt.slice(prefix.length) : receipt;
 }
 

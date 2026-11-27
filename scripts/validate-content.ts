@@ -3,14 +3,17 @@
 //   node scripts/validate-content.ts --days [files]  content/days/day-*.json (or the files given)
 //   node scripts/validate-content.ts --strings       keys in zh.json missing from en.json
 //   node scripts/validate-content.ts --objects       content/objects.json + en twin: 2–4 options, ≤ 1 right
-// Exit codes: 0 clean · 1 a day file has a problem · 2 cannot run (bad arguments, or a table it
-// reads is missing or unreadable) · 3 the days are clean but English keys are missing (a report:
-// the game falls back to Chinese). The highest-priority code wins: 2, then 1, then 3.
+//   node scripts/validate-content.ts --delivery      content/delivery.json has all its text in content/en/delivery.json
+// Exit codes: 0 clean · 1 a day file, the objects or the delivery twin has a problem · 2 cannot run
+// (bad arguments, or a table it reads is missing or unreadable) · 3 the days are clean but English
+// keys are missing (a report: the game falls back to Chinese). The highest-priority code wins: 2,
+// then 1, then 3.
 // Read-only: it never writes content. The strict loaders (src/state/**) stay the authority at
 // import time; this gives the same news earlier, file by file, without starting the game.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { deliveryTwinProblems } from "../src/state/delivery/twin.ts";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DAYS_DIR = join(ROOT, "content/days");
@@ -20,6 +23,8 @@ const ZH = join(ROOT, "content/strings/zh.json");
 const EN = join(ROOT, "content/strings/en.json");
 const OBJECTS = join(ROOT, "content/objects.json");
 const OBJECTS_EN = join(ROOT, "content/en/objects.json");
+const DELIVERY = join(ROOT, "content/delivery.json");
+const DELIVERY_EN = join(ROOT, "content/en/delivery.json");
 
 /** Every day has these beats. */
 const CORE_BEATS = ["boot", "desk", "shutdown", "night"] as const;
@@ -230,6 +235,18 @@ function runObjects(): number {
   return problems;
 }
 
+/**
+ * The delivery texts (door lines, receipts, shop and item names) against their English twin: a
+ * text the Chinese has and the twin lacks, or a shape that differs, is a problem (the loader
+ * src/state/delivery/table.ts refuses the same things at import).
+ */
+function runDelivery(): number {
+  const found = deliveryTwinProblems(readJson(DELIVERY, "delivery"), readJson(DELIVERY_EN, "delivery en"));
+  for (const line of found) console.log(line);
+  console.log(`delivery: 2 files, ${found.length} problem${found.length === 1 ? "" : "s"}`);
+  return found.length;
+}
+
 function runStrings(t: Tables): number {
   const en = readJson(EN, "strings en");
   if (!isRecord(en)) throw new CannotRun("en.json must be a JSON object");
@@ -242,21 +259,23 @@ function runStrings(t: Tables): number {
 export function main(argv: readonly string[]): number {
   const flags = argv.filter((a) => a.startsWith("--"));
   const files = argv.filter((a) => !a.startsWith("--"));
-  const unknown = flags.filter((f) => f !== "--days" && f !== "--strings" && f !== "--objects");
+  const unknown = flags.filter((f) => f !== "--days" && f !== "--strings" && f !== "--objects" && f !== "--delivery");
   if (unknown.length) {
-    console.error(`unknown option ${unknown.join(", ")} (use --days [files], --strings, --objects)`);
+    console.error(`unknown option ${unknown.join(", ")} (use --days [files], --strings, --objects, --delivery)`);
     return 2;
   }
   const both = flags.length === 0;
   const days = both || flags.includes("--days");
   const strings = both || flags.includes("--strings");
   const objects = both || flags.includes("--objects");
+  const delivery = both || flags.includes("--delivery");
   try {
     const t = loadTables();
     const dayProblems = days ? runDays(dayFilesFrom(files), t) : 0;
     const objectProblems = objects ? runObjects() : 0;
+    const deliveryProblems = delivery ? runDelivery() : 0;
     const missing = strings ? runStrings(t) : 0;
-    return dayProblems > 0 || objectProblems > 0 ? 1 : missing > 0 ? 3 : 0;
+    return dayProblems > 0 || objectProblems > 0 || deliveryProblems > 0 ? 1 : missing > 0 ? 3 : 0;
   } catch (e) {
     // Anything unexpected is "cannot run" too, so 1 always means a content problem.
     console.error(`cannot run: ${e instanceof CannotRun ? e.message : (e as Error).stack ?? String(e)}`);

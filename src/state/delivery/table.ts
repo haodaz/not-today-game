@@ -1,8 +1,12 @@
 // Loads content/delivery.json (Claude's file): read, checked, frozen. No string is rewritten.
 // The guard is strict so a new content feature is noticed instead of silently ignored.
+// Its text reads from the English twin content/en/delivery.json under lang=en (see twin.ts).
 import raw from "@content/delivery.json";
+import enRaw from "@content/en/delivery.json";
 import stagesFile from "@content/stages.json";
+import { bilingual, bilingualValues } from "../content-locale";
 import { PLACEHOLDERS } from "../replies/table";
+import { deliveryTwinProblems, MEAL_TEXTS, type DeliveryTwin, type TwinMeal } from "./twin";
 
 export const MEALS = ["lunch", "dinner"] as const;
 export type Meal = (typeof MEALS)[number];
@@ -280,7 +284,51 @@ export function parseDelivery(input: unknown): DeliveryTable {
   });
 }
 
-export const deliveryTable: DeliveryTable = parseDelivery(raw);
+// ——— English twin (2026-11-27) ———
+// content/en/delivery.json holds only the text (twin.ts lists the fields and checks them against the
+// Chinese source). Everything the state derives (windows, arrivals, prices, effects, drift) is the
+// Chinese file's; under lang=en the texts below read from the twin.
+
+/** A meal with its four texts in the content locale. A text the Chinese has as null stays null. */
+function localiseMeal(zh: MealEntry, en: TwinMeal): MealEntry {
+  const texts: Partial<Record<keyof MealEntry, string>> = {};
+  for (const k of MEAL_TEXTS) if (zh[k] !== null && en[k] !== null) texts[k] = en[k]!;
+  return Object.freeze(bilingual(zh, texts));
+}
+
+/**
+ * The Chinese table, its text read from the English twin under lang=en. Throws at the first
+ * difference between the two files that is not text (a missing English string included).
+ * Pure; exported for tests.
+ */
+export function localiseDelivery(zhRaw: unknown, twinRaw: unknown): DeliveryTable {
+  const zh = parseDelivery(zhRaw);
+  const problem = deliveryTwinProblems(zhRaw, twinRaw)[0];
+  if (problem !== undefined) throw new Error(problem);
+  const en = twinRaw as DeliveryTwin;
+
+  const shops = zh.shops.map((z, i) => {
+    const e = en.shops[i]!;
+    const items = z.items.map((it, j) => Object.freeze(bilingual(it, { name: e.items[j]!.name })));
+    return Object.freeze(bilingual({ ...z, items: Object.freeze(items) }, { name: e.name, tag: e.tag, ...(z.typo !== undefined ? { typo: e.typo } : {}) }));
+  });
+  const defaults = {} as Record<Meal, Default>;
+  for (const meal of MEALS) defaults[meal] = Object.freeze(bilingual(zh.defaults[meal], { by: en.defaults[meal].by }));
+  const days = new Map<number, DayEntry>();
+  for (const [day, z] of zh.days) {
+    const e = en.days.find((d) => d.day === day)!;
+    days.set(day, Object.freeze({ ...z, lunch: localiseMeal(z.lunch, e.lunch), dinner: localiseMeal(z.dinner, e.dinner) }));
+  }
+  return Object.freeze(
+    bilingualValues(
+      { ...zh, shops: Object.freeze(shops), defaults: Object.freeze(defaults), days: Object.freeze(days) },
+      { doorSteps: Object.freeze([...en.door.steps]), ...(zh.address !== undefined ? { address: en.address } : {}) },
+    ),
+  );
+}
+
+/** The table, its text in the content locale (the twin is checked at load). */
+export const deliveryTable: DeliveryTable = localiseDelivery(raw, enRaw);
 
 /** The meal entry for a day, or undefined past the scripted days. */
 export function mealOf(day: number, meal: Meal): MealEntry | undefined {
