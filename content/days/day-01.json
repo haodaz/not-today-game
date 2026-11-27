@@ -249,12 +249,12 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "老师打电话来了。"
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "不是说你。是说那个东西。先放老师那儿，期末拿回来。"
         },
         {
@@ -263,7 +263,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "一个游戏机，饿不死人。吃饭。"
         },
         {

@@ -93,7 +93,7 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "Play with it. Don't press that key."
         },
         {
@@ -102,12 +102,12 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "Dinner. Don't break it."
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "Can't break it. It just takes numbers. Someone wants me, it beeps once. When it beeps, you go."
         },
         {
@@ -126,7 +126,7 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "Give it here."
         },
         {
@@ -135,12 +135,12 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "I'll go down and make a call."
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "Come back up and eat after."
         },
         {
@@ -149,7 +149,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "Go to sleep. Your dad isn't coming home tonight."
         },
         {

@@ -93,7 +93,7 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "玩吧。别按那个键。"
         },
         {
@@ -102,12 +102,12 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "吃饭了。别给弄坏了。"
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "坏不了。就是个收数字的。有人找，它响一声。响了就得去。"
         },
         {
@@ -126,7 +126,7 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "给我。"
         },
         {
@@ -135,12 +135,12 @@
         },
         {
           "k": "speaker",
-          "who": "father",
+          "who": "father_young",
           "t": "我下楼打个电话。"
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "打完上来吃。"
         },
         {
@@ -149,7 +149,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "睡吧。你爸今晚不回来了。"
         },
         {

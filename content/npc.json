@@ -222,6 +222,18 @@
       "name": "msgs.laozhou",
       "portrait": "/npc/laozhou_young.png",
       "avatar": "/npc/laozhou_young_av.png"
+    },
+    "father_young": {
+      "name": "msgs.father",
+      "portrait": "/npc/father_young.png",
+      "avatar": "/npc/father_young_av.png",
+      "stand": "/npc/stand/father_young.webp"
+    },
+    "mother_young": {
+      "name": "msgs.mother",
+      "portrait": "/npc/mother_young.png",
+      "avatar": "/npc/mother_young_av.png",
+      "stand": "/npc/stand/mother_young.webp"
     }
   },
   "silhouettes": [

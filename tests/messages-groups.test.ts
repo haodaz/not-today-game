@@ -133,6 +133,8 @@ describe("prefix → who: an npc id or name in either language, else a silhouett
     // message prefixed 老王 or 小满 is the plain one. The plain entry comes first in npc.json.
     const firstWithName: Record<string, string> = {};
     for (const [id, entry] of Object.entries(npcData.npcs)) firstWithName[entry.name] ??= id;
+    // The young mother (author 2026-11-26) is named 妈; 妈 in a message is still the family thread's mother.
+    firstWithName["msgs.mother"] = "family";
     for (const [id, entry] of Object.entries(npcData.npcs)) {
       expect(npcIdOf(id), id).toBe(id);
       for (const l of ["zh", "en"] as const) {

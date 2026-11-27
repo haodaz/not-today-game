@@ -128,6 +128,8 @@ const toRoom = async () => { if (await has("[data-action=onboard-skip]")) await 
     if (await inRoom()) return true;
     // box-arrival: the case left open at 窗 blocks the turn: close it first (author 2026-11-11 run)
     if (await has("[data-action=case-close]")) { await sel("[data-action=case-close]", 0.8); continue; }
+    // work-mode §1: the full chrome first (退出工作模式); it is held while the day's game runs
+    if (i === 0 && (await has("[data-action=work-exit]"))) { await sel("[data-action=work-exit]", 1.2); continue; }
     await key(" ");
     // navigation-polish (2026-11-16): the screen has no room tile; 离开屏幕 lands on 桌子, and Esc there goes to the room
     if (await has(".leave-screen")) { await sel(".leave-screen[data-action=view][data-view=desk]", 2.2); await key("Escape"); await sleep(1.2); }
@@ -201,6 +203,8 @@ const followRing = async (max = 6) => {
   return true;
 };
 const toWorkbench = async () => {
+  // already in 工作台 (work mode included): stay; going through the room would leave work mode
+  if (await wbOpen()) { await readLines(); return; }
   for (let attempt = 0; attempt < 3; attempt++) {
     await toDesktop(); await readLines(); if (await has("[data-action=files-close]")) await sel("[data-action=files-close]", 0.6);
     if (!(await wbOpen())) { const dk = await sel("[data-action=dock][data-app=workbench]", 2); if (!dk) await click(S("wb.title"), 2); if (!(await wbOpen())) { const line = await text();
@@ -330,7 +334,7 @@ const currentLine = async () => {
     await readLines();
     // game-menu R1: while a meal is on its way and nothing else is current, the card says
     // checklist.waitIdle (no id, no 前往): that is a wait, not a missing line
-    const v = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now')].find(__vis); return e ? JSON.stringify({ id: e.dataset.id || (e.classList.contains('idle') ? '__wait' : ''), text: e.innerText.replace(/\\s+/g,' ').replace(/前往›?/,'').trim() }) : ''})()");
+    const v = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now, .wait-card .it.now')].find(__vis); return e ? JSON.stringify({ id: e.dataset.id || (e.classList.contains('idle') ? '__wait' : ''), text: e.innerText.replace(/\\s+/g,' ').replace(/前往›?/,'').trim() }) : ''})()");
     if (v) return JSON.parse(v);
     await interrupts(); await toRoom();
   }
@@ -345,7 +349,7 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
   if (line?.id === "__wait") {
     note(`   (waiting: ${line.text})`); await shotStep("wait");
     let moved = false;
-    for (let w = 0; w < 90 && !moved; w++) { await sleep(2); await interrupts(); if (await has("[data-action=loop-choice]")) await settle(); const l = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now')].find(__vis); return e ? (e.dataset.id||'idle') : 'none'})()"); moved = l !== "idle"; }
+    for (let w = 0; w < 90 && !moved; w++) { await sleep(2); await interrupts(); if (await has("[data-action=loop-choice]")) await settle(); const l = await ev("(()=>{const e=[...document.querySelectorAll('.list .it.now, .wait-card .it.now')].find(__vis); return e ? (e.dataset.id||'idle') : 'none'})()"); moved = l !== "idle"; }
     if (!moved) { stalled = { step: stepNo, line: line.text, why: "the meal never came (3 min)" }; await shotStep("stall"); break; }
     continue;
   }
@@ -463,6 +467,7 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
       };
       if (board && !board.tune) await waitForAsk("board", "[data-action=task-launch],[data-action=compare-pick],[data-action=board-slot],[data-action=shell-slot],[data-action=board-lock]");
       if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); await sleep(0.6); }  // every board task opens on its launch page
+      let deferred = false;
       if (board?.tune) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
         // turn, Kuro speaks between), the end-of-work offer declined (不接), then 提交.
@@ -502,7 +507,23 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         // OFFER=take (2026-11-13): her skin taken instead (the settlement then shows the backend wearing it)
         if (process.env.OFFER === "take" && (await has("[data-action=board-mod][data-path=skin]"))) { await sel("[data-action=board-mod][data-path=skin]", 1.5); note("   tune: offer taken (skin)"); await sleep(4); await shotStep("board-skin"); }
         else if (await has("[data-action=board-keep]")) { await sel("[data-action=board-keep]", 1.5); note("   tune: offer declined"); }
-        for (let w = 0; w < 8 && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
+        // 2026-11-24 (#51): the offer is asked in the box (tune-ask → 换上 / 不换); take the last choice (不换) unless OFFER=take
+        if (await has("[data-action=tune-ask]")) {
+          await sel("[data-action=tune-ask]", 1); await readLines();
+          const ch = await ev("__choices()"); const pick = process.env.OFFER === "take" ? ch[0] : ch[ch.length - 1];
+          if (pick) { await click(pick, 1.5); note(`   tune: offer asked → ◇${pick}`); } await readLines(); await sleep(1);
+        }
+        // 2026-11-24 (#52/#60/#33): under today's line 提交 stays shut until Kuro's fix (克总帮我补一下) or 今天先不发.
+        // TUNE_SHORT=defer keeps it for tomorrow; the default asks for the fix (his scene types for a few seconds).
+        if (!(await has("[data-action=board-print]:not([disabled])"))) {
+          const defer = process.env.TUNE_SHORT === "defer" && (await has("[data-action=board-defer]"));
+          if (defer) { await shotStep("tune-short"); await sel("[data-action=board-defer]", 1); await readLines(); note("   tune: under the line → 今天先不发"); deferred = true; }
+          else if (await has("[data-action=tune-kuro-fix]")) {
+            await shotStep("tune-short"); await sel("[data-action=tune-kuro-fix]", 1); note("   tune: under the line → 克总帮我补一下");
+            for (let w = 0; w < 20 && !(await has("[data-action=board-print]:not([disabled])")); w++) { await readLines(); await sleep(1); }
+          }
+        }
+        for (let w = 0; w < 8 && !deferred && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
         note(`   tune: ${picks} picks`); await shotStep("board-tuned");
         // stack (2026-11-12): the filled form goes up the chain; the dev cheat approves it (the game itself is 2048)
         if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   stack: approved via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }  // the approval moment holds the chain a beat (work-stages-polish 3) before the board returns
@@ -535,7 +556,7 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         // settlement sheet (Kiro 2026-11-12): on the evidence board and the meeting replay 提交 sits behind 整理好了
         if (typeof readOn === "function") await readOn();
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
-        ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
+        if (deferred) ok = true; else { ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`); }
         await settle(); await toRoom();
       } else
       if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {

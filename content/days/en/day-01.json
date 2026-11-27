@@ -249,12 +249,12 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "Your teacher phoned."
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "Not about you. About that thing. It stays with her till the end of term."
         },
         {
@@ -263,7 +263,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_young",
           "t": "It's a game. Nobody starves. Eat."
         },
         {
