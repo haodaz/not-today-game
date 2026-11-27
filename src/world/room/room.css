@@ -802,6 +802,12 @@
 /* dictionary-guide (author 2026-11-10): the first use's example card, over the device; the coach card's look */
 .dict-guide{position:fixed;left:50%;top:10%;transform:translateX(-50%);width:320px;box-sizing:border-box;background:#fff;border-radius:12px;padding:14px 16px 12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-size:13px;line-height:1.55;color:#1d2129;z-index:80}
 .dict-guide b{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+/* ledger #128: what Kuro said, beside the dictionary (to the right of the device, out of the way of its keys); it takes no clicks */
+.room .held-layer .dict-lines{position:absolute;right:28px;top:24%;width:250px;box-sizing:border-box;background:#f6f2e9;border-radius:12px;padding:14px 16px 12px;box-shadow:0 14px 34px rgba(0,0,0,.35);font-size:13px;line-height:1.5;color:#1d2129;z-index:79;pointer-events:none}
+.room .held-layer .dict-lines b{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+.room .held-layer .dict-lines ul{list-style:none;margin:0;padding:0}
+.room .held-layer .dict-lines li{font:13px/1.5 Menlo,monospace;color:#7a7266;padding:3px 0}
+.room .held-layer .dict-lines li.now{color:#243024;background:#eef0e6;border-radius:6px;padding:5px 8px;margin:0 -8px 4px}
 .dict-guide p{margin:0 0 10px;color:#5a5248}
 .dict-guide .ex{font:14px/1.5 Menlo,monospace;background:#eef0e6;color:#243024;border-radius:8px;padding:8px 10px;margin:0 0 10px;min-height:1.5em}
 .dict-guide .row{display:flex;gap:8px;justify-content:flex-end}

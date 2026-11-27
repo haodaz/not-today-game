@@ -485,6 +485,7 @@
   "dict.guide.ex0": "How much is the shirt?",
   "dict.guide.ex1": "衬衫的价格是九磅十五便士。",
   "dict.guide.ex2": "Nine pounds fifteen.",
+  "dict.lines.title": "Run what Kuro said today through it.",
   "dictionary.unknown": "Not found",
   "objects.putdown": "Put down",
   "objects.exit": "Exit",

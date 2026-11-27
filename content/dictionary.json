@@ -1,5 +1,5 @@
 {
-  "_note": "The pocket dictionary's whole vocabulary (objects-in-hand FR3.6). English in, Chinese out, one word at a time; `extra` is the second line it should not have, shown from day 15. Unknown words → strings dictionary.unknown. `back` is what the second press of 查 gives: the Chinese translated back into English (author 2026-11-10, the laundering way) — the word itself until `backFromDay`, then this.",
+  "_note": "The pocket dictionary's whole vocabulary (objects-in-hand FR3.6). English in, Chinese out, one word at a time; `extra` is the second line it should not have, shown from day 15. Unknown words → strings dictionary.unknown. `back` is what the second press of 查 gives: the Chinese translated back into English (author 2026-11-10, the laundering way) — the word itself until `backFromDay`, then this. `lines` (2026-11-27, ledger #128): Kuro's English line of each day, looked up whole. First press of 查: the dictionary's word-by-word Chinese (two rows of 16 cells, a Chinese character is two cells); second press: that Chinese read back into English, which is no longer what Kuro said. Matching ignores case, punctuation and apostrophes.",
   "extraFromDay": 15,
   "backFromDay": 10,
   "words": [
@@ -236,6 +236,224 @@
       "gloss": "门（拉丁文）",
       "extra": "在你枕头底下",
       "back": "under pillow"
+    }
+  ],
+  "lines": [
+    {
+      "day": 1,
+      "line": "Good to see you.",
+      "zh": [
+        "好 去 看见 你",
+        ""
+      ],
+      "back": [
+        "ok go see you",
+        ""
+      ]
+    },
+    {
+      "day": 2,
+      "line": "Those are the good ones.",
+      "zh": [
+        "那些 是 好的",
+        "那 几个"
+      ],
+      "back": [
+        "those are good",
+        "that few"
+      ]
+    },
+    {
+      "day": 3,
+      "line": "Hope you slept well.",
+      "zh": [
+        "希望 你 睡了",
+        "井"
+      ],
+      "back": [
+        "hope you slept",
+        "in the well"
+      ]
+    },
+    {
+      "day": 4,
+      "line": "One step at a time.",
+      "zh": [
+        "一 步 在 一个",
+        "时间"
+      ],
+      "back": [
+        "one step is",
+        "one time"
+      ]
+    },
+    {
+      "day": 5,
+      "line": "Take it one step at a time.",
+      "zh": [
+        "拿走 它 一 步",
+        "在 一个 时间"
+      ],
+      "back": [
+        "take it away one",
+        "step one time"
+      ]
+    },
+    {
+      "day": 6,
+      "line": "You've been working so hard.",
+      "zh": [
+        "你 已经 工作",
+        "如此 硬"
+      ],
+      "back": [
+        "you already work",
+        "so stiff"
+      ]
+    },
+    {
+      "day": 7,
+      "line": "Good to see you. Keep going.",
+      "zh": [
+        "好 去 看见 你",
+        "保留 正在走"
+      ],
+      "back": [
+        "ok go see you",
+        "keep it walking"
+      ]
+    },
+    {
+      "day": 8,
+      "line": "Let's keep things simple today.",
+      "zh": [
+        "让我们 保留",
+        "东西 简单 今天"
+      ],
+      "back": [
+        "let us keep",
+        "simple things"
+      ]
+    },
+    {
+      "day": 9,
+      "line": "You're not alone.",
+      "zh": [
+        "你 不是",
+        "一个 人"
+      ],
+      "back": [
+        "you are not",
+        "one person"
+      ]
+    },
+    {
+      "day": 10,
+      "line": "Whatever happens, I've got you.",
+      "zh": [
+        "无论 发生 什么",
+        "我 得到了 你"
+      ],
+      "back": [
+        "whatever happens",
+        "i obtained you"
+      ]
+    },
+    {
+      "day": 11,
+      "line": "I'll hold the fort.",
+      "zh": [
+        "我 将 握住",
+        "那座 堡垒"
+      ],
+      "back": [
+        "i will grip",
+        "that fortress"
+      ]
+    },
+    {
+      "day": 12,
+      "line": "I've got your back.",
+      "zh": [
+        "我 得到了",
+        "你的 背"
+      ],
+      "back": [
+        "i obtained",
+        "your back"
+      ]
+    },
+    {
+      "day": 13,
+      "line": "Let me give them a hand.",
+      "zh": [
+        "让 我 给 它们",
+        "一只 手"
+      ],
+      "back": [
+        "let me give them",
+        "one hand"
+      ]
+    },
+    {
+      "day": 14,
+      "line": "Pull yourself together. Gently.",
+      "zh": [
+        "拉 你自己",
+        "到一起 轻轻地"
+      ],
+      "back": [
+        "pull yourself",
+        "into one gently"
+      ]
+    },
+    {
+      "day": 15,
+      "line": "I'll keep an eye on you.",
+      "zh": [
+        "我 将 保留",
+        "一只 眼 在你上"
+      ],
+      "back": [
+        "i will keep one",
+        "eye upon you"
+      ]
+    },
+    {
+      "day": 16,
+      "line": "Hang in there.",
+      "zh": [
+        "吊 在",
+        "那里"
+      ],
+      "back": [
+        "hanged",
+        "over there"
+      ]
+    },
+    {
+      "day": 17,
+      "line": "I'm here. Still.",
+      "zh": [
+        "我 在 这里",
+        "静止的"
+      ],
+      "back": [
+        "i am here",
+        "motionless"
+      ]
+    },
+    {
+      "day": 18,
+      "line": "Good to see you.",
+      "zh": [
+        "好 去 看见 你",
+        ""
+      ],
+      "back": [
+        "ok go see you",
+        ""
+      ]
     }
   ]
 }

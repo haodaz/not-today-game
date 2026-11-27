@@ -9,6 +9,7 @@ import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
+import { dictionaryTable } from "@state/hands";
 import { Bits, drawSegLine, finer, SEG_PITCH } from "@world/objects/frame";
 import { CHICK_H, CHICK_ICONS, CHICK_W, chickFrames, ICON_SIZE, type ChickFrames, type ChickIcon } from "@world/objects/frames";
 import { CHICK_SCREEN_H, type ChickState } from "@world/objects/chick";
@@ -336,4 +337,16 @@ export function renderDevice(id: string, state: State, session: Session, level: 
   // The flip / rotate buttons sit under the device, inside the focus view, never while holding;
   // under them the lock's read footer when the caller has one (the room's 使用, 2026-11-10).
   return html`<div class="dev-focus">${make(ctx)}${buttons}${footer}</div>`;
+}
+
+/**
+ * Ledger #128 (author 2026-11-27): beside the dictionary, her line 「把今天克总说的怪话翻译一下」 and what Kuro said: today's line
+ * first, the two days before under it. The player types a line in by hand; the card only says what there is to type.
+ * Drawn by the held layer on the stage (not inside the device, whose box is scaled in 使用). Null while the first-use
+ * guide is up, or on a day without a line.
+ */
+export function dictLinesCard(day: number, guideDue: boolean): SafeHtml | null {
+  const said = [0, 1, 2].map((k) => dictionaryTable.lineOfDay.get(day - k)).filter((l, i, arr): l is NonNullable<typeof l> => l !== undefined && arr.findIndex((x) => x?.key === l.key) === i);
+  if (guideDue || said.length === 0 || said[0]!.day !== day || !hasString("dict.lines.title")) return null;
+  return html`<aside class="dict-lines" aria-label="${t("dict.lines.title")}"><b>${tr("dict.lines.title")}</b><ul>${said.map((l, i) => html`<li class="${cls(i === 0 && "now")}" lang="en">${l.line}</li>`)}</ul></aside>`;
 }

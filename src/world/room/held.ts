@@ -22,7 +22,7 @@ import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
 import { hasString, t, tr } from "@world/i18n";
 import { CHICK_ICONS } from "@world/objects/frames";
-import { chickIconMark } from "./devices";
+import { chickIconMark, dictLinesCard } from "./devices";
 import { FLIPPERS, isDevice, renderDevice } from "@world/room/devices";
 import { readFooter } from "@world/desktop/workbench/lockread";
 
@@ -277,5 +277,5 @@ export function heldLayer(state: State, events: readonly GameEvent[], session: S
   const focused = !session.phoneOpen && session.hand.using;
   // guidance R8: with the phone up the hint sits under the phone's bottom edge, never over its buttons.
   // data-keep-shell (author 2026-11-24 #13: 放大放大放大): the layer is kept across renders, so the object zooms in once
-  return html`<div class="${cls("held-layer", focused && "focus", session.phoneOpen && "phone-up")}" data-held="${item}" data-keep="held:${item}" data-keep-shell>${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
+  return html`<div class="${cls("held-layer", focused && "focus", session.phoneOpen && "phone-up")}" data-held="${item}" data-keep="held:${item}" data-keep-shell>${dim()}${body}${blood}${!session.phoneOpen && item === "dictionary" ? dictLinesCard(state.day, session.dictGuide === "due") : null}<div class="hint">${hint}</div></div>`;
 }

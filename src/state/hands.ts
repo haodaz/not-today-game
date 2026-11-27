@@ -215,18 +215,27 @@ export interface Word {
   /** The line shown when the Wenquxing is held over this word in a contract (work spec 2026-11-02 "the dictionary verifies"). */
   readonly contractNote?: string;
 }
+/** A whole line of Kuro's, looked up on the dictionary (ledger #128): its day, the line as said, its matching key, the word-by-word Chinese and what that reads back as. */
+export interface DictLine { readonly day: number; readonly line: string; readonly key: string; readonly zh: readonly [string, string]; readonly back: readonly [string, string] }
+/** How a typed line is matched: letters and single spaces only, lower case (so "You've been…" is typed youve been…). */
+export const lineKey = (text: string): string => text.toLowerCase().replace(/[^a-z ]+/g, "").replace(/ +/g, " ").trim();
+const cells = (row: string): number => [...row].reduce((n, c) => n + (c.codePointAt(0)! > 0x2e7f ? 2 : 1), 0);
 export interface DictionaryTable {
   readonly extraFromDay: number;
   /** From this day the second press gives `back` instead of the word itself (the round trip stops being faithful). */
   readonly backFromDay: number;
   readonly words: ReadonlyMap<string, Word>;
+  /** By matching key (the first day that says a line owns it). */
+  readonly lines: ReadonlyMap<string, DictLine>;
+  /** The line Kuro says on each day. */
+  readonly lineOfDay: ReadonlyMap<number, DictLine>;
 }
 /** A word fits row 1 of the screen: lower-case a–z, at most 16 letters. */
 export const WORD_RE = /^[a-z]{1,16}$/;
 export function parseDictionary(input: unknown): DictionaryTable {
   const fail: Fail = failer("dictionary.json");
   if (!isRecord(input)) fail("", "not an object");
-  keysOf(input, ["_note", "extraFromDay", "backFromDay", "words"], "top level", fail);
+  keysOf(input, ["_note", "extraFromDay", "backFromDay", "words", "lines"], "top level", fail);
   const extraFromDay = int(input.extraFromDay, "extraFromDay", fail);
   if (extraFromDay < 1) fail("extraFromDay", "must be a day (1..)");
   const backFromDay = int(input.backFromDay, "backFromDay", fail);
@@ -244,7 +253,26 @@ export function parseDictionary(input: unknown): DictionaryTable {
     if (words.has(word)) fail(`${w}.w`, `duplicate word "${word}"`);
     words.set(word, Object.freeze({ w: word, gloss: str(v.gloss, `${w}.gloss`, fail), extra: v.extra === undefined ? null : str(v.extra, `${w}.extra`, fail), back, ...(v.contractNote !== undefined ? { contractNote: str(v.contractNote, `${w}.contractNote`, fail) } : {}) }));
   });
-  return Object.freeze({ extraFromDay, backFromDay, words });
+  const lines = new Map<string, DictLine>(), lineOfDay = new Map<number, DictLine>();
+  (Array.isArray(input.lines) ? input.lines : []).forEach((v, i) => {
+    const w = `lines[${i}]`;
+    if (!isRecord(v)) fail(w, "must be an object {day, line, zh, back}");
+    keysOf(v, ["day", "line", "zh", "back"], w, fail);
+    const day = int(v.day, `${w}.day`, fail), line = str(v.line, `${w}.line`, fail), key = lineKey(line);
+    if (key.length < 1 || key.length > 32) fail(`${w}.line`, "must be 1–32 letters and spaces once punctuation is dropped (two rows of the screen)");
+    const pair = (x: unknown, name: string): [string, string] => {
+      if (!Array.isArray(x) || x.length !== 2 || x.some((r) => typeof r !== "string")) fail(`${w}.${name}`, "must be two rows (strings)");
+      const rows = x as [string, string];
+      rows.forEach((r, k) => { if (cells(r) > 16) fail(`${w}.${name}[${k}]`, "must fit the row (16 cells; a Chinese character is two)"); });
+      if (rows[0] === "") fail(`${w}.${name}[0]`, "the first row is not empty");
+      return rows;
+    };
+    if (lineOfDay.has(day)) fail(`${w}.day`, `day ${day} twice`);
+    const entry: DictLine = Object.freeze({ day, line, key, zh: pair(v.zh, "zh"), back: pair(v.back, "back") });
+    lineOfDay.set(day, entry);
+    if (!lines.has(key)) lines.set(key, entry);
+  });
+  return Object.freeze({ extraFromDay, backFromDay, words, lines, lineOfDay });
 }
 export const dictionaryTable = parseDictionary(dictionaryRaw);
 

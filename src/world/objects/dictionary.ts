@@ -3,7 +3,7 @@
 // type into row 1; lookup shows content's gloss in row 2; from `extraFromDay` a word's `extra` is
 // the line it should not have; an unknown word is 「未收录」 (strings). Upgraded: the whole gloss,
 // smooth, and it is read out (a placeholder line in the box, until there is a voice).
-import { dictionaryTable, type DictionaryTable } from "@state/hands";
+import { dictionaryTable, type DictionaryTable, lineKey } from "@state/hands";
 import { t } from "@world/i18n";
 import { Bits, drawDot, fitRow, type Frame } from "./frame";
 import { step, type ObjectEnv, type Out, type Program } from "./program";
@@ -12,7 +12,8 @@ import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const DICT_COLS = 16;
 export const DICT_ROWS = 2;
-const MAX_INPUT = 16;
+// 32 since 2026-11-27 (ledger #128): a whole line of Kuro's fills both rows while it is typed; a single word still fits the first
+export const MAX_INPUT = 32;
 
 export interface DictionaryState {
   readonly open: boolean;
@@ -109,8 +110,11 @@ function gameKey(s: DictionaryState, g: DictGame, key: string, env: ObjectEnv): 
 
 /** The two rows for a lookup of `word` on `day`. */
 export function lookup(word: string, day: number, table: DictionaryTable = dictionaryTable): [string, string] {
+  // a whole line of Kuro's (ledger #128): the word-by-word Chinese, which is where it stops being kind
+  const line = table.lines.get(lineKey(word));
+  if (line) return [line.zh[0], line.zh[1]];
   const hit = table.words.get(word);
-  if (!hit) return [word, t("dictionary.unknown")];
+  if (!hit) return [fitRow(word, DICT_COLS), t("dictionary.unknown")];
   // The second line it should not have: the gloss moves up, the extra comes in under it.
   if (hit.extra && day >= table.extraFromDay) return [hit.gloss, hit.extra];
   return [word, hit.gloss];
@@ -123,8 +127,11 @@ export function lookup(word: string, day: number, table: DictionaryTable = dicti
  * back as itself. Chinese players understand at the first layer; English players press twice.
  */
 export function lookupBack(word: string, day: number, table: DictionaryTable = dictionaryTable): [string, string] {
+  // a whole line: the Chinese read back into English, on any day (it never comes back as what Kuro said)
+  const line = table.lines.get(lineKey(word));
+  if (line) return [line.back[0], line.back[1]];
   const hit = table.words.get(word);
-  if (!hit) return [t("dictionary.unknown"), word];
+  if (!hit) return [t("dictionary.unknown"), fitRow(word, DICT_COLS)];
   const back = hit.back !== null && day >= table.backFromDay ? hit.back : word;
   return [hit.gloss, back];
 }
@@ -135,7 +142,8 @@ export function drawDictionary(s: DictionaryState, env: ObjectEnv): Frame {
   if (env.upgraded) return upgradedHi(env, s.press, { lines: s.open && s.on ? (s.answer ?? [s.input, ""]).filter((r) => r !== "") : [] });
   if (!s.open || !s.on) return { kind: "cells", cols: DICT_COLS, rows: ["", ""], level: env.level };
   if (s.game) return { kind: "pixels", ...drawWordle(s.game, env.t) };
-  const rows = s.answer ?? [s.input, ""];
+  // what is being typed runs on into the second row (a line of Kuro's is longer than sixteen letters)
+  const rows = s.answer ?? [s.input.slice(0, DICT_COLS), s.input.slice(DICT_COLS)];
   return { kind: "cells", cols: DICT_COLS, rows: rows.map((r) => fitRow(r, DICT_COLS)), level: env.level };
 }
 
