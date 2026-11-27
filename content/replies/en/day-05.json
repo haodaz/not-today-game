@@ -308,7 +308,7 @@
     "xiaozhang": {
       "incoming": [
         {
-          "t": "13:00",
+          "t": "15:00",
           "text": "{calledBy}, that money…",
           "kind": "money",
           "cond_show": {
@@ -391,13 +391,28 @@
     "laozhou": {
       "incoming": [
         {
+          "t": "08:47",
+          "text": "{calledBy}, you there",
+          "kind": "money"
+        },
+        {
+          "t": "08:48",
+          "text": "Could you lend me something to tide me over. Forty-four thousand",
+          "kind": "money"
+        },
+        {
+          "t": "08:48",
+          "text": "It's urgent at home. The day the company pays what it owes, you're the first I pay back",
+          "kind": "money"
+        },
+        {
           "t": "09:44",
           "text": "You read it",
           "kind": "work"
         },
         {
-          "t": "12:08",
-          "text": "Forty-four thousand",
+          "t": "15:00",
+          "text": "Got it. Forty-four thousand. I'll remember.",
           "kind": "money",
           "cond_show": {
             "has": "lent"

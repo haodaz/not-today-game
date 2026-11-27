@@ -4,8 +4,16 @@
     "boss": {
       "incoming": [
         {
-          "t": "19:05",
-          "text": "Got it. This version's fine for sure. 18 — lucky number.",
+          "t": "22:40",
+          "text": "Got it.",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d3-theory"
+          }
+        },
+        {
+          "t": "22:41",
+          "text": "This version's fine for sure. 18, lucky number.",
           "kind": "odd",
           "cond_show": {
             "has": "sent_d3-theory"

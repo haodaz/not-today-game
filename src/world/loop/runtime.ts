@@ -18,6 +18,7 @@ import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
 import { judgementPending, startJudgement } from "@world/dialogue/judge";
 import { resumeCall } from "@world/desktop/call/actions";
+import { callEndTime } from "./call";
 
 /** How often a waiting lie-down looks again for the judgement. */
 export const JUDGE_POLL_MS = 250;
@@ -45,6 +46,10 @@ export const BEAT_TIMES: Readonly<Record<"desk" | "night", string>> = { desk: "1
 export const AFTER_LUNCH = "13:30";
 export const TASK_MINUTES = 90;
 const LAST_AFTERNOON = "18:29";
+/** The night's task (the one a call leaves) is finished by this time at the earliest. */
+export const NIGHT_WORK_DONE = "22:30";
+/** A hand-in that late is answered this many minutes on (day 3: 老王's 22:40 「收到。」). */
+export const NIGHT_ANSWER_MINUTES = 15;
 const workTime = (clock: BeatClock): BeatClock =>
   clock.beat === "work" || clock.beat === "afternoon" ? advanceTo(clock, plusMinutes(clock.time, TASK_MINUTES) < LAST_AFTERNOON ? plusMinutes(clock.time, TASK_MINUTES) : LAST_AFTERNOON) : clock;
 
@@ -229,6 +234,12 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       }
     }
     if (e.kind === "task") clock = workTime(clock);
+    // author 2026-11-27 (#106): the evening's clock runs too. The call ends an hour (its length) after it
+    // connected; the night task it left is done by 22:30 — so the boss's 22:40 「收到」 can arrive.
+    if (e.kind === "callEnded" && file.call) clock = advanceTo(clock, callEndTime(file.call, events, day));
+    if (e.kind === "task" && file.items.some((it) => it.when === "night" && it.done.kind === "flag" && it.done.flag === e.flag)) clock = advanceTo(clock, NIGHT_WORK_DONE);
+    // …and what was sent that late is answered a quarter of an hour on (the card keeps its own time, `e.t`)
+    if (e.kind === "give" && e.t !== undefined && e.t >= NIGHT_WORK_DONE) clock = advanceTo(clock, plusMinutes(e.t, NIGHT_ANSWER_MINUTES));
     if (e.kind === "task" && e.mode !== "auto") {
       // A work task played from the workbench: its start, then the chosen path (content/tasks).
       const tree = taskByFlag(day, e.flag);

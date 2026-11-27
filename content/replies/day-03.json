@@ -4,8 +4,16 @@
     "boss": {
       "incoming": [
         {
-          "t": "19:05",
-          "text": "收到。这版肯定没问题，18，数字吉利。",
+          "t": "22:40",
+          "text": "收到。",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d3-theory"
+          }
+        },
+        {
+          "t": "22:41",
+          "text": "这版肯定没问题，18，数字吉利。",
           "kind": "odd",
           "cond_show": {
             "has": "sent_d3-theory"

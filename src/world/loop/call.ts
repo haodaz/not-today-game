@@ -50,6 +50,25 @@ export function callStartTime(call: Call): string {
 }
 
 /**
+ * The clock when 「好的。」 was said: the ask time, or the day's last timed event before the answer when
+ * that is later (day 3: the dinner at the door, 18:40). From the log, so a reload reads the same.
+ */
+export function callAnswerTime(call: Call, events: readonly GameEvent[], day: number): string {
+  let base = call.at;
+  for (const e of events) {
+    if (e.day !== day) continue;
+    if (e.kind === "callAnswer") break;
+    if ("t" in e && typeof e.t === "string" && /^\d\d:\d\d$/.test(e.t) && e.t > base) base = e.t;
+  }
+  return base;
+}
+/** When the call connects: the answer plus the 30-minute wait (author 2026-11-27: the evening's clock runs). */
+export const callConnectTime = (call: Call, events: readonly GameEvent[], day: number): string => timeOf(minutesOf(callAnswerTime(call, events, day)) + CALL_WAIT_MINUTES);
+/** When it ends: the connection plus the call's length. */
+export const callEndTime = (call: Call, events: readonly GameEvent[], day: number): string =>
+  timeOf(minutesOf(callConnectTime(call, events, day)) + Math.round(lengthSeconds(call.length) / 60));
+
+/**
  * The call's phase now. `answeredPast` lets the session say the 30-minute wait is over (the timer
  * ran); without it, an answered-but-not-connected call reads as `waiting`. `nowTime` is the clock.
  */
@@ -57,6 +76,8 @@ export function callPhase(call: Call | null, events: readonly GameEvent[], day: 
   if (!call) return "before";
   if (ended(events, day)) return "ended";
   if (answered(events, day)) return connected ? "inCall" : "waiting";
+  // the ask waits for the meal it interrupts, when content names one
+  if (call.afterPickup && !events.some((e) => e.kind === "pickup" && e.day === day && e.meal === call.afterPickup)) return "before";
   return nowTime >= call.at ? "ask" : "before";
 }
 

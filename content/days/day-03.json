@@ -360,6 +360,7 @@
   },
   "call": {
     "at": "18:00",
+    "afterPickup": "dinner",
     "length": "1:00:00",
     "lines": [
       {

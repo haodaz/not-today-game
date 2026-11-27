@@ -167,6 +167,11 @@ export interface CallLine {
  */
 export interface Call {
   readonly at: string;
+  /**
+   * author 2026-11-27: the ask also waits for this meal to be taken in (day 3: 「晚饭到了电话才打进来」 —
+   * the order alone moves the clock past `at`, and the ask stood on the screen before the food came).
+   */
+  readonly afterPickup?: "lunch" | "dinner";
   readonly length: string;
   readonly lines: readonly CallLine[];
   readonly task: Item;
@@ -390,7 +395,8 @@ const CALL_LEN = /^(?:\d+:)?[0-5]?\d:[0-5]\d$/;
 /** Parses the day's optional boss call (day-loop 2026-11-03). Its `task` is a required night item. */
 function call(v: unknown, w: string): Call {
   if (!isRecord(v)) fail(w, "a call must be an object");
-  keys(v, ["at", "length", "lines", "task"], w);
+  keys(v, ["at", "afterPickup", "length", "lines", "task"], w);
+  if (v.afterPickup !== undefined && v.afterPickup !== "lunch" && v.afterPickup !== "dinner") fail(`${w}.afterPickup`, 'must be "lunch" or "dinner"');
   const atTime = str(v.at, `${w}.at`);
   if (!HHMM.test(atTime)) fail(`${w}.at`, "must be HH:MM");
   const length = str(v.length, `${w}.length`);
@@ -408,7 +414,7 @@ function call(v: unknown, w: string): Call {
   const task = item(v.task, `${w}.task`);
   if (task.when !== "night") fail(`${w}.task`, 'the call\'s task is a night item (when: "night")');
   if (!task.required) fail(`${w}.task`, "the call's task is required");
-  return { at: atTime, length, lines, task };
+  return { at: atTime, ...(v.afterPickup !== undefined ? { afterPickup: v.afterPickup } : {}), length, lines, task };
 }
 
 function deepFreeze<T>(value: T): T {

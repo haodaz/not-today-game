@@ -51,6 +51,8 @@ window.__txt = (e) => ((e.getAttribute('aria-label')||'')+' '+(e.textContent||''
 window.__click = (sub) => { let els=[...document.querySelectorAll('button,[role=button]')].filter(e=>__vis(e)&&__txt(e).includes(sub)); if(!els.length) return false; els.sort((a,b)=>__txt(a).length-__txt(b).length); els[0].click(); return true; };
 window.__sel = (s) => { const el=[...document.querySelectorAll(s)].find(e=>__vis(e)); if(!el) return false; el.click(); return true; };
 if (!window.__clicks) { window.__clicks = []; const __d = (e) => { const t = e.target; return (t.tagName || '') + '.' + String(t.className || '').slice(0, 30) + '#' + (t.dataset?.action || '') + ':' + (t.dataset?.slot || t.dataset?.card || ''); }; window.addEventListener('click', (e) => window.__clicks.push({ t: Math.round(performance.now()), c: __d(e) }), true); window.addEventListener('click', () => { const l = window.__clicks[window.__clicks.length - 1]; if (l) l.bubbled = true; }); }
+// TRANSCRIPT: every line the box has shown (the game's own history, session.dlgLog), stamped with the clock and the view it was read in
+if (!window.__rec) { window.__rec = []; let n = 0; setInterval(() => { try { const s = window.__nt && window.__nt.session; if (!s) return; const L = s.dlgLog; if (L.length < n) n = 0; for (; n < L.length; n++) { const e = L[n]; window.__rec.push({ day: e.day, t: s.clock.time, view: s.view, who: e.who, kind: e.kind, text: e.text }); } } catch (e) {} }, 250); }
 window.__has = (s) => [...document.querySelectorAll(s)].some(e=>__vis(e));
 window.__text = () => (document.body.innerText||'').replace(/\\s+/g,' ');
 window.__choices = () => [...document.querySelectorAll('[data-action=loop-choice]')].filter(__vis).map(__txt);
@@ -112,7 +114,13 @@ const interrupts = async () => {
   } finally { busy = false; }
 };
 let stepNo = 0;
-const shotStep = async (name) => { const r = await send("Page.captureScreenshot", process.env.HIRES ? { format: "png" } : { format: "jpeg", quality: 60 }); fs.writeFileSync(`${shotdir}/d${String(day).padStart(2, "0")}-${String(++stepNo).padStart(2, "0")}-${name}.${process.env.HIRES ? "png" : "jpg"}`, Buffer.from(r.result.data, "base64")); };
+// TRANSCRIPT=<dir> (2026-11-27): the run as text, for reading a day without opening frames — lines.txt is every
+// box line in order (clock, view, speaker), and each frame gets a .txt of what the page said at that moment.
+const TRANSCRIPT = process.env.TRANSCRIPT || null; if (TRANSCRIPT) fs.mkdirSync(TRANSCRIPT, { recursive: true });
+const flushLines = async () => { if (!TRANSCRIPT) return; const rec = await ev("JSON.stringify(window.__rec || [])"); if (typeof rec !== "string") return;
+  fs.writeFileSync(`${TRANSCRIPT}/lines.txt`, JSON.parse(rec).map((e) => `d${e.day} ${e.t} [${e.view}] ${e.kind === "narration" ? "" : (e.who ?? e.kind) + "："}${e.text}`).join("\n") + "\n"); };
+const shotStep = async (name) => { const r = await send("Page.captureScreenshot", process.env.HIRES ? { format: "png" } : { format: "jpeg", quality: 60 }); const base = `d${String(day).padStart(2, "0")}-${String(++stepNo).padStart(2, "0")}-${name}`; fs.writeFileSync(`${shotdir}/${base}.${process.env.HIRES ? "png" : "jpg"}`, Buffer.from(r.result.data, "base64"));
+  if (TRANSCRIPT) { const tx = await ev("(document.body.innerText||'').replace(/[ \\t]+/g,' ').replace(/\\n\\s*\\n+/g,'\\n')"); if (typeof tx === "string") fs.writeFileSync(`${TRANSCRIPT}/${base}.txt`, tx); await flushLines(); } };
 // Press the box through; answer a pending choice (the recognise question by its right option, else the first).
 const settle = async (rightOption = null) => {
   let quiet = 0;

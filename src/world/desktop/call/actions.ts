@@ -6,7 +6,7 @@
 // live timer. Unskippable: the controller blocks every other action while the call is live.
 import { advanceTo } from "../beat";
 import type { ActionContext, ActionHandler } from "../controller";
-import { callOf, callStartTime, lengthSeconds } from "@world/loop/call";
+import { callConnectTime, callOf, lengthSeconds } from "@world/loop/call";
 
 /**
  * How long any call lasts in real ms, whatever its `length` (correction 2026-11-03: the online
@@ -25,8 +25,8 @@ function connect(ctx: ActionContext, day: number): void {
   const call = callOf(day);
   if (!call || !ctx.session.call || ctx.session.call.day !== day) return;
   ctx.session.call.connected = true;
-  // The clock jumps to the call's start time (ask + 30 min).
-  ctx.session.clock = advanceTo(ctx.session.clock, callStartTime(call));
+  // The clock jumps to the call's start: the answer + 30 min (day 3: the dinner came at 18:40, so 19:10).
+  ctx.session.clock = advanceTo(ctx.session.clock, callConnectTime(call, ctx.store.getEvents(), day));
   ctx.later(callTotalMs(ctx), () => endCall(ctx, day));
   ctx.rerender();
 }
@@ -82,7 +82,7 @@ export function resumeCall(ctx: ActionContext): boolean {
   // Resume connected (the wait is long past on a reload): run the minute out, then end.
   ctx.session.call = { day, answeredMs: nowOf(ctx), connected: true };
   const call = callOf(day)!;
-  ctx.session.clock = advanceTo(ctx.session.clock, callStartTime(call));
+  ctx.session.clock = advanceTo(ctx.session.clock, callConnectTime(call, events, day));
   ctx.later(callTotalMs(ctx), () => endCall(ctx, day));
   return true;
 }
