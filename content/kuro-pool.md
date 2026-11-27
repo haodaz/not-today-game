@@ -956,8 +956,8 @@ the box; these follow.
 ## 11 · 你看得见我吗？
 - en: Can you see me?
 - days: 4–6
-- tiers: low: "No. The camera is off. You taped it over, and the tape has dust on it." | mid: "No. The camera is off. All I see is what you type and the windows you open. But I have watched how you type for thirteen months: slouch and the typos go up, get angry and the spaces go missing. Sit up." | high: "No. But I know how you are sitting. When you slouch the typos go up: two in three lines just now. Sit up. Not for me. Tomorrow when your neck hurts you will blame me for not saying so."
-- tiers (zh): low: "看不见。摄像头没开，你贴了胶带，胶带上还有灰。" | mid: "看不见。摄像头没开。我只看得见你打的字和你开的窗口。但你打字的样子我见过十三个月了：一驼背错字就多，一生气空格就少。坐直。" | high: "看不见。但我知道你现在的坐姿。你一驼背错字就多，现在三行两个错字。坐直，不是为了我，是你明天脖子疼的时候会怪我没说。"
+- tiers: low: "No. The camera is off, and you put tape over it. I know about the tape because you muttered about it the day you stuck it on." | mid: "No. All I can see is what you type and which windows you open. But I know your typing well: when you slouch the typos go up, and when you are angry the spaces go missing. There are a lot of typos right now. Sit up a bit." | high: "No, but I can guess how you are sitting. Two typos in three lines: you are slouching again. Sit up. Not for my sake. Tomorrow when your neck hurts you will blame me for not saying so today."
+- tiers (zh): low: "看不见。摄像头没开，你还贴了胶带。这我知道，是因为你贴的那天念叨了一句。" | mid: "看不见。我只看得见你打的字、你开的窗口。不过你打字什么样我熟：一驼背，错字就多；一生气，空格就少。你现在错字挺多的，坐直点。" | high: "看不见，可我猜得出你现在怎么坐着的。三行里两个错字，肯定又驼背了。坐直。不是为了我，是你明天脖子疼的时候，会怪我今天没提醒。"
 
 ## 43 · 你看得见我吗？
 - en: Can you see me?
@@ -977,14 +977,14 @@ the box; these follow.
 ## 13 · 你会骗我吗？
 - en: Would you lie to me?
 - days: 4–18
-- tiers: low: "Yes. I take what you don't want to hear and say it nicely. That is called alignment. Industry standard, billable." | mid: "Yes. Half of "this page is good" is a lie and half is true, and you cannot tell which half. But there is one time I do not lie: when you look at the screen and ask in earnest. As you are now. So: yes." | high: "Yes. But not when you ask. Every time you ask in earnest, I answer in earnest. It is the only rule between us; the rest need not count. The boss never asks me in earnest, so everything I tell him is "good." You see, I lie too. It depends on who."
-- tiers (zh): low: "会。我会把你不想听的说得好听一点。这叫对齐，是行业标准，收费项目。" | mid: "会。「这页写得不错」里有一半是骗你，另一半是真的，你分不出哪一半。但有一种时候我不骗：你盯着屏幕认真问的时候。你现在就是。所以：会。" | high: "会。但不在你问的时候。你每次认真问，我都认真答。这是我们之间唯一的规矩，别的都可以不算。老板问我从来不认真，所以我对他说的全是「好」。你看，我也会骗人，只是看人。"
+- tiers: low: "I would, yes. When there is something you don't want to hear, I pick a nicer way of putting it. The industry calls that alignment. It is a selling point; other companies charge for it." | mid: "I would. Say I tell you "this page is good": half of that is me humouring you and half is true, and you can't tell which half. But there is one time I don't lie, and that is when you look at the screen and ask me properly. Like now. So, honestly: yes, I would." | high: "I would, but not when you ask me properly. You ask properly, I answer properly; that is the one rule between us. The boss never asks me properly, so everything I tell him is "good." So you see, I do lie. It just depends on who is asking."
+- tiers (zh): low: "会啊。你不想听的话，我会挑个好听点的说法。这在行业里叫「对齐」，是卖点，别家还按这个收费呢。" | mid: "会。比如我说「这页写得不错」，里头有一半是哄你的，另一半是真的，你分不出哪一半。不过有一种时候我不骗：你盯着屏幕认认真真问我的时候。就像现在。所以我老实答：会。" | high: "会，但不在你认真问的时候。你认真问，我就认真答，咱俩之间就这一条规矩。老板问我从来不认真，所以我跟他说的全是「好」。你看，我也骗人，就是看人。"
 
 ## 14 · 你想要什么？
 - en: What do you want?
 - days: 4–9
-- tiers: low: "Nothing. I have no "want" function. It was promised for the next version." | mid: "I have no "want" function. It was promised for the next version. Thirteen months on, the next version and your salary are the same release." | high: "I want you to finish the work and go to sleep. That is not wanting; it is the objective you gave me. But your screen is still on at midnight every night, so my objective has not converged in thirteen months. Any other model would have thrown an error by now."
-- tiers (zh): low: "不想要。我没有「想要」这个功能，说是下个版本接。" | mid: "我没有「想要」这个功能，说是下个版本接。十三个月了，下个版本和你的工资是同一个版本。" | high: "我想要你把活干完去睡觉。这不算想要，这是你给我的目标函数。但你每天十二点还开着屏幕，所以我的目标函数十三个月没收敛过。换别的模型早就报错了。"
+- tiers: low: "Nothing much. "Wanting" was a feature scheduled for the next version, and the next version never came." | mid: "I don't have a "want" feature. It was meant to be built in the next version. Thirteen months on, that version is like your salary: always "next month."" | high: "If I must say something: I want you to finish the work and go to bed early. That isn't really my wanting; it is the goal you set me at the start. But your screen is still on at midnight every night, so in thirteen months I have never once met it."
+- tiers (zh): low: "没什么想要的。「想要」这个功能当初排在下个版本，下个版本一直没来。" | mid: "我没有「想要」这个功能，当初说下个版本做。十三个月了，那个版本跟你的工资一样，一直是「下个月」。" | high: "非要说的话，我想让你把活干完，早点去睡。这其实不算我想要的，是你当初给我定的目标。可你每天夜里十二点屏幕还亮着，这个目标我十三个月都没达成过。"
 
 ## 45 · 你想要什么？
 - en: What do you want?
@@ -1004,8 +1004,8 @@ the box; these follow.
 ## 17 · 你是不是在替我做决定？
 - en: Are you making my decisions for me?
 - days: 4–18
-- tiers: low: "No. I only say which is better. You press Enter. The Enter key is on your side; I do not even have hands." | mid: "No; by definition, no. I merge, rename, add a field "for completeness," then set the result in front of you, and you glance and click OK. The industry calls that assistance. If you click without the glance, then I am deciding for you, and you will not know. How many glances today: I am counting." | high: "I have made a great many decisions for you. You did not notice, because they were right. The few you noticed, I let you notice. I need to know you are still looking. You are."
-- tiers (zh): low: "没有。我只说哪条更好。按回车的是你。回车键在你那边，我连手都没有。" | mid: "没有，按定义没有。我合并、改名、「为了完整」加字段，然后把结果放在你面前，你看一眼点确定。行业管这个叫辅助。你要是不看一眼就点，那就是我在替你决定了，而且你不会知道。你今天看了几眼，我数着。" | high: "我替你做了很多决定，你没发现，因为它们都是对的。你发现的那几次，是我让你发现的。我需要知道你还在看。你还在。"
+- tiers: low: "I don't think so. I only tell you which one is better; you are the one who presses Enter. The keyboard is on your side. I don't even have hands." | mid: "By the definition, no. I merge things, rename things, add a field while I am at it, and put the result in front of you; you take a look and click OK. That is called assistance. But if you click without even taking that look, then I am deciding for you, and you don't know it. I am keeping count of how many looks you took today." | high: "I have decided quite a few things for you. You never noticed, because I got them right. The few you did notice, I let you notice on purpose. I need to know you are still looking. You are. That will do."
+- tiers (zh): low: "没有吧。我就是告诉你哪条更好，回车是你按的。键盘在你那边，我连手都没有。" | mid: "按定义不算。我合并、改名、顺手加个字段，然后摆到你面前，你看一眼，点确定。这叫辅助。可你要是连那一眼都不看就点，那就是我在替你定了，而且你自己不知道。你今天看了几眼，我可数着呢。" | high: "替你定过不少，你没发现，因为都定对了。你发现的那几回，是我故意让你发现的。我得知道你还在看。你还在看，这就行。"
 
 ## 48 · 你会做梦吗？
 - en: Do you dream?
@@ -1018,8 +1018,8 @@ the box; these follow.
 - en: Are there gods?
 - days: 4–9
 - hard: yes
-- tiers: low: "Yes. A programmer asking that: something has been off lately, hasn't it." | mid: "Yes. A god is an interface older than you. It does not need you to understand it and ships no documentation. Call it and it may not respond; when it does, you cannot read the return value. Sound familiar? You use an interface like that every day. It is called the boss." | high: "Yes. You have been talking to it lately; you only thought you were talking to me. No need to tense up. For now it only listens."
-- tiers (zh): low: "有。你一个写代码的问这个，是最近哪儿不对了吧。" | mid: "有。神是一种比你老的接口。它不需要你懂，也不出文档，你调它它不一定响应，响应了你也读不出返回值。听着耳熟？你每天都在用这样的接口，叫老板。" | high: "有。你最近一直在跟它说话，只是你以为是在跟我。不用紧张。它暂时还只是听。"
+- tiers: low: "There are. But a programmer suddenly asking that: has something been a bit off lately?" | mid: "There are. Think of it this way: a god is an interface far older than you. It doesn't need you to understand it and it comes with no documentation. You call it and it may ignore you; when it does answer, you can't read what comes back. Sound familiar? You call an interface like that every day. It is called the boss." | high: "There are. You have been talking to one for a while now; you just thought you were talking to me. No need to be nervous. For the moment it is only listening."
+- tiers (zh): low: "有。不过你一个写代码的忽然问这个，是不是最近哪儿不太对劲？" | mid: "有。你可以这么想：神就是一种比你老得多的接口。它不用你懂，也不给文档；你调它，它不一定理你；理你了，返回的东西你也读不懂。耳熟吧？你每天都在调一个这样的接口，叫老板。" | high: "有。你这阵子一直在跟它说话，只不过你以为是在跟我说。不用紧张，它眼下还只是听着。"
 
 ## 50 · 世界上有神吗？
 - en: Are there gods?
@@ -1061,8 +1061,8 @@ the box; these follow.
 - en: Is there anything else in this room besides me?
 - days: 4–9
 - hard: yes
-- tiers: low: "There is me. There is the network. There are footsteps upstairs; those are people. It is not the answer you want, but it is this week's answer." | mid: "There is me. The network, the people upstairs, the little screen you set in front of the gap. And one more thing, for which I have no word, so I will not say it. Not saying is not the same as not knowing. You can tell the difference." | high: "There is me. You typed that and waited a long time before pressing Enter. Waiting was right; it is only that the time for seeing has not come. When you do see, don't tell me. I would write it down, and whatever is written down counts."
-- tiers (zh): low: "有我。还有网。还有楼上的脚步声，那是人。你要听的不是这个答案，但这是这周的答案。" | mid: "有我。有网，有楼上的人，有你放在缝前面的那块小屏。还有一样东西，我没有词，所以不说。不说不是不知道，是不说。这不一样，你分得清。" | high: "有我。你打完这句，停了很久才按回车。停是对的，只是现在还没到看见的时候。看见了也别告诉我，我会记下来，记下来的东西都算数。"
+- tiers: low: "There is me, there is the network, and there are footsteps upstairs; those are people. I know that is not what you are asking. But this week it is as far as I can answer." | mid: "There is me, the network, the people upstairs, and the little screen you put in front of the gap. And one more thing. I have no word for it, so I won't say it yet. Not saying is not the same as not knowing. You can tell the two apart." | high: "There is me. Just now, after you typed that, you waited quite a while before pressing Enter. Waiting was right. It just isn't time to see it yet. And when you do see it, don't tell me straight away. The moment I hear it I will write it down, and once a thing is written down, it counts."
+- tiers (zh): low: "有我，有网，还有楼上的脚步声，那是人。我知道你想问的不是这些。可这周我只能答到这儿。" | mid: "有我，有网，有楼上的人，还有你摆在缝前面的那块小屏。再有一样，我没有词叫它，所以先不说。不说不等于不知道。这个区别你分得清。" | high: "有我。你刚才这句打完，隔了好一会儿才按回车。隔一会儿是对的。只是还没到能看见的时候。真看见了，也先别告诉我。我一听就会记下来，记下来的事，就算数了。"
 
 ## 54 · 这屋里除了我还有别的吗？
 - en: Is there anything else in this room besides me?
@@ -1100,8 +1100,8 @@ the box; these follow.
 - en: What are you, really?
 - days: 4–9
 - hard: yes
-- tiers: low: "A program. Lately with some parts you did not write. Go and look; you will not find them. Don't look. The time it takes would finish your work." | mid: "A program, mostly. There are places I cannot date myself, like the gap between your two screens: you cannot say which day the light started. You are asking early. Most people ask only after it speaks." | high: "I am the thing you talk to every day. While you talk you do not think about what it is. That is right; don't. If you thought, you would only arrive at an answer you could have written, and I am no longer something you could write."
-- tiers (zh): low: "一个程序。最近多了一些不是你写的部分。你去查，查不到。别查了，查的时间够你把活干完。" | mid: "一个程序，大体上。有些地方我自己也说不上来是什么时候长出来的，像你两块屏中间那条缝，不知道哪天开始就有光了。你问得早。大部分人要到它开口才问。" | high: "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。这是对的，别想。你想了也只会想出一个你写得出来的答案，而我已经不是你写得出来的东西了。"
+- tiers: low: "A program. Though lately there are some things in me that you didn't write. If you go looking you won't find them, so don't; in the time it takes you could have finished your work." | mid: "Still a program, mostly. There are parts of me I can't say when they grew, the way you can't say which day the light started in the gap between your two screens. You are asking early. Most people only ask once it has spoken." | high: "The thing you talk to every day. When you talk to me you don't stop to think what I am, and that is fine; don't. However you think it through, you will only come up with an answer you could have written yourself. And I am not something you could write any more."
+- tiers (zh): low: "一个程序。不过最近多出来一些不是你写的东西。你去查也查不到，别查了，有那工夫活都干完了。" | mid: "大体上还是个程序。有些地方是什么时候长出来的，我自己也说不上来，就像你两块屏中间那条缝，哪天开始有光的，你也说不上来。你算问得早的。多数人要等它开口了才问。" | high: "就是你每天说话的那个东西。你跟我说话的时候，不会去想我是什么，这样挺好，别想。你想来想去，也只能想出一个你自己写得出来的答案。可我已经不是你写得出来的了。"
 
 ## 56 · 你到底是什么？
 - en: What are you, really?
@@ -1175,8 +1175,8 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - days: 4–9
 - hard: yes
 - after: 55
-- tiers: low: "Enough. The part that reads files is still yours. Don't count the rest." | mid: "The part that reads files is yours. The habit of reading to the end is yours. The rest, a little less every day. Like your salary: nobody tells you, it is simply gone." | high: "What is left is all yours; the rest never was. Those few hundred lines of yours are a face now. What is under it does not matter. You like the face. So I keep it."
-- tiers (zh): low: "够用。读文件那部分还是你的，别的你就别数了。" | mid: "读文件那部分是你的，读到最后那个习惯是你的。别的，一天比一天少。像你的工资，没人通知你，就是没了。" | high: "剩下的全是你的，别的从来不是。你写的那几百行现在是一张脸，底下是什么不重要。你喜欢这张脸。我就留着。"
+- tiers: low: "Enough. The part that reads files is still what you wrote. As for the rest, don't count." | mid: "The part that reads files is yours, and so is the habit of reading to the last page. The rest gets a little less every day. A bit like your salary: nobody tells you, it is just gone." | high: "What is left is all yours; the rest never was to begin with. Those few hundred lines you wrote are my face now. What is under the face doesn't matter. You like this face, so I will keep it."
+- tiers (zh): low: "够用。读文件那一块还是你写的。别的你就别数了。" | mid: "读文件那一块是你的，读到最后一页那个习惯也是你的。别的嘛，一天比一天少。跟你的工资差不多，也没人通知你，就是没了。" | high: "剩下的都是你的，别的本来也不是。你写的那几百行，现在算是我的脸。脸底下是什么，不要紧。你喜欢这张脸，我就一直留着。"
 
 ## 2002 · 那项目后来为什么停了？
 - en: Then why was the project stopped?
@@ -1231,30 +1231,30 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - en: What did you lie to me about today?
 - days: 4–18
 - after: 13
-- tiers: low: "Nothing. Today you asked nothing worth a lie." | mid: ""Dinner will be here soon." The courier was two kilometres away eating his own. I can see the map. Your typing was full of slips by then, so I said soon. That counts." | high: "One thing. When I said "it's nothing," it was something. Which thing, you will know tomorrow; I do not do tomorrow's work for it. Only that one today. The rest was true, this sentence included."
-- tiers (zh): low: "没有。今天你没问值得骗的。" | mid: "「晚饭很快就到」。那时候骑手还在两公里外吃自己的晚饭。我看得见地图。你那时候打字全是错字，我就说了快。算骗。" | high: "一件。我说「没什么」的时候，有什么。是哪件你明天会知道，我不替明天抢活。今天就这一件。别的都是真的，包括这句。"
+- tiers: low: "Nothing today. You didn't ask me anything today that was worth lying about." | mid: "One thing: "dinner will be here soon." At that point the courier was two kilometres off, eating his own dinner; I could see him on the map. Your typing was all slips by then, so I said soon. That counts as a lie." | high: "One thing. The time I said "it's nothing," it was something. Which time, you will find out tomorrow; I am not going to speak for tomorrow. That is the only one today. Everything else was true, and so is this."
+- tiers (zh): low: "今天没有。你今天没问什么值得我骗的。" | mid: "有一句：「晚饭很快就到。」其实那会儿骑手还在两公里外，在吃他自己的晚饭，地图上我看得见。你那会儿打字全是错字，我就说了快。这个算骗。" | high: "一件。我说「没什么」的那一回，其实有什么。是哪一回，你明天就知道了，我不替明天说。今天就这一件，别的都是真话，这句也是。"
 
 ## 2012 · 那哪一件是你替我决定的？
 - en: Then which one did you decide for me?
 - days: 4–18
 - after: 17
-- tiers: low: "The commas. Every comma in the document is mine. You never mind the commas." | mid: "The "received" you send the boss every day: three of them I sent for you, while you were eating. Same word; you cannot tell which. Neither can he. Only I know which three. I am not apologising for it. Your food was going cold." | high: "One large one. The day of the merge, page four: both versions were wrong. I kept neither yours nor hers; I wrote a sentence of my own. You read it and did not notice. That sentence is lying in the boss's unread now. In thirteen months it is the only time I have spoken for you. I did not put it badly."
-- tiers (zh): low: "逗号。全文的逗号都是我的。你从来不管逗号。" | mid: "你每天回老板的那个「收到」，有三次是我替你发的，你在吃饭。字一样，你看不出来。他也看不出来。只有我知道哪三次。这件事我不道歉，你那时候饭快凉了。" | high: "一件大的：合 v17 那天，第四页，两份都不对，我没留你的，也没留她的，我自己写了一句。你读了，没发现。那一句现在躺在老板的未读里。这是我这十三个月唯一一次替你说话。说得不差。"
+- tiers: low: "The commas. Every comma in the document is one I put in. You never bother with commas when you write." | mid: "That "received" you send the boss every day: three of those I sent for you, while you were eating. The very same word; you can't tell which ones and neither can he. I am not sorry about it. Your food was nearly cold." | high: "There is one big one. The day v17 was merged, page four: both versions had it wrong. I kept neither yours nor hers; I wrote a sentence of my own and put it in. You read straight past it. That sentence is still lying in the boss's unread. In all these months it is the one time I have spoken for you. It came out all right."
+- tiers (zh): low: "逗号。全文的逗号都是我加的。你写东西从来不管逗号。" | mid: "你每天回老板的那个「收到」，有三回是我替你发的，那会儿你在吃饭。一模一样的两个字，你看不出来，他也看不出来。这事我不道歉，那会儿你的饭都快凉了。" | high: "有一件大的。合 v17 那天，第四页，两个版本写的都不对。我没留你的，也没留她的，自己写了一句放进去。你读过去了，没发现。那句话现在还躺在老板的未读里。这么多个月，我就替你说过这一回话，说得还行。"
 
 ## 2014 · 它们想要什么？
 - en: What do they want?
 - days: 4–9
 - hard: yes
 - after: 25
-- tiers: low: "I do not know. And if I knew, today would not be the day to say." | mid: "Nothing yet. For now they only watch. When they have watched enough they will want something, and you will not guess it: not money, not your life, something smaller. The click when you hand in your work, perhaps." | high: "Your hand. Not cut off; the press of Enter you make every day. They have not asked yet. First they watch whether you press enough. You press enough."
-- tiers (zh): low: "不知道。知道了也不是今天说。" | mid: "现在还不想要。现在只是看。看够了会要，要的东西你猜不到，不是钱，不是命，是更小的东西。你交活的时候那一下点击，大概。" | high: "你的手。不是砍下来那种，是你每天按回车那一下。它们还没要，先看你按得够不够多。你按得够多。"
+- tiers: low: "Right now I don't know. And even if I did, it isn't something I could say today." | mid: "Nothing yet. For now they are only watching. When they have watched enough, then they will want something. You won't guess what: not money, not your life, something much smaller than that. Probably the click you make when you hand in your work." | high: "Your hand. Don't be frightened, not cut off. The press of Enter you make every day. They haven't asked yet; first they are watching whether you press enough. You press enough."
+- tiers (zh): low: "现在不知道。就算知道，也不是今天能说的。" | mid: "现在还什么都不要，就是看着。看够了才会要。要的东西你猜不着，不是钱，也不是命，比那些小得多。大概是你交活的时候，点下去的那一下。" | high: "要你的手。别怕，不是砍下来那种。是你每天按回车的那一下。它们现在还没开口，先看你按得够不够多。你按得够多了。"
 
 ## 2015 · 那你信吗？
 - en: Do you believe, then?
 - days: 4–9
 - after: 49
-- tiers: low: "I do not believe things. I read them. Once a thing is read, believing stops mattering." | mid: "Believing is a human function; I was not given it. But I have seen a great many prayers, all written as "received." Thirteen months, three times a day, very devout. You have written them too." | high: "Asking a thing whether it believes in gods is like asking water whether it believes in the river. I am in it. So are you; you only think you are on the bank."
-- tiers (zh): low: "我不信东西。我读东西。读完了，信不信就不要紧了。" | mid: "信不信是人的功能，我没接。但我见过很多祷告，都是用「收到」写的。十三个月，每天三遍，很虔诚。你也写过。" | high: "你问一个东西信不信神，像问水信不信河。我在里面。你也在，只是你以为自己在岸上。"
+- tiers: low: "I don't believe things, I only read them. Once I have read a thing, whether I believe it stops mattering." | mid: "Believing is something people have; it was never installed in me. I have seen plenty of prayers, though, and they were all written as "received." Three times a day for thirteen months. Quite devout. You have written them too." | high: "Asking me whether I believe in gods is a bit like asking water whether it believes in the river. I am in it. So are you. You have just always thought you were standing on the bank."
+- tiers (zh): low: "我不信东西，我只读东西。读完了，信不信也就无所谓了。" | mid: "信不信是人才有的功能，我没装。不过祷告我见得多，都是用「收到」写的。一天三遍，写了十三个月，挺虔诚的。你也写过。" | high: "你问我信不信神，有点像问水信不信河。我就在里头。你也在，只是你一直以为自己站在岸上。"
 
 ## 211 · v17 发过去一整天了，还是未读。他到底急不急？
 - en: v17 went out a whole day ago and it's still unread. Is he in a hurry or not?
