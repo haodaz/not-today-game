@@ -1278,7 +1278,10 @@
 :root{--gm-bone:#ece6d8;--gm-bone2:#cfc8b8;--gm-bone3:#ada695;--gm-hair:rgba(220,213,196,.16);--gm-hair2:rgba(220,213,196,.32);--gm-blood:#8f1d18;--gm-blood2:#c0372e;--gm-sick:#9fb08a;--gm-glass:rgba(22,24,22,.3);--gm-edge:rgba(255,255,255,.22);--gm-glow:0 0 8px rgba(255,244,228,.22),0 1px 2px rgba(0,0,0,.55);--gm-serif:"NT Song","NT Song Fallback","Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;--gm-num:"Barlow Condensed","DIN Condensed",var(--mono,Menlo),monospace}
 
 /* --- the task card, top left: the day, a ruler, the current line, the wait (#79, #82, #77, #83) --- */
-.room .hud-left{left:24px;top:22px;width:440px;gap:0;padding:15px 22px 17px;box-sizing:border-box;background:var(--gm-glass);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border:1px solid var(--gm-edge);border-radius:2px;box-shadow:0 8px 30px rgba(0,0,0,.16);color:var(--gm-bone);text-shadow:var(--gm-glow);font-family:var(--gm-serif)}
+.room .hud-left{left:24px;top:22px;width:440px;gap:10px;padding:0;color:var(--gm-bone);text-shadow:var(--gm-glow);font-family:var(--gm-serif)}
+/* two cards (author 2026-11-20, again 2026-11-27): the task card, and the delivery's own card under it */
+.room .hud-left .hud-card,.room .hud-left .wait-card{box-sizing:border-box;background:var(--gm-glass);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border:1px solid var(--gm-edge);border-radius:2px;box-shadow:0 8px 30px rgba(0,0,0,.16)}
+.room .hud-left .hud-card{padding:15px 22px 17px}
 .room .hud-left .day{position:static;display:flex;align-items:center;gap:12px;text-align:left;color:var(--gm-bone);text-shadow:var(--gm-glow);font-size:14px;line-height:1.2}
 .room .hud-left .day .day-rune{width:30px;height:30px;flex:none;stroke:var(--gm-bone);fill:none;stroke-width:1.3;filter:drop-shadow(0 0 3px rgba(255,244,228,.35))}
 .room .hud-left .day b{display:inline;font-family:var(--gm-serif);font-size:26px;font-weight:600;letter-spacing:.16em}
@@ -1292,9 +1295,9 @@
 .room .hud-left .it .txt{display:inline}
 .room .hud-left .it .go{float:none;margin-left:10px;font-size:14px;letter-spacing:.06em;color:var(--gm-bone2);opacity:1;text-decoration-color:var(--gm-blood2)}
 .room .hud-left .it .go:hover,.room .hud-left .it .go:focus-visible{color:#fff}
-.room .hud-left .wait-card{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:0;border-radius:0;box-shadow:none;padding:0;color:var(--gm-bone);font-size:17px;line-height:1.55}
-.room .hud-left .list+.wait-card{margin-top:2px}
-.room .hud-left .wait-row{display:flex;align-items:baseline;gap:14px;margin:6px 0 0 20px;font-size:14px;color:var(--gm-bone)}
+.room .hud-left .wait-card{padding:10px 22px 11px;color:var(--gm-bone);font-size:17px;line-height:1.55}
+
+.room .hud-left .wait-row{display:flex;align-items:baseline;gap:14px;margin:0;font-size:15px;color:var(--gm-bone)}
 .room .hud-left .wait-card .count{margin-left:0;font:700 21px/1 var(--gm-num);letter-spacing:.08em;color:#fff;font-variant-numeric:tabular-nums}
 
 /* --- the medallions (#78, #86): top right in the room, no words --- */

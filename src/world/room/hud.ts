@@ -131,14 +131,20 @@ export const countdownText = (ms: number): string => {
  */
 export function waitCard(view: ChecklistView, session: Session, nowMs: number): SafeHtml | null {
   if (!view.waiting) return null;
-  // author 2026-11-25 (#77): while the meal is on its way the card says what to do meanwhile (no 前往)
-  const idle = view.lines.some((l) => l.state === "now") ? null : html`<div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${tr("checklist.waitIdle")}</span></div>`;
   let left: number | null = null;
   for (const o of session.loop?.orders.values() ?? []) {
     const l = o.atMs + o.waitMs - nowMs;
     if (nowMs > 0 && (left === null || l < left)) left = l;
   }
-  return html`<div class="wait-card">${idle}<div class="wait-row"><span>${tr("checklist.wait.text")}</span>${left === null ? null : html`<b class="count">${countdownText(left)}</b>`}</div></div>`;
+  // author 2026-11-20 (kept by the 2026-11-25 menu pass, author 2026-11-27): the delivery is a card of
+  // its own under the task card — 外卖在路上 and its countdown, nothing else
+  return html`<div class="wait-card"><div class="wait-row"><span>${tr("checklist.wait.text")}</span>${left === null ? null : html`<b class="count">${countdownText(left)}</b>`}</div></div>`;
+}
+
+/** author 2026-11-25 (#77): while the meal is on its way and nothing else is current, the task card's line (no 前往). */
+export function waitIdleLine(view: ChecklistView): SafeHtml | null {
+  if (!view.waiting || view.lines.some((l) => l.state === "now")) return null;
+  return html`<div class="list"><div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${tr("checklist.waitIdle")}</span></div></div>`;
 }
 
 function dayCorner(state: State, session: Session, nowMs = 0): SafeHtml {
@@ -795,7 +801,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const listView = lc ? checklistNow(lc, state, events, session) : null;
   // An empty list (nothing open: the meal ordered, the rest still locked) draws no card; the delivery card stands alone.
   // game-menu (2026-11-25): one glass card, top left — the day, a ruler, the current line, the wait
-  const list = html`<div class="hud-left">${dayCorner(state, session, model.nowMs ?? 0)}${dayRuler()}${listView && listView.lines.length ? renderChecklist(listView) : null}${listView ? waitCard(listView, session, model.nowMs ?? 0) : null}</div>`;
+  // the task card (the day, a ruler, the current line), and the delivery's own card under it
+  const list = html`<div class="hud-left"><div class="hud-card">${dayCorner(state, session, model.nowMs ?? 0)}${dayRuler()}${listView && listView.lines.length ? renderChecklist(listView) : null}${listView ? waitIdleLine(listView) : null}</div>${listView ? waitCard(listView, session, model.nowMs ?? 0) : null}</div>`;
   // The four facings and 桌子 (屏幕 is the desktop's own render).
   // lying-view R2: and the ceiling from the bed.
   const view = isFacing(session.view) || session.view === "desk" || session.view === "table" || session.view === "lying" ? session.view : "room";

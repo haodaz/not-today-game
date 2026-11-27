@@ -8,7 +8,7 @@ import { initialSession } from "@world/desktop/model";
 import { t } from "@world/i18n";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { freshMemo, rollWaitMs } from "@world/loop/runtime";
-import { countdownText, waitCard } from "@world/room/hud";
+import { countdownText, renderRoom, waitCard, waitIdleLine } from "@world/room/hud";
 
 const step = (name: string, at = "09:03") => ({ kind: "step" as const, name, t: at });
 
@@ -46,9 +46,17 @@ describe("the card", () => {
     expect(view.waiting).toBe(true);
     expect(view.lines.some((l) => l.state === "wait")).toBe(false);
     const out = waitCard(view, session, 40_000)!.value;
-    // author 2026-11-25 (#77): with nothing else current, what to do meanwhile — no 前往 on it
-    expect(out).toContain(`<div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${t("checklist.waitIdle")}</span></div>`);
-    expect(out).not.toContain("go-item");
+    // author 2026-11-20, again 2026-11-27: the delivery card holds 外卖在路上 and the countdown only
+    expect(out).toBe(`<div class="wait-card"><div class="wait-row"><span>${t("checklist.wait.text")}</span><b class="count">01:00</b></div></div>`);
+    // author 2026-11-25 (#77): the task card's line meanwhile, with no 前往 — in the task card, not here
+    const idle = waitIdleLine(view)!.value;
+    expect(idle).toContain(`<div class="it now idle"><i class="mark" aria-hidden="true">▸</i><span class="txt">${t("checklist.waitIdle")}</span></div>`);
+    expect(idle).not.toContain("go-item");
+    // in the room: two cards, the task card first, the delivery's card after it
+    const room = renderRoom({ state: store.getState(), events: store.getEvents(), session, nowMs: 40_000 }).value;
+    const left = room.slice(room.indexOf('<div class="hud-left">'));
+    expect(left.indexOf('<div class="hud-card">')).toBeGreaterThan(-1);
+    expect(left.indexOf(t("checklist.waitIdle"))).toBeLessThan(left.indexOf('<div class="wait-card">'));
     expect(out).toContain(`<span>${t("checklist.wait.text")}</span><b class="count">01:00</b>`);
     expect(waitCard(view, session, 0)!.value).not.toContain("count"); // no clock given: the text alone
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));

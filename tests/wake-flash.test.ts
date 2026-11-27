@@ -107,11 +107,12 @@ describe("getting up on day 4", () => {
     // no way back, no caption on the picture
     expect(out).not.toContain("window-back");
     expect(out).not.toContain(t("wake.flash"));
-    // a reload: a fresh session, the same events
+    // a reload: a fresh session, the same events — the player is already up (author 2026-11-27:
+    // a reload resumes standing), so no second flash and no host
     const again = rig(store);
-    again.getUp();
+    syncLoop(again.ctx, 0);
+    expect(again.session.view).not.toBe("lying");
     expect(again.session.wakeFlash).toBeNull();
-    expect(again.keys()).toEqual(["d4:beat:rise"]);
     expect(again.room()).not.toContain("outside-host");
     expect(flashSteps(store.getEvents())).toHaveLength(1);
   });

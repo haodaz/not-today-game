@@ -161,7 +161,7 @@
   "status.assim": "同化",
   "status.objects": "老物件 {n} / {total}",
   "status.upgraded": "升级过 {n} 件",
-  "status.chats": "和它说过 {n} 次话",
+  "status.chats": "和克总聊过 {n} 次",
   "status.close": "关上",
   "hud.cam.room": "房间",
   "hud.cam.desk": "桌子",

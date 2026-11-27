@@ -203,7 +203,7 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     // The live stage keeps its HUD; its own still waits under the box; it stays the one backdrop.
     expect(live().classList.contains("m-turning")).toBe(true);
     expect(live().classList.contains("m-nobg")).toBe(false);
-    expect(live().querySelector(":scope > .hud-left > .list")).not.toBeNull(); // wait-card (2026-11-20): the list sits in the top-left stack
+    expect(live().querySelector(":scope > .hud-left .list")).not.toBeNull(); // wait-card (2026-11-20): the list sits in the top-left stack (in its task card since 2026-11-27)
     expect(root.querySelector(".m-backdrop")).toBeNull();
     await wait(CHOSEN.turn + 80);
     await frame();

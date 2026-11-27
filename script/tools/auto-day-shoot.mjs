@@ -37,9 +37,13 @@ let targets;
 for (let i = 0; i < 40; i++) { try { targets = await (await fetch(`http://localhost:${port}/json`)).json(); break; } catch { await sleep(0.25); } }
 const ws = new WebSocket(targets.find((t) => t.type === "page").webSocketDebuggerUrl);
 await new Promise((r) => (ws.onopen = r));
+ws.onclose = () => console.log("   (cdp: the socket closed)");
 let id = 0; const pending = new Map(); const errors = [];
 ws.onmessage = (m) => { const j = JSON.parse(m.data); if (j.id && pending.has(j.id)) { pending.get(j.id)(j); pending.delete(j.id); } else if (j.method === "Runtime.exceptionThrown") errors.push((j.params.exceptionDetails.exception?.description || "").split("\n")[0].slice(0, 160)); };
-const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+// a reply can be lost (seen 2026-11-26: the run sat 10 min on one evaluate): give up after 30 s, say so, go on
+const send = (method, params = {}) => new Promise((r) => { const i = ++id;
+  const t = setTimeout(() => { if (pending.delete(i)) { console.log(`   (cdp: no reply to ${method} in 30 s)`); r({}); } }, 30000);
+  pending.set(i, (v) => { clearTimeout(t); r(v); }); ws.send(JSON.stringify({ id: i, method, params })); });
 const ev = async (expression) => { const r = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true }); return r.result?.result?.value; };
 const HELPERS = `
 window.__vis = (e) => e.getClientRects().length > 0;

@@ -13,7 +13,7 @@ import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { ARRIVAL_DAY } from "@world/room/arrival";
 import { startEnding } from "@world/endings/flow";
 import { answerFor, knows, optionOrder, recogniseTable } from "@state/recognise";
-import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, plusMinutes, type Beat, type BeatClock } from "@world/desktop/beat";
+import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, isTime, plusMinutes, type Beat, type BeatClock } from "@world/desktop/beat";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
 import { judgementPending, startJudgement } from "@world/dialogue/judge";
@@ -22,12 +22,12 @@ import { resumeCall } from "@world/desktop/call/actions";
 /** How often a waiting lie-down looks again for the judgement. */
 export const JUDGE_POLL_MS = 250;
 import type { ActionContext } from "@world/desktop/controller";
-import type { LoopMemo } from "@world/desktop/model";
+import type { LoopMemo, Session } from "@world/desktop/model";
 import { arrivalOf, mealView, ordersOn } from "@world/delivery/meals";
 import { doorLines } from "@world/delivery/view";
 import { hasString, t } from "@world/i18n";
 import { booted, itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
-import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
+import { dropWaiting, EMPTY_DIALOGUE, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { settleSession } from "@world/dialogue/place";
 import { arrivalDue, MINUTE, msUntilDue, msUntilMinimum } from "./waiting";
 
@@ -332,6 +332,26 @@ export function freshMemo(lc: LoopContext, events: readonly GameEvent[], nowMs: 
   return { day: lc.state.day, items: new Map(itemStates(lc)), seen: events.length, orders, selfScheduled: new Set(), timers: new Set() };
 }
 
+/**
+ * A reload mid-day (author 2026-11-27): the clock as today's events moved it (react's own clock
+ * rules, replayed from the morning; its lines are dropped, nothing is said again), and the room
+ * instead of the ceiling once the player is up. Only from the defaults a fresh mount starts with
+ * (lying, 09:03): a dev `?view=` / beat params stay as given.
+ */
+export function resumeDay(session: Session, lc: LoopContext, events: readonly GameEvent[], runId: string): void {
+  const today = lc.today;
+  if (today.length === 0) return;
+  if (session.clock.beat === DEFAULT_CLOCK.beat && session.clock.time === DEFAULT_CLOCK.time) {
+    const start = events.indexOf(today[0]!);
+    const memo: LoopMemo = { day: lc.state.day, items: new Map(itemStates(lc)), seen: Math.max(0, start), orders: new Map(), selfScheduled: new Set(), timers: new Set() };
+    session.clock = react(memo, lc, events, { dialogue: EMPTY_DIALOGUE, clock: { ...DEFAULT_CLOCK }, sounds: [] }, runId).clock;
+    // the latest time any of today's events carries (an order, an arrival) — the clock never runs behind it
+    for (const e of today) if ("t" in e && typeof e.t === "string" && isTime(e.t)) session.clock = advanceTo(session.clock, e.t);
+  }
+  const up = today.some((e) => e.kind === "step" && e.name === "rise");
+  if (up && session.view === "lying") session.view = "room";
+}
+
 /** Bound to the store: runs after every change (controller onChange). */
 export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   const { store, session } = ctx;
@@ -368,13 +388,21 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.kuroDraft = "";
       session.playerPage = 0;
     }
+    const firstLook = !session.loop;
     session.loop = freshMemo(lc, events, nowMs, session.deliveryUnitMs);
+    // author 2026-11-27: a reload mid-day came back lying in bed at 09:03. The first look after a
+    // reload resumes the day as its events left it: the clock rebuilt from today's events, and
+    // standing in the room once the player has got up.
+    if (firstLook) resumeDay(session, lc, events, store.getRunId());
     // Night already fell before this look (a reload): the evening look stays, nothing replays.
     if (nightfallReached(lc)) session.clock = eveningClock(session.clock);
     // A call answered but not ended before this look (a reload): it resumes and still ends.
     if (!session.call) resumeCall(ctx);
     wake(ctx, lc);
     scheduleSelf(ctx, lc);
+    // author 2026-11-27: a meal ordered before a reload showed 外卖在路上 and its countdown, but no
+    // look was set for its arrival, so at 00:00 nothing came. The first look sets it as every later one does.
+    checkArrivals(ctx, lc, nowMs);
     noticeKuroLine(ctx, nowMs);
     return;
   }

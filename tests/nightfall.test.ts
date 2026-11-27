@@ -104,7 +104,9 @@ describe("nightfall", () => {
     syncLoop(ctx, 0);
     expect(nightfallKeys(ctx, 1)).toHaveLength(0);
     expect(sounds).toEqual([]);
-    expect(ctx.session.clock).toEqual({ beat: "desk", time: BEAT_TIMES.desk });
+    // the evening look; the clock no earlier than 18:30 (author 2026-11-27: a reload keeps today's latest time)
+    expect(ctx.session.clock.beat).toBe("desk");
+    expect(ctx.session.clock.time >= BEAT_TIMES.desk).toBe(true);
   });
   it("the clock goes to the desk beat at 18:30 only if earlier; later times and the night beat stay", () => {
     expect(eveningClock({ beat: "work", time: "10:00" })).toEqual({ beat: "desk", time: "18:30" });

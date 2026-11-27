@@ -161,7 +161,7 @@
   "status.assim": "Assimilation",
   "status.objects": "Old things {n} / {total}",
   "status.upgraded": "{n} upgraded",
-  "status.chats": "Talked to it {n} times",
+  "status.chats": "Talked with Kuro {n} times",
   "status.close": "Close",
   "hud.cam.room": "Room",
   "hud.cam.desk": "Desk",
