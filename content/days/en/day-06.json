@@ -9,8 +9,8 @@
         },
         {
           "k": "narration",
-          "t": "Two typos in the document. You did not type them.",
-          "where": "screen:workbench:docs"
+          "t": "The document you handed in yesterday has two typos in it now. You did not type them.",
+          "where": "screen"
         },
         {
           "k": "narration",
@@ -144,7 +144,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "In the little box, an electronic dictionary. Clamshell, silver-grey, the hinge a little loose.",
+          "t": "The thing in the little box is a clamshell, silver-grey, the hinge a little loose.",
           "me": "carton"
         },
         {
@@ -153,7 +153,7 @@
         },
         {
           "k": "inner",
-          "t": "It only looks up words."
+          "t": "It only does one thing."
         }
       ]
     }

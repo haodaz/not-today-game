@@ -9,8 +9,8 @@
         },
         {
           "k": "narration",
-          "t": "更新日志：Kuro now speaks your language。",
-          "where": "screen:workbench:docs"
+          "t": "屏幕一亮，角上弹出一条更新日志：Kuro now speaks your language。",
+          "where": "screen"
         },
         {
           "k": "inner",

@@ -143,12 +143,12 @@
       "say": [
         {
           "k": "narration",
-          "t": "Today's little box is heavier. A cassette and a walkman. The box's corners worn round.",
+          "t": "Today's little box is heavier, its corners worn round.",
           "me": "carton"
         },
         {
           "k": "narration",
-          "t": "The walkman is heavier than you remember; the battery bay bulges a little."
+          "t": "What is inside is heavier than you remember; the battery bay bulges a little."
         }
       ]
     }

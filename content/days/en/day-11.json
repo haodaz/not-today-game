@@ -9,8 +9,8 @@
         },
         {
           "k": "narration",
-          "t": "Changelog: Kuro now speaks your language.",
-          "where": "screen:workbench:docs"
+          "t": "The screen comes on and a changelog notice pops up in the corner: Kuro now speaks your language.",
+          "where": "screen"
         },
         {
           "k": "inner",

@@ -9,8 +9,8 @@
         },
         {
           "k": "narration",
-          "t": "Changelog v4.3. A single dash. Nothing about what changed.",
-          "where": "screen:workbench:docs"
+          "t": "The screen comes on and a notice pops up in the corner: changelog v4.3. Opened, it is a single dash. Nothing about what changed.",
+          "where": "screen"
         },
         {
           "k": "inner",
@@ -24,7 +24,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "Today's loose one is flat. An IC card, the magnetic strip scuffed, the corners whitened, rows of pinch marks.",
+          "t": "Today's loose one is flat.",
           "me": "carton"
         },
         {
