@@ -1424,13 +1424,12 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    // author 2026-11-24 (#64): the mug — 喝一口 / 一口闷 / 先放着, each with its own line
+    // author 2026-11-24 (#64), 2026-11-27 (#104): the mug is in the hand — 喝一口 / 一口闷 / 先放着. The drinking
+    // is the room's (it tips, the coffee goes down, the sound); no line is said about it.
     if (q.ending.kind === "mugAsk") {
-      const choice = data.choice === "sip" || data.choice === "gulp" ? data.choice : "leave";
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
-      const evening = ctx.session.clock.beat === "desk" || ctx.session.clock.beat === "night";
-      const key = `room.mug.${choice}.${evening ? "cold" : "warm"}`;
-      if (hasString(key)) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:mug:${choice}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
+      const act = data.choice === "sip" ? "sip" : data.choice === "gulp" ? "glug" : "down";
+      ctx.session.mug = { act, seq: (ctx.session.mug?.seq ?? 0) + 1 };
       ctx.rerender();
       return;
     }
@@ -1844,6 +1843,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const { session } = ctx;
     if (session.dialogue.queue.length > 0 || !hasString("room.mug.ask")) return;
     session.dialogue = push(session.dialogue, { key: `d${ctx.store.getState().day}:mug`, lines: [{ k: "narration", t: t("room.mug.ask") }], ending: { kind: "mugAsk" } });
+    // #104: it comes up into the hand and stays there while the question is open
+    session.mug = { act: "hold", seq: (session.mug?.seq ?? 0) + 1 };
     ctx.rerender();
   },
   // author 2026-11-24 (#13): the chick's how-to card under it in 使用 (说明 toggles it)

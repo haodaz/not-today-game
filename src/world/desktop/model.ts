@@ -174,6 +174,8 @@ export interface Session {
   bookOpen: boolean;
   /** book-cover (author 2026-11-20): the gamebook said its cover was opened — the reader goes dark behind it. */
   bookOpened: boolean;
+  /** author 2026-11-27 (#104): the coffee mug's word for the 3D room — held up while the game asks, then a sip / all of it / back down. `seq` makes each word new. */
+  mug: { readonly act: "hold" | "sip" | "glug" | "down"; readonly seq: number } | null;
   /** bedside-book: this run has said the first-time lines (「not today……」 / 剧情还挺真实的) — once per run, not per profile (author 2026-11-23). */
   bookFirstSaid: boolean;
   /** empty-box (author 2026-11-20): the meal just eaten leaves its empty box on the table up close until the player steps back. */
@@ -635,6 +637,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     bookOpened: false,
+    mug: null,
     bookFirstSaid: false,
     emptyBox: null,
     fullnessFloat: null,

@@ -138,6 +138,19 @@
 .opening-scene.phase-stick .opening-box,.opening-scene.phase-hold .opening-box,.opening-scene.phase-fade .opening-box{transform:none;opacity:1}
 .opening-scene.phase-stick .opening-label,.opening-scene.phase-hold .opening-label,.opening-scene.phase-fade .opening-label{transform:translateY(40px) rotate(2deg)}
 .opening-black{position:absolute;inset:0;z-index:2;background:#000;opacity:0;pointer-events:none;transition:opacity 1200ms ease}
+/* author 2026-11-27 (#105): the same box as a story prop (the carton at the door, day 1): the opening's kraft box and
+   its label with the run's name, sized by its own width (cqw) so it fits any stage. dialogue/scene.ts namedCarton. */
+.scene .scene-prop.carton-named{width:min(520px,44%);aspect-ratio:520/394;max-width:none;max-height:none;container-type:inline-size;animation:m-fade-in 300ms both}
+.carton-named .cn-box{position:absolute;left:0;right:0;bottom:0;height:91.4%;background:#B98B5E;border-radius:4px;box-shadow:inset 0 -3.5cqw 0 rgba(0,0,0,.12)}
+.carton-named .cn-box .flap{position:absolute;top:-6.5cqw;width:50%;height:7.7cqw;background:#9C7046}
+.carton-named .cn-box .flap.l{left:0;transform:skewX(-18deg);transform-origin:bottom}
+.carton-named .cn-box .flap.r{right:0;transform:skewX(18deg);transform-origin:bottom}
+.carton-named .cn-box .tape{position:absolute;left:50%;top:-1.2cqw;width:15.4cqw;height:17.3cqw;margin-left:-7.7cqw;background:rgba(214,196,160,.75)}
+.carton-named .cn-label{position:absolute;left:19.2cqw;top:30cqw;width:61.5cqw;height:34.6cqw;box-sizing:border-box;padding:4.2cqw 4.6cqw;background:#fff;border:1px solid #d6d6d6;box-shadow:0 1.2cqw 3.5cqw rgba(0,0,0,.35);display:flex;flex-direction:column;justify-content:center;gap:3.1cqw;color:#1d1d1d;transform:rotate(2deg)}
+.carton-named .ol-row{display:flex;align-items:baseline;gap:2.3cqw;border-bottom:1px solid #cfcfcf;padding-bottom:1.5cqw}
+.carton-named .ol-k{flex:0 0 auto;font-size:2.5cqw;letter-spacing:.12em;color:#6b6b6b}
+.carton-named .ol-v{flex:1;min-height:4.2cqw}
+.carton-named .ol-name{font:600 3.85cqw/1.1 "SF Mono","Menlo","Courier New",monospace;letter-spacing:.06em;transform:rotate(-1.5deg);transform-origin:left center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .opening-scene.phase-fade .opening-black{opacity:1}
 
 /* The collection on the desk (FR4/FR8): figures and the book; a missing image keeps its node. */

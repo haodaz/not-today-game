@@ -98,6 +98,8 @@ export interface RoomPosted {
   readonly chick: string | null;
   /** day1-playtest-1117 R6: the 3D object glowing as the guide's target (null: none; undefined: never posted). */
   readonly glow?: string | null;
+  /** #104: the mug's last word posted, as `act:seq`. */
+  readonly mug?: string | null;
   readonly paused: boolean;
 }
 export const NOTHING_POSTED: RoomPosted = { main: null, day: null, faceSpot: null, objects: null, prints: null, chick: null, paused: false };
@@ -111,6 +113,8 @@ export interface RoomWant {
   readonly chick: string;
   /** R6: the guided 3D object (it glows in the scene itself, so the glow goes where it is dragged). */
   readonly glow?: string | null;
+  /** author 2026-11-27 (#104): the mug's word, as `act:seq` (hold / sip / glug / down); null: nothing to say. */
+  readonly mug?: string | null;
 }
 
 /**
@@ -160,6 +164,12 @@ export function roomPosts(prev: RoomPosted, want: RoomWant): { readonly posts: r
     if (want.chick !== prev.chick) {
       posts.push({ target: ROOM_TARGET, chick: want.chick });
       next = { ...next, chick: want.chick };
+    }
+    // #104: the mug's word, once per change
+    const mug = want.mug ?? null;
+    if (mug !== null && mug !== (prev.mug ?? null)) {
+      posts.push({ target: ROOM_TARGET, mug: mug.split(":")[0] });
+      next = { ...next, mug };
     }
   } else locate = false;
   return { posts, next, locate };

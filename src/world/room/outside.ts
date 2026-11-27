@@ -12,7 +12,8 @@ import type { ActionContext, ActionHandler } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { leavePill } from "@world/desktop/shell";
 import { cls, html, type SafeHtml } from "@world/html";
-import { t } from "@world/i18n";
+import { hasString, t } from "@world/i18n";
+import { push } from "@world/loop/dialogue";
 import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
 import { actWant, bossPosts, HOME_KURO_STEP, homeKept, homePosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
@@ -144,7 +145,11 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       // R6: the guided object glows in the room itself
       const g = guideNow(state, events, ctx.session);
       const glow = glowTarget(g?.target.kind ?? null, root.querySelector<HTMLElement>(":scope > .prompt-layer")?.dataset.hint ?? null);
-      return { mode: m, main, objects: [...(state.found as readonly string[])], prints: printsOnDesk(state.day, events).length > 0, chick: chickFrameNow(state, events, ctx.session, now(), ctx.store.getRunId?.() ?? "run"), glow };
+      // #104: a mug still held with no question open (the question went some other way) goes back down
+      const held = ctx.session.mug;
+      if (held?.act === "hold" && !ctx.session.dialogue.queue.some((q) => q.ending.kind === "mugAsk")) ctx.session.mug = { act: "down", seq: held.seq + 1 };
+      const mug = ctx.session.mug ? `${ctx.session.mug.act}:${ctx.session.mug.seq}` : null;
+      return { mode: m, main, objects: [...(state.found as readonly string[])], prints: printsOnDesk(state.day, events).length > 0, chick: chickFrameNow(state, events, ctx.session, now(), ctx.store.getRunId?.() ?? "run"), glow, mug };
     };
     const send = (m: object) => readyWin?.postMessage(m, "*");
     const sync = () => {
@@ -179,6 +184,9 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       const plan = roomPosts(posted, want());
       posted = plan.next;
       for (const p of plan.posts) send(p);
+      // #104: a drink or a set-down is said once; only "hold" is kept (a frame that reloads lifts it again)
+      const mugNow = ctx.session.mug;
+      if (mugNow && mugNow.act !== "hold" && posted.mug === `${mugNow.act}:${mugNow.seq}`) ctx.session.mug = null;
       if (plan.locate) send(locateCommand());
     };
     const chickTick = (on: boolean) => {
@@ -240,6 +248,15 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
         const id = typeof msg.id === "string" ? msg.id : null;
         if (ctx.session.deskHover !== id) {
           ctx.session.deskHover = id;
+          ctx.rerender();
+        }
+        return;
+      }
+      // #104: the mug's own words (空了。 / 哈啊——), said by the game in its language
+      if (msg.type === "mug") {
+        const key = msg.word === "empty" ? "room.mug.empty" : msg.word === "ahh" ? "room.mug.ahh" : null;
+        if (key && hasString(key) && mode() === "desk" && ctx.session.dialogue.queue.length === 0) {
+          ctx.session.dialogue = push(ctx.session.dialogue, { key: `mug:${String(msg.word)}:${now()}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
           ctx.rerender();
         }
         return;

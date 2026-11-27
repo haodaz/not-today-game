@@ -905,7 +905,7 @@ PRINTS.visible = false;
 const OBJ = {};
 const CHICK_FACE = { paint: null, name: "idle-1" };
 // the coffee mug, and drinking from it (author 2026-11-16: sip, a big mouthful, glug glug, refill)
-const COFFEE = { level: 1, hot: 1, act: null, inner: null, liquid: null, steam: [], pour: null };
+const COFFEE = { level: 1, hot: 1, act: null, inner: null, liquid: null, steam: [], pour: null, hold: false, holdK: 0, day: null };
 G(DX - 0.44, top, DZ - 0.02, () => {
   COFFEE.inner = G(0, 0, 0, () => {
     lathe([[0, 0], [0.034, 0], [0.04, 0.008], [0.042, 0.09], [0.039, 0.09], [0.037, 0.012], [0, 0.01]], mat.ceramic, 0, 0, 0);
@@ -943,14 +943,22 @@ function gulp(when = 0) { // one swallow: a short note that drops
 function click() { try { hiss(0.035, 2600, 900, 0.5, 0, "highpass"); } catch {} } // a rocker switch
 function say(text, ms = 1600) { const cap = document.getElementById("caption"); cap.textContent = text; cap.style.opacity = "1"; clearTimeout(say.t); say.t = setTimeout(() => { cap.style.opacity = "0"; }, ms); }
 const SIP = { sip: 0.07, gulp: 0.22, glug: 9 };
+// what the mug has to say: its own caption on the bare page; inside the game the game says it, in its own language
+function mugSays(word, text, ms) {
+  if (document.body.classList.contains("embed")) { try { window.parent.postMessage({ source: "nt-room", type: "mug", word }, "*"); } catch {} }
+  else say(text, ms);
+}
 function drink(kind) {
   if (COFFEE.act) return;
   const t0 = performance.now() / 1000, from = COFFEE.level;
+  // author 2026-11-27 (#104): drinking from the hand: the mug is already up, so it only tips, then goes back down
+  const held = COFFEE.hold && kind !== "refill";
+  if (held) { COFFEE.hold = false; COFFEE.holdK = 0; }
   try {
     if (kind === "refill") { COFFEE.act = { kind, t0, from, hold: 1.4 }; hiss(1.4, 500, 1400, 0.2, 0.05, "lowpass"); return; }
-    if (from <= 0.02) { COFFEE.act = { kind: "empty", t0, from: 0, to: 0, hold: 0.5 }; say("空了。"); return; }
+    if (from <= 0.02) { COFFEE.act = { kind: "empty", t0, from: 0, to: 0, hold: 0.5, held }; mugSays("empty", "空了。"); return; }
     const to = Math.max(0, from - SIP[kind]), hold = kind === "sip" ? 0.45 : kind === "gulp" ? 0.75 : 0.5 + from * 1.7;
-    COFFEE.act = { kind, t0, from, to, hold };
+    COFFEE.act = { kind, t0, from, to, hold, held };
     if (kind === "sip") hiss(0.32, 900, 2600, 0.16, 0.35);
     else if (kind === "gulp") { gulp(0.45); gulp(0.75); }
     else { const n = Math.max(2, Math.ceil(from * 6)); for (let i = 0; i < n; i++) gulp(0.42 + i * (hold - 0.2) / n); hiss(0.9, 1500, 500, 0.22, 0.75 + hold, "bandpass"); } // glug, glug, glug … ahh
@@ -967,18 +975,22 @@ function updateCoffee(s, dt) {
       COFFEE.level = Math.min(1, a.from + (1 - a.from) * ss(0.1, 1.3, t));
       if (t > 1.5) { COFFEE.hot = 1; COFFEE.act = null; }
     } else {
-      const k = ss(0, 0.35, t) * (1 - ss(a.hold + 0.35, a.hold + 0.7, t));
-      lift = k;
+      const down = 1 - ss(a.hold + 0.35, a.hold + 0.7, t), k = ss(0, 0.35, t) * down;
+      lift = a.held ? down : k; // from the hand it starts up there
       COFFEE.level = a.from - (a.from - a.to) * ss(0, 1, (t - 0.35) / a.hold);
       tilt = k * (0.5 + (1 - COFFEE.level) * 0.8); // the emptier the mug, the further back it tips
-      if (t > a.hold + 0.7) { COFFEE.act = null; if (a.kind === "glug") say("哈啊——", 1800); }
+      if (t > a.hold + 0.7) { COFFEE.act = null; if (a.kind === "glug") mugSays("ahh", "哈啊——", 1800); }
     }
   }
+  // #104: held in the hand (the game is asking how to drink it): up and waiting, upright
+  COFFEE.holdK += ((COFFEE.hold ? 1 : 0) - COFFEE.holdK) * Math.min(1, dt * 9);
+  if (COFFEE.holdK < 0.002 && !COFFEE.hold) COFFEE.holdK = 0;
+  lift = Math.max(lift, ss(0, 1, COFFEE.holdK));
   const L = COFFEE.level;
   { // the mug comes to where a seated person holds it: middle of the view, a little below centre, close (author 2026-11-16)
     const par = COFFEE.inner.parent;
     par.updateWorldMatrix(true, false);
-    _cv.set(0, -0.085, -0.36).applyMatrix4(camera.matrixWorld);
+    _cv.set(0, document.body.classList.contains("embed") ? -0.035 : -0.085, -0.36).applyMatrix4(camera.matrixWorld); // inside the game the line box is along the bottom: a little higher (#104)
     par.worldToLocal(_cv);
     COFFEE.inner.position.set(0, 0, 0).lerp(_cv, lift);
     par.getWorldQuaternion(_cq0).invert();
@@ -3274,8 +3286,7 @@ const drop = (e) => {
     const r = canvasEl.getBoundingClientRect();
     ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
     if (document.body.classList.contains("embed")) { // inside the game the room only says what was touched; the game decides what happens
-      const id = pickAt();
-      if (id === "mug") drink("sip");
+      const id = pickAt(); // (the mug too: the game lifts it and asks how to drink, #104)
       try { window.parent.postMessage({ source: "nt-room", type: "pick", id, face: state.face, spot: state.desk ? state.spot : null }, "*"); } catch {}
       dragging = null; return;
     }
@@ -3403,6 +3414,7 @@ function setSpot(spot) {
 }
 const ui = (id, v) => { const e = document.getElementById(id); if (!e) return; if (e.type === "checkbox") { e.checked = !!v; e.dispatchEvent(new Event("change", { bubbles: true })); } else { e.value = String(v); e.dispatchEvent(new Event("input", { bubbles: true })); e.dispatchEvent(new Event("change", { bubbles: true })); } };
 function command(m) {
+  if (m.day != null && Number(m.day) !== COFFEE.day) { if (COFFEE.day !== null) { COFFEE.level = 1; COFFEE.hot = 1; } COFFEE.day = Number(m.day); } // a new day, a new cup
   if (m.day != null) { ui("day", m.day); if (m.snap !== false) { Object.assign(state, dayLook(state.day)); goal = null; apply(); } }
   if (m.time != null) { ui("time", m.time); state.time = Number(m.time); apply(); }
   if (m.face != null) setFace(Number(m.face));
@@ -3434,6 +3446,7 @@ function command(m) {
   if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
   if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }
   if (m.far != null) FAR.to = Math.max(0, Math.min(1, Number(m.far)));
+  if (m.mug != null) { const k = String(m.mug); if (k === "hold") COFFEE.hold = true; else if (k === "down") COFFEE.hold = false; else if (k === "sip" || k === "gulp" || k === "glug") drink(k); } // #104
   if (m.wake) wake();
   if (m.vision) document.getElementById("vision").click();
 }

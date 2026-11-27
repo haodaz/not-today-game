@@ -39,6 +39,7 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `chick` | frame name | paints the chick's LCD |
 | `glow` | object id or `null` | the guide's glow: a pulsing ring under that object, following it |
 | `layout` | `{ id: [x, z] }` or `null` | puts the desk things where a saved layout says |
+| `mug` | `"hold"`, `"sip"`, `"gulp"`, `"glug"`, `"down"` | the coffee mug: up in the hand and waiting; drink from the hand (a sip, a mouthful, all of it) and set it down; back on the desk untouched. A new `day` fills it again |
 
 ### Asking
 | Field | Value | What the room does |
@@ -75,6 +76,7 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `ready` | none | the first frames are drawn | `outside.ts`, `wake.ts` |
 | `where` | `rects`, `face`, `spot`, `moving` | after a `locate` | `outside.ts` → the guide's marks |
 | `pick` | `id`, `face`, `spot` | a click on a desk thing | `outside.ts` → the game's own action for it |
+| `mug` | `word`: `"empty"` or `"ahh"` | the mug was asked to drink and is empty; a whole mug went down in one | `outside.ts` → one line in the game's language |
 | `hover` | `id` | the pointer moves onto another thing | `outside.ts` (cursor) |
 | `moved` | `id`, `x`, `z` | a dragged thing is set down | `outside.ts`: keeps the layout, asks `locate` again |
 | `wake-line` | none | the wake flash wants the game's line said | `wake.ts` |

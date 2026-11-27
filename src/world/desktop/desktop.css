@@ -291,8 +291,13 @@ html,body{height:100%;overflow:hidden}
 .screen-toggle{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;gap:2px;z-index:8;background:rgba(20,22,26,.6);border-radius:8px;padding:2px}
 .screen-toggle button{border:0;background:transparent;color:#9aa3b0;font:12px var(--font);padding:2px 12px;border-radius:6px;cursor:pointer}
 .screen-toggle button.on{background:#3a3f46;color:#e8eaee}
-.other-tab{position:absolute;top:50%;transform:translateY(-50%);width:22px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,33,38,.75);border:0;border-radius:6px;cursor:pointer;z-index:8;color:#9aa3b0;font:10px var(--font);writing-mode:vertical-rl}
-.other-tab[data-side="left"]{left:4px}.other-tab[data-side="right"]{right:4px}
+/* author 2026-11-27 (#102): the tab is a column of names, each name written downwards. (The whole tab used to be
+   vertical-rl, which turns a flex column sideways: three apps spilled out to the left; and the dock classes on the
+   names (.msgs is also the chat list: padding, flex, overflow) are undone here.) */
+.other-tab{position:absolute;top:50%;transform:translateY(-50%);width:22px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:10px;background:rgba(30,33,38,.75);border:0;border-radius:6px;cursor:pointer;z-index:8;color:#9aa3b0;font:10px var(--font)}
+.other-tab .tab-app{flex:none;display:block;padding:0;overflow:visible;background:none;writing-mode:vertical-rl;white-space:nowrap;line-height:1.2;letter-spacing:.08em}
+/* #102: the left tab sits above 离开屏幕 (the pill is at the same edge, at mid height) */
+.other-tab[data-side="left"]{left:4px;top:calc(50% - 158px)}.other-tab[data-side="right"]{right:4px}
 .other-tab .tab-app b{display:inline-block;margin-top:4px;min-width:14px;border-radius:7px;background:var(--red);color:#fff;font-weight:500;writing-mode:horizontal-tb;text-align:center}
 
 /* kuro-zh-answers R4: Kuro's face wherever it speaks (the box, the task threads, the pill): the day's
@@ -306,7 +311,8 @@ html,body{height:100%;overflow:hidden}
 .monitor[data-ring="desk"]{--tint:8deg;--drift-x:1px;--drift-y:1px;--blur:.2px}
 .monitor[data-ring="wall"],.monitor[data-ring="room"],.monitor[data-ring="door"]{--tint:12deg;--drift-x:2px;--drift-y:1px;--blur:.35px}
 button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
-.dock .app{border:0}
+/* author 2026-11-27 (#103): `.msgs` is also the chat list (overflow) — on the dock tile it cut the badge and the dot */
+.dock .app{border:0;overflow:visible}
 /* Messages */
 .row{background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font:inherit;color:inherit}
 .row.family-sec{cursor:default}
