@@ -5,7 +5,7 @@
       "incoming": [
         {
           "t": "09:00",
-          "text": "{bossCalls}，PDF 我这边只收到两份。",
+          "text": "{bossCalls}，交接单我这边只收到两份。",
           "kind": "work"
         },
         {
@@ -92,11 +92,11 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[卡片] PDF 回执 · 2/6",
+          "text": "[卡片] 交接回执 · 2/6",
           "kind": "work",
           "card": {
             "type": "task",
-            "title": "PDF 回执",
+            "title": "交接回执",
             "fields": [
               [
                 "已读",
@@ -146,7 +146,7 @@
           {
             "who": "partner",
             "t": "09:31",
-            "text": "[卡片] PDF 回执 · 2/6"
+            "text": "[卡片] 交接回执 · 2/6"
           }
         ],
         "inner": "他发回执。四份不见了，回执上写 2/6，像本来就该是 2。"
@@ -178,7 +178,7 @@
       "incoming": [
         {
           "t": "09:20",
-          "text": "member：PDF 收到两份，辛苦",
+          "text": "member：交接单收到两份，辛苦",
           "kind": "work"
         },
         {

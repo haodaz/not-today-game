@@ -316,7 +316,7 @@ describe("the connected meeting window (correction 2026-11-03)", () => {
     // The first line is the boss's: prefixed with his name.
     expect(html).toContain("老板：我刚从一个会出来");
     // A me line (line 4) is the player's own summary in parentheses.
-    expect(html).toContain("（他又讲了一遍那个市值。）");
+    expect(html).toContain("（他又讲了一遍「自己人」。）");
   });
 
   it("the boss's ring pulses while his line is the newest", () => {

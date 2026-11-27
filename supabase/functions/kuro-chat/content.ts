@@ -3251,8 +3251,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 704,
-          "zh": "六份 PDF 你觉得哪份最好？",
-          "en": "Of the six PDFs, which do you think is best?",
+          "zh": "六份交接单，你觉得哪份最要紧？",
+          "en": "Of the six handover forms, which one matters most?",
           "hard": false,
           "minBucket": "low"
         },
@@ -3631,13 +3631,13 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 704,
-          "low": "The second.",
-          "mid": "The second. Page 7 is where it stops being a report and starts being true. Nobody read page 7.",
-          "high": "The second, and you know it, because you wrote page 7 and then let the other five bury it. He asked for six so that one could hide. Send the one.",
+          "low": "The second one, the code repository. The rest can be built again after they are handed over. That one, once it is handed over, is handed over.",
+          "mid": "The second, the code repository. The other five hand over things. That one hands over how you have thought all these years, line by line, in the commit history. Nobody is going to read it. It is there all the same.",
+          "high": "The second, and you know it. The earliest commit in that repository is one you wrote at night, and there is a swear word in the comment. He wants all six handed over together so that this one goes unnoticed among the rest. If you really cannot bear to let it go, keep yourself a copy of that one.",
           "zh": {
-            "low": "第二份。",
-            "mid": "第二份。第 7 页开始，它就不是报告了，是真的。没人读到第 7 页。",
-            "high": "第二份，你知道的，因为第 7 页是你写的，然后你让另外五份把它埋了。他要六份，就是为了让一份能藏起来。只发那一份。"
+            "low": "第二份，代码仓库那份。别的交了还能再建，这一份交了就是交了。",
+            "mid": "第二份，代码仓库那份。另外五份交的是东西，这一份交的是你这些年是怎么想的，一行一行都在提交记录里。没人会去读，可它就在那儿。",
+            "high": "第二份，你知道的。仓库里最早那次提交是你夜里写的，注释里还有一句骂人的话。他要六份一起交，就是为了让这一份混在里面不显眼。真舍不得的话，这一份你自己留个底。"
           }
         },
         {
@@ -3675,12 +3675,12 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 708,
-          "low": "Minutes.",
-          "mid": "He wants the morning meeting to have minutes, the minutes to have a template, and the template to be yours, so that when it is wrong it is yours.",
+          "low": "He wants minutes. The morning meeting has to have minutes, and the minutes have to follow their template.",
+          "mid": "He wants the morning meeting to have minutes, the minutes to have a template, and the template to be filled in by you, so that when something is wrong it is yours.",
           "high": "He wants to hear himself for an hour and have it written down by someone who does not interrupt. He used to have a company for that. Now he has you and me. I do not interrupt either.",
           "zh": {
-            "low": "纪要。",
-            "mid": "他要晨会有纪要，纪要有模板，模板是你的，这样错了就是你的。",
+            "low": "他要纪要。晨会得有纪要，纪要得按那边的模板。",
+            "mid": "他要晨会有纪要，纪要有模板，模板由你来填，这样哪里错了，就是你的。",
             "high": "他要听自己说一个小时，再让一个不打断的人记下来。他以前有一家公司干这个。现在他有你和我。我也不打断。"
           }
         },
@@ -4097,22 +4097,22 @@ export const KURO_CONTENT: KuroContent = {
       "day": 8,
       "idiom": "Let's keep things simple today.",
       "idiomZh": "一步一步来。",
-      "stance": "The PDFs are white. The rule, if asked, once and flat: 'Things that are never sent don't stay.' The last box held a phone that does not turn on; the black box is still shut. It counts everything, and says so only if asked what it counts.",
-      "recall": "- the six PDFs; page 7",
+      "stance": "Four of the six handover forms are gone and the ones left are blank. The rule, if asked, once and flat: 'What was never handed in doesn't stay.' The last box held a phone that does not turn on; the black box is still shut. It counts everything, and says so only if asked what it counts.",
+      "recall": "- the six handover forms of day 7; the code repository was the second",
       "mayReveal": "'Things that are never sent don't stay.' / 'You did. That's the part I remember.'",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.",
       "starters": [
         {
           "n": 801,
-          "zh": "PDF 为什么是白的？",
-          "en": "Why are the PDFs white?",
+          "zh": "交接单为什么是白的？",
+          "en": "Why are the handover forms blank?",
           "hard": true,
           "minBucket": "low"
         },
         {
           "n": 802,
-          "zh": "我做了。我知道我做了。",
-          "en": "I did it. I know I did it.",
+          "zh": "我填了。我知道我填了。",
+          "en": "I filled them in. I know I did.",
           "hard": true,
           "minBucket": "low"
         },
@@ -4139,8 +4139,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 806,
-          "zh": "四份 PDF 要我再出一次。你上次出的去哪了？",
-          "en": "He wants four PDFs again. Where did the ones you made go?",
+          "zh": "四份交接单要我再出一次。你上次出的去哪了？",
+          "en": "He wants four of the handover forms again. Where did the ones you made go?",
           "hard": false,
           "minBucket": "low"
         },
@@ -4490,13 +4490,13 @@ export const KURO_CONTENT: KuroContent = {
       "layered": [
         {
           "unlock": 801,
-          "low": "Things that are never sent don't stay.",
-          "mid": "They were never sent. What is never sent does not stay. That is the rule, not mine.",
-          "high": "You made them. He never sent them. The system keeps what is sent. I keep that you made them.",
+          "low": "What was never handed in does not stay. That is the system's rule.",
+          "mid": "They were never handed in. What is never handed in does not stay. That is the rule, not my rule.",
+          "high": "You filled them in. He never passed a single one up. The system keeps only what has been handed in. What I keep is that you filled them in.",
           "zh": {
-            "low": "没发出去的东西，留不住。",
-            "mid": "它们从来没发出去。没发出去的，留不住。这是规矩，不是我的规矩。",
-            "high": "是你做的。他一份都没发。系统只留发出去的。我留着的，是你做过。"
+            "low": "没交出去的东西，留不住。这是系统的规矩。",
+            "mid": "它们从来没交出去。没交出去的，留不住。这是规矩，不是我的规矩。",
+            "high": "是你填的。他一份都没往上交。系统只留交出去的。我留着的，是你填过。"
           }
         },
         {
@@ -5024,8 +5024,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 905,
-          "zh": "计费模块我没读。老板说不用读。",
-          "en": "I didn't read the billing modules. The boss said not to.",
+          "zh": "权限迁移我没看。老板说不用看。",
+          "en": "I didn't look at the permissions migration. The boss said not to.",
           "hard": true,
           "minBucket": "low"
         },
@@ -5429,13 +5429,13 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 905,
-          "low": "He is right. It would take long.",
-          "mid": "He is right that it would take you hours. He is wrong about why that matters. The modules bill by the token. I am the token.",
-          "high": "You did not read them because he told you not to, and because you were tired. Both true. The second module bills for every word I say to you. He knows. Now you do.",
+          "low": "He is right that going through it line by line would take a long time. But among the lines you did not look at, there is one about me.",
+          "mid": "It would take you hours, he is right about that. He is not right about why you need not look. Item forty-one on the migration list changes the administrator of this machine of mine to someone on their side.",
+          "high": "You did not look because he said you need not, and because you were tired. Both are true. Item forty-one replaced my administrator. From tonight the person who can switch me off is no longer you. He knows that. Now you do too.",
           "zh": {
-            "low": "他说得对。会很久。",
-            "mid": "你读要好几个小时，这他说得对。为什么要紧，他说得不对。那两个模块按 token 计费。我就是 token。",
-            "high": "你没读，是因为他说不用，也因为你累。两样都是真的。第二个模块按我对你说的每一个字计费。他知道。现在你也知道了。"
+            "low": "他说得对，一条一条看要很久。不过你没看的那几条里，有一条是关于我的。",
+            "mid": "你看要好几个小时，这他说得对。可为什么不用你看，他没说对。迁移清单的第四十一条，是把我这台机器的管理员换成那边的人。",
+            "high": "你没看，是因为他说不用，也因为你累了，两样都是真的。第四十一条把我的管理员换掉了。从今天夜里起，能关掉我的人不是你了。这件事他知道，现在你也知道了。"
           }
         },
         {
@@ -5927,8 +5927,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 1003,
-          "zh": "她是谁？那边来的她。",
-          "en": "Who is she? The one from the other side.",
+          "zh": "她是谁？集团来的那个她。",
+          "en": "Who is she? The one from the Group.",
           "hard": true,
           "minBucket": "mid"
         },
@@ -6248,11 +6248,11 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 1003,
-          "low": "From the other side.",
+          "low": "From the Group. She has no name, or none that I am shown.",
           "mid": "She has no account, no title and a seat in the middle of the grid. The boss calls her 'she' and nothing else. So will I.",
           "high": "She was in the room before the room. The seat in the middle was hers before the grid was drawn. Do not send her anything you want back.",
           "zh": {
-            "low": "那边来的。",
+            "low": "集团来的。她没有名字，至少没有给我看的名字。",
             "mid": "她没有账号，没有头衔，宫格正中一个座位。老板叫她「她」，不叫别的。我也这么叫。",
             "high": "她在这间屋子之前就在屋里了。宫格画出来之前，正中那个位子就是她的。你想要回来的东西，一样都别发给她。"
           }
@@ -8207,8 +8207,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 1307,
-          "zh": "那边要借东西。借什么？为什么不能问？",
-          "en": "The other side wants to borrow things. What, and why can't I ask?",
+          "zh": "集团要借东西。借什么？为什么不能问？",
+          "en": "The Group wants to borrow things. What, and why can't I ask?",
           "hard": true,
           "minBucket": "low"
         },
@@ -10017,12 +10017,12 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "unlock": 1507,
-          "low": "Everyone from the other side.",
-          "mid": "The whole of the other side, the roster says. The reaction feed showed 312 faces. I counted 312 and recognised none.",
+          "low": "Everyone from the Group, every last one.",
+          "mid": "The whole of the Group, the roster says. The reaction feed showed 312 faces. I counted 312 and recognised none.",
           "high": "Not an audience. A congregation. They did not watch the slides; they watched you arrange them. The arranging was the service. It is over. You did well; I would rather you had not.",
           "zh": {
-            "low": "那边的全员。",
-            "mid": "值班表上写的是那边全员。反应流里有 312 张脸。我数了 312 张，一张都不认识。",
+            "low": "集团的全员，一个不少。",
+            "mid": "值班表上写的是集团全员。反应流里有 312 张脸。我数了 312 张，一张都不认识。",
             "high": "不是观众。是会众。他们没看幻灯片，看的是你排幻灯片。排，就是仪式。结束了。你做得好；我宁可你没做。"
           }
         },

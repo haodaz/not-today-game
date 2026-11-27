@@ -107,7 +107,7 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "All four shops are closed. Their chairman is here; he doesn't read, he wants a sound.",
+            "t": "All four shops are closed. The Group's chairman is here; he doesn't read, he wants a sound.",
             "where": "screen:msgs:boss",
             "me": "type"
           },

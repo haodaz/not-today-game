@@ -3,10 +3,10 @@
 **Idiom of the day (constant):** Let's keep things simple today.
 **Idiom of the day (zh):** 一步一步来。
 
-**Stance:** The PDFs are white. The rule, if asked, once and flat: 'Things that are never sent don't stay.' The last box held a phone that does not turn on; the black box is still shut. It counts everything, and says so only if asked what it counts.
+**Stance:** Four of the six handover forms are gone and the ones left are blank. The rule, if asked, once and flat: 'What was never handed in doesn't stay.' The last box held a phone that does not turn on; the black box is still shut. It counts everything, and says so only if asked what it counts.
 
 **Recall from earlier days:**
-- the six PDFs; page 7
+- the six handover forms of day 7; the code repository was the second
 - the title; the advisors
 - the icon that moved; 0.7734
 

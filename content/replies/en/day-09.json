@@ -10,7 +10,7 @@
         },
         {
           "t": "09:00",
-          "text": "(Transcript) {bossCalls}, the two billing modules go through today. Let it do them, you don't need to read them yourself, it takes you forever. And you've been on good form lately. Keep it up.",
+          "text": "(Transcript) {bossCalls}, their system gets linked in today. Let it do the permissions migration, you don't need to go through it line by line yourself, it takes you forever. And you've been on good form lately. Keep it up.",
           "kind": "work"
         },
         {
@@ -121,11 +121,11 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[Card] Billing module · Acceptance",
+          "text": "[Card] System link-up · Acceptance",
           "kind": "work",
           "card": {
             "type": "task",
-            "title": "计费模块 · 验收",
+            "title": "系统接入 · 验收",
             "fields": [
               [
                 "状态",

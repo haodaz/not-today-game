@@ -5,7 +5,7 @@
       "incoming": [
         {
           "t": "09:00",
-          "text": "{bossCalls}, I've only received two of the PDFs.",
+          "text": "{bossCalls}, I've only received two of the handover forms.",
           "kind": "work"
         },
         {
@@ -92,11 +92,11 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[Card] PDF receipt · 2/6",
+          "text": "[Card] Handover receipt · 2/6",
           "kind": "work",
           "card": {
             "type": "task",
-            "title": "PDF 回执",
+            "title": "交接回执",
             "fields": [
               [
                 "已读",
@@ -146,7 +146,7 @@
           {
             "who": "partner",
             "t": "09:31",
-            "text": "[Card] PDF receipt · 2/6"
+            "text": "[Card] Handover receipt · 2/6"
           }
         ],
         "inner": "He sends a receipt. Four are gone; the receipt says 2/6, as if it was always meant to be 2."
@@ -178,7 +178,7 @@
       "incoming": [
         {
           "t": "09:20",
-          "text": "member: Two PDFs received, thanks",
+          "text": "member: Two handover forms received, thanks",
           "kind": "work"
         },
         {

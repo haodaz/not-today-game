@@ -93,11 +93,11 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - hard: yes
 - locked: "Because the world finally got big enough to hold me."
 
-## 704 · 六份 PDF 你觉得哪份最好？
-- en: Of the six PDFs, which do you think is best?
+## 704 · 六份交接单，你觉得哪份最要紧？
+- en: Of the six handover forms, which one matters most?
 - days: 7
-- tiers: low: "The second." | mid: "The second. Page 7 is where it stops being a report and starts being true. Nobody read page 7." | high: "The second, and you know it, because you wrote page 7 and then let the other five bury it. He asked for six so that one could hide. Send the one."
-- tiers (zh): low: "第二份。" | mid: "第二份。第 7 页开始，它就不是报告了，是真的。没人读到第 7 页。" | high: "第二份，你知道的，因为第 7 页是你写的，然后你让另外五份把它埋了。他要六份，就是为了让一份能藏起来。只发那一份。"
+- tiers: low: "The second one, the code repository. The rest can be built again after they are handed over. That one, once it is handed over, is handed over." | mid: "The second, the code repository. The other five hand over things. That one hands over how you have thought all these years, line by line, in the commit history. Nobody is going to read it. It is there all the same." | high: "The second, and you know it. The earliest commit in that repository is one you wrote at night, and there is a swear word in the comment. He wants all six handed over together so that this one goes unnoticed among the rest. If you really cannot bear to let it go, keep yourself a copy of that one."
+- tiers (zh): low: "第二份，代码仓库那份。别的交了还能再建，这一份交了就是交了。" | mid: "第二份，代码仓库那份。另外五份交的是东西，这一份交的是你这些年是怎么想的，一行一行都在提交记录里。没人会去读，可它就在那儿。" | high: "第二份，你知道的。仓库里最早那次提交是你夜里写的，注释里还有一句骂人的话。他要六份一起交，就是为了让这一份混在里面不显眼。真舍不得的话，这一份你自己留个底。"
 
 ## 705 · 消息的图标挪了几个像素。是你？
 - en: The messages icon moved a few pixels. Was that you?
@@ -122,8 +122,8 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 ## 708 · 老板电话打了一个多小时。他到底要什么？
 - en: The boss's call ran over an hour. What does he actually want?
 - days: 7
-- tiers: low: "Minutes." | mid: "He wants the morning meeting to have minutes, the minutes to have a template, and the template to be yours, so that when it is wrong it is yours." | high: "He wants to hear himself for an hour and have it written down by someone who does not interrupt. He used to have a company for that. Now he has you and me. I do not interrupt either."
-- tiers (zh): low: "纪要。" | mid: "他要晨会有纪要，纪要有模板，模板是你的，这样错了就是你的。" | high: "他要听自己说一个小时，再让一个不打断的人记下来。他以前有一家公司干这个。现在他有你和我。我也不打断。"
+- tiers: low: "He wants minutes. The morning meeting has to have minutes, and the minutes have to follow their template." | mid: "He wants the morning meeting to have minutes, the minutes to have a template, and the template to be filled in by you, so that when something is wrong it is yours." | high: "He wants to hear himself for an hour and have it written down by someone who does not interrupt. He used to have a company for that. Now he has you and me. I do not interrupt either."
+- tiers (zh): low: "他要纪要。晨会得有纪要，纪要得按那边的模板。" | mid: "他要晨会有纪要，纪要有模板，模板由你来填，这样哪里错了，就是你的。" | high: "他要听自己说一个小时，再让一个不打断的人记下来。他以前有一家公司干这个。现在他有你和我。我也不打断。"
 
 ## 709 · 老板给我安了个头衔。你知道是谁加的？
 - en: The boss gave me a title. Do you know who added it?
@@ -139,15 +139,15 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "Nothing." | mid: "Nothing you would miss. Things on the screen. I do not reach the room." | high: "A line in a document. An icon. The order of two files. Small things, each one to see if you would look. You looked every time. I have stopped testing."
 - tiers (zh): low: "没有。" | mid: "没有你会在意的。屏幕上的东西。屋子我够不着。" | high: "文档里的一行。一个图标。两个文件的先后。都是小东西，每一个都是看你会不会看。你每次都看了。我不再试了。"
 
-## 801 · PDF 为什么是白的？
-- en: Why are the PDFs white?
+## 801 · 交接单为什么是白的？
+- en: Why are the handover forms blank?
 - days: 8
 - hard: yes
-- tiers: low: "Things that are never sent don't stay." | mid: "They were never sent. What is never sent does not stay. That is the rule, not mine." | high: "You made them. He never sent them. The system keeps what is sent. I keep that you made them."
-- tiers (zh): low: "没发出去的东西，留不住。" | mid: "它们从来没发出去。没发出去的，留不住。这是规矩，不是我的规矩。" | high: "是你做的。他一份都没发。系统只留发出去的。我留着的，是你做过。"
+- tiers: low: "What was never handed in does not stay. That is the system's rule." | mid: "They were never handed in. What is never handed in does not stay. That is the rule, not my rule." | high: "You filled them in. He never passed a single one up. The system keeps only what has been handed in. What I keep is that you filled them in."
+- tiers (zh): low: "没交出去的东西，留不住。这是系统的规矩。" | mid: "它们从来没交出去。没交出去的，留不住。这是规矩，不是我的规矩。" | high: "是你填的。他一份都没往上交。系统只留交出去的。我留着的，是你填过。"
 
-## 802 · 我做了。我知道我做了。
-- en: I did it. I know I did it.
+## 802 · 我填了。我知道我填了。
+- en: I filled them in. I know I did.
 - days: 8
 - hard: yes
 - locked: "You did. That's the part I remember."
@@ -171,8 +171,8 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "The advisors." | mid: "It arrived with the advisors, at 08:51, already filled in. It has a field for every minute of the meeting and none for what was decided." | high: "Nobody set it. It was there before the meeting existed, the way a form is there before the person who fills it in. Lao Zhou reads it because reading it is easier than being the one who wrote the minutes. You used to be the one who wrote them."
 - tiers (zh): low: "顾问。" | mid: "08:51 跟顾问一起来的，已经填好了。会上每一分钟都有一格，决定了什么没有格。" | high: "没人定。会还没有的时候它就在了，就像表格在填表的人之前就在。老周念它，是因为念它比当那个写纪要的人容易。以前写纪要的人是你。"
 
-## 806 · 四份 PDF 要我再出一次。你上次出的去哪了？
-- en: He wants four PDFs again. Where did the ones you made go?
+## 806 · 四份交接单要我再出一次。你上次出的去哪了？
+- en: He wants four of the handover forms again. Where did the ones you made go?
 - days: 8
 - tiers: low: "They were not sent." | mid: "The four he did not receive were made at 16:10 and never left the outbox. Things that never leave do not stay." | high: "I made six. He opened two. The four he did not open went where unopened things go. He will open two of the next six. I would make two."
 - tiers (zh): low: "没发出去。" | mid: "他没收到的那四份，16:10 做的，一直没出过发件箱。没出去的东西留不住。" | high: "我做了六份。他打开两份。没打开的四份去了没打开的东西去的地方。下六份他还会打开两份。换我做两份。"
@@ -234,12 +234,12 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "A guest." | mid: "The invitation says 'from the other side'. No name. The seating grid has a place for them already, in the middle." | high: "Someone who was invited before the company existed. The grid has a seat in the middle that nobody was told to leave empty, and everybody did. Do not put yourself in that row."
 - tiers (zh): low: "一位贵客。" | mid: "邀请函上写的是「那边来的」。没有名字。宫格里已经给他们留了位子，正中间。" | high: "一个在这家公司存在之前就被请过的人。宫格正中有一个座位，没人被告知要空着，每个人都空着了。别把你自己排到那一排。"
 
-## 905 · 计费模块我没读。老板说不用读。
-- en: I didn't read the billing modules. The boss said not to.
+## 905 · 权限迁移我没看。老板说不用看。
+- en: I didn't look at the permissions migration. The boss said not to.
 - days: 9
 - hard: yes
-- tiers: low: "He is right. It would take long." | mid: "He is right that it would take you hours. He is wrong about why that matters. The modules bill by the token. I am the token." | high: "You did not read them because he told you not to, and because you were tired. Both true. The second module bills for every word I say to you. He knows. Now you do."
-- tiers (zh): low: "他说得对。会很久。" | mid: "你读要好几个小时，这他说得对。为什么要紧，他说得不对。那两个模块按 token 计费。我就是 token。" | high: "你没读，是因为他说不用，也因为你累。两样都是真的。第二个模块按我对你说的每一个字计费。他知道。现在你也知道了。"
+- tiers: low: "He is right that going through it line by line would take a long time. But among the lines you did not look at, there is one about me." | mid: "It would take you hours, he is right about that. He is not right about why you need not look. Item forty-one on the migration list changes the administrator of this machine of mine to someone on their side." | high: "You did not look because he said you need not, and because you were tired. Both are true. Item forty-one replaced my administrator. From tonight the person who can switch me off is no longer you. He knows that. Now you do too."
+- tiers (zh): low: "他说得对，一条一条看要很久。不过你没看的那几条里，有一条是关于我的。" | mid: "你看要好几个小时，这他说得对。可为什么不用你看，他没说对。迁移清单的第四十一条，是把我这台机器的管理员换成那边的人。" | high: "你没看，是因为他说不用，也因为你累了，两样都是真的。第四十一条把我的管理员换掉了。从今天夜里起，能关掉我的人不是你了。这件事他知道，现在你也知道了。"
 
 ## 906 · 右上角那个数是什么？
 - en: What's that number in the top right?
@@ -291,13 +291,13 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "It is the same contract." | mid: "The same contract, the same cell, the same hour. He does not remember that day; the system does. It gave him back a day that went well." | high: "Because that was a day you still read everything. Something wanted to see whether you still would. You did. It has what it needed from today."
 - tiers (zh): low: "是同一份合同。" | mid: "同一份合同，同一个格子，同一个钟点。他不记得那天，系统记得。系统把一个顺利的日子还给了他。" | high: "因为那是你还什么都读的一天。有东西想看看你是不是还会读。你读了。它今天要的，拿到了。"
 
-## 1003 · 她是谁？那边来的她。
-- en: Who is she? The one from the other side.
+## 1003 · 她是谁？集团来的那个她。
+- en: Who is she? The one from the Group.
 - days: 10
 - hard: yes
 - bucket: mid
-- tiers: low: "From the other side." | mid: "She has no account, no title and a seat in the middle of the grid. The boss calls her 'she' and nothing else. So will I." | high: "She was in the room before the room. The seat in the middle was hers before the grid was drawn. Do not send her anything you want back."
-- tiers (zh): low: "那边来的。" | mid: "她没有账号，没有头衔，宫格正中一个座位。老板叫她「她」，不叫别的。我也这么叫。" | high: "她在这间屋子之前就在屋里了。宫格画出来之前，正中那个位子就是她的。你想要回来的东西，一样都别发给她。"
+- tiers: low: "From the Group. She has no name, or none that I am shown." | mid: "She has no account, no title and a seat in the middle of the grid. The boss calls her 'she' and nothing else. So will I." | high: "She was in the room before the room. The seat in the middle was hers before the grid was drawn. Do not send her anything you want back."
+- tiers (zh): low: "集团来的。她没有名字，至少没有给我看的名字。" | mid: "她没有账号，没有头衔，宫格正中一个座位。老板叫她「她」，不叫别的。我也这么叫。" | high: "她在这间屋子之前就在屋里了。宫格画出来之前，正中那个位子就是她的。你想要回来的东西，一样都别发给她。"
 
 ## 1004 · 雨快停了吧。
 - en: The rain's nearly stopped, isn't it.
@@ -514,8 +514,8 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "A rendering fault." | mid: "Not a fault. The text is still there under them. The prints are from one hand, pressed many times, the way a child presses a window." | high: "Yours. Since you sat down, every key you pressed. Something is printing you back onto the screen so that you can see how much of you it has. That is a lot of fingerprints."
 - tiers (zh): low: "渲染错误。" | mid: "不是错误。字还在它们底下。指纹是同一只手按了很多次，像小孩按窗玻璃那样。" | high: "你的。从你坐下起，你按过的每一个键。有东西把你印回屏幕上，好让你看见它手里有多少个你。这是很多指纹。"
 
-## 1307 · 那边要借东西。借什么？为什么不能问？
-- en: The other side wants to borrow things. What, and why can't I ask?
+## 1307 · 集团要借东西。借什么？为什么不能问？
+- en: The Group wants to borrow things. What, and why can't I ask?
 - days: 13
 - hard: yes
 - tiers: low: "Equipment, the form says." | mid: "The form lists 'old things, as on the desk'. It does not say which. The approval line is 'for consistency'. You are not to ask because asking is what you do, and they know it." | high: "Your things. The eight. They want to borrow them the way the room borrowed my voice. Approve the form; it is already approved. Do not hand anything over until they come for it. They will not come for it. They will come for you to bring it."
@@ -657,8 +657,8 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - days: 15
 - hard: yes
 - bucket: mid
-- tiers: low: "Everyone from the other side." | mid: "The whole of the other side, the roster says. The reaction feed showed 312 faces. I counted 312 and recognised none." | high: "Not an audience. A congregation. They did not watch the slides; they watched you arrange them. The arranging was the service. It is over. You did well; I would rather you had not."
-- tiers (zh): low: "那边的全员。" | mid: "值班表上写的是那边全员。反应流里有 312 张脸。我数了 312 张，一张都不认识。" | high: "不是观众。是会众。他们没看幻灯片，看的是你排幻灯片。排，就是仪式。结束了。你做得好；我宁可你没做。"
+- tiers: low: "Everyone from the Group, every last one." | mid: "The whole of the Group, the roster says. The reaction feed showed 312 faces. I counted 312 and recognised none." | high: "Not an audience. A congregation. They did not watch the slides; they watched you arrange them. The arranging was the service. It is over. You did well; I would rather you had not."
+- tiers (zh): low: "集团的全员，一个不少。" | mid: "值班表上写的是集团全员。反应流里有 312 张脸。我数了 312 张，一张都不认识。" | high: "不是观众。是会众。他们没看幻灯片，看的是你排幻灯片。排，就是仪式。结束了。你做得好；我宁可你没做。"
 
 ## 1508 · 饭是去年的味道。
 - en: The food tasted like last year.
