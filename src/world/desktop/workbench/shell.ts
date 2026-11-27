@@ -18,7 +18,7 @@ import { FRAMES, frameUrl } from "../kuro/body";
 import { kuroText } from "../kuro/voice";
 import { sentFiles, sentReplies, transcript } from "../messages/transcript";
 import { taskPageId, type AppContext, type PaneId, type Session, type ShellState } from "../model";
-import { boardActions, cardText, finishLabel, lockRow, renderBoardLive, renderBoardRead } from "./board";
+import { boardActions, cardText, finishLabel, lockRow, renderBoardLive, renderBoardRead, setSentFlags, taskSent } from "./board";
 import { meetingWindow } from "./meeting";
 import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
@@ -420,7 +420,7 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
       chips = html`${finish}`;
     } else if (board.view === "ide") {
       // days 1–3's IDE (frozen for looks): 让它补全 and 打快照 stay where they were
-      const label = hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+      const label = !taskSent(task) && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
       const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
       chips = html`${assist}${finish}`;
     }
@@ -437,6 +437,7 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
  */
 export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill): { main: SafeHtml; title: SafeHtml; tools: SafeHtml } {
   const { state, events, session } = ctx;
+  setSentFlags(state.flags);
   const done = state.flags.includes(task.done);
   const live = day === state.day && !done && openWork(state, events)?.tree?.id === task.id;
   const st = shellOf(session, day, task, live);

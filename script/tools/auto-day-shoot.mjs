@@ -594,8 +594,12 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         if (deferred) ok = true; else { ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`); }
         // work-mode: the closing lines and the landing in the recipient's thread wait for 退出工作模式
-        if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); }
-        await settle(); await sleep(3.5); await shotStep("handin-thread"); await toRoom();
+        const st = () => ev("(()=>{const s=window.__nt&&window.__nt.session; if(!s) return ''; const q=s.dialogue.queue; return JSON.stringify({page:s.workbenchPage,wbFull:s.wbFull,focus:s.focus,conv:s.conversation,queue:q.map(x=>x.key+':'+x.ending.kind)})})()");
+        note(`   handin: after print · ${await st()}`);
+        if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); note(`   handin: after 退出工作模式 · ${await st()}`); }
+        // read the closing lines only (settle would also run the interrupts, which open Vivi's unread pages when the
+        // landing is the group thread and walk the screen away before the frame is taken)
+        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread"); await settle(); await toRoom();
       } else
       if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
         // launch (author 2026-11-11): the task's opening page first (Kuro's ask was answered by settle on the row click)
@@ -750,8 +754,12 @@ for (let stepGuard = 0; stepGuard < 90; stepGuard++) {
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         // work-mode: the closing lines and the landing in the recipient's thread wait for 退出工作模式
-        if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); }
-        await settle(); await sleep(3.5); await shotStep("handin-thread"); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
+        const st = () => ev("(()=>{const s=window.__nt&&window.__nt.session; if(!s) return ''; const q=s.dialogue.queue; return JSON.stringify({page:s.workbenchPage,wbFull:s.wbFull,focus:s.focus,conv:s.conversation,queue:q.map(x=>x.key+':'+x.ending.kind)})})()");
+        note(`   handin: after print · ${await st()}`);
+        if (await has("[data-action=work-exit]")) { await sel("[data-action=work-exit]", 1.2); note(`   handin: after 退出工作模式 · ${await st()}`); }
+        // read the closing lines only (settle would also run the interrupts, which open Vivi's unread pages when the
+        // landing is the group thread and walk the screen away before the frame is taken)
+        await readLines(); await sleep(2); note(`   handin: after the lines · ${await st()}`); await shotStep("handin-thread"); await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
         results.push; 
       } else {
       ok = await sel("[data-action=wb-send]", 1.5); if (!ok) ok = await key("Enter") || true;

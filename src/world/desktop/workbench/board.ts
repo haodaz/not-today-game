@@ -203,8 +203,23 @@ function tray(board: TaskBoard, s: BoardState, state: State, events: readonly Ga
  * screen (发给老板 / 发给 Vivi / 发到群里 / 提交) by `board.send.<to>`; a `hand` deliverable (or no
  * deliverable) prints to the desk with `board.print`.
  */
+/**
+ * author 2026-11-27: 「如果当天完成工作，进入工作台也是可以落在完成之后的任务拟真 UI，并且提交工作按钮显示提交了」.
+ * The flags of the render in hand (set by 工作台's render entry): a task whose flag is among them has been
+ * handed in, and its button says so instead of offering to send again.
+ */
+let sentFlags: ReadonlySet<string> = new Set();
+export function setSentFlags(flags: readonly string[]): void {
+  sentFlags = new Set(flags);
+}
+export const taskSent = (task: Task): boolean => sentFlags.has(task.done);
+
 export function finishLabel(task: Task): SafeHtml | null {
   const to = task.deliverable?.to ?? "hand";
+  if (taskSent(task)) {
+    const sent = to !== "hand" ? `board.sent.${to}` : "board.printed";
+    if (hasString(sent)) return tr(sent);
+  }
   const key = to !== "hand" ? `board.send.${to}` : "board.print";
   return hasString(key) ? tr(key) : null;
 }
@@ -272,7 +287,7 @@ function renderIde(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState,
   const src = ideSrc(board, s, ideOps(task, state.day, events));
   const left = html`<div class="ide-left"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${idePages(board, s, session)}${tray(board, s, state, events, session, task.id, "board.ide.sources")}</div>`;
   const mid = html`<div class="ide-mid"><iframe class="ide-frame" data-keep="ide" src="${src}" title="${board.title}" sandbox="allow-scripts"></iframe></div>`;
-  const snapshot = hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+  const snapshot = !taskSent(task) && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
   const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${snapshot}</button>`;
   const header = hasString("board.ide.copilot") ? html`<div class="ide-h">${tr("board.ide.copilot")}</div>` : null;
   const right = html`<div class="ide-right">${header}${ideChat(board, task, ctx)}<div class="bbar">${assist}${finish}</div></div>`;

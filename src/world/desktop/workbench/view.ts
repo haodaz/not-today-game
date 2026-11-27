@@ -9,6 +9,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { getLocale, hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { taskForId } from "@state/days/board";
+import { setSentFlags } from "./board";
 import { openStarters, starterPages } from "@world/dialogue/kuro";
 import { greetingKeyAt } from "../beat";
 import { frameUrl, FRAMES } from "../kuro/body";
@@ -260,6 +261,7 @@ function codePage(state: State, data: WorkbenchDay | null, fill: Fill): SafeHtml
 
 export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, WorkbenchDay> = workbenchDays): { body: SafeHtml; badge: number; tag: SafeHtml | null; bar: SafeHtml } {
   const data = workbenchDay(ctx.state.day, days);
+  setSentFlags(ctx.state.flags);
   const fill: Fill = (s) => fillPlaceholders(s, ctx.state.names);
   const page = ctx.session.workbenchPage;
   const taskId = taskPageId(page);

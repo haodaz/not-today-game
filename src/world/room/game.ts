@@ -2,6 +2,7 @@
 // and the day-loop's actions. Everything the player does appends one event; the runtime
 // (loop/runtime.ts) reacts after each.
 import { dayFile } from "@state/days/table";
+import { taskByFlag, type Task } from "@state/days/tasks";
 import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
 import { desktopApps } from "@world/desktop/apps";
@@ -743,10 +744,35 @@ function firstHold(ctx: ActionContext, id: string | null): void {
 export const TASK_THEN_MS = 1800;
 /** author 2026-11-24 (#48): how long a look at an object in 使用 before Kuro's offer comes. */
 export const OFFER_LOOK_MS = 2200;
+/** The task handed in last today (the newest `task` event of the day whose task has a page), or null. */
+function lastSentToday(ctx: ActionContext): Task | null {
+  const day = ctx.store.getState().day;
+  const events = ctx.store.getEvents();
+  for (let i = events.length - 1; i >= 0; i--) {
+    const e = events[i]!;
+    if (e.day !== day) break;
+    if (e.kind !== "task") continue;
+    const tree = taskByFlag(day, e.flag);
+    if (tree) return tree;
+  }
+  return null;
+}
+
 export function landOnOpenTask(ctx: ActionContext): void {
   const { session } = ctx;
   if (session.view !== "desktop" || shownApp(session) !== "workbench" || session.workbenchPage !== "home") return;
   const open = openWork(ctx.store.getState(), ctx.store.getEvents());
+  // author 2026-11-27: with the day's work handed in, 工作台 opens on that work as it was left (its page,
+  // the button saying it was sent), not on a home page that says there is nothing to do.
+  if (!open) {
+    const last = lastSentToday(ctx);
+    if (last) {
+      const sidebar = session.wbSidebar;
+      workbenchActions["wb-nav"]!(ctx, { page: `task:${last.id}` } as DOMStringMap, null as never);
+      session.wbSidebar = sidebar;
+    }
+    return;
+  }
   if (!open?.tree || ctx.store.getState().flags.includes(open.tree.done)) return;
   // guidance R6: the run's first open keeps its sidebar (the past) however the page lands
   const sidebar = session.wbSidebar;
@@ -1334,8 +1360,11 @@ export const loopActions: Record<string, ActionHandler> = {
     // guidance R14: a sent task's lines read: 工作台 is home again, the next task's row lit (guide).
     else if (ended?.kind === "taskHome") {
       if (session.view === "desktop" && taskPageId(session.workbenchPage) !== null) {
-        session.workbenchPage = "home";
-        session.wbTaskDay = null;
+        // more work today: home, the next task's row lit; the day's last hand-in keeps its own page (2026-11-27)
+        if (openWork(ctx.store.getState(), ctx.store.getEvents())) {
+          session.workbenchPage = "home";
+          session.wbTaskDay = null;
+        }
         // author 2026-11-20 / 2026-11-24 (#61 #63): the work was sent, so the screen lands in the thread
         // of whoever it went to (the file sits there; their answer comes there), not on 工作台's home.
         session.wbFull = false;
