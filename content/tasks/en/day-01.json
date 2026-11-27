@@ -4,12 +4,12 @@
   "tasks": [
     {
       "id": "task3",
-      "title": "Future Intelligence, the technical story (v17)",
+      "title": "Future Intelligence BP: the technical story (v17)",
       "app": "docs",
       "done": "task_merge_done",
       "board": {
         "kind": "table",
-        "title": "Future Intelligence, the technical story (v17)",
+        "title": "Future Intelligence BP: the technical story (v17)",
         "columns": [
           "",
           "What Lao Wang wants made clear",
@@ -367,7 +367,7 @@
       },
       "deliverable": {
         "id": "d1-tech",
-        "label": "the technical story v17",
+        "label": "the BP's technical story v17",
         "to": "boss"
       },
       "judge": {

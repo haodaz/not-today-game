@@ -54,11 +54,12 @@ describe("the loader is strict", () => {
 describe("a file is listed from its day, its flag and the opened Vivi deliverable", () => {
   const opened = (ids: string[]) => new Set(ids);
   it("from the `from` day", () => {
-    // Vivi's first page is there from day 1 now (day graph); v18 still arrives on day 3.
+    // author 2026-11-27: the folder is the BP's version history; v18 is made on day 3's night, so the copy
+    // saved at 02:40 by something else is there from day 4.
     const v18 = fileById("c-v18")!;
-    expect(v18.from).toBe(3);
-    expect(fileListed(v18, 2, [], opened([]))).toBe(false);
-    expect(fileListed(v18, 3, [], opened([]))).toBe(true);
+    expect(v18.from).toBe(4);
+    expect(fileListed(v18, 3, [], opened([]))).toBe(false);
+    expect(fileListed(v18, 4, [], opened([]))).toBe(true);
   });
   it("afterOpen: only once the player has opened the named deliverable", () => {
     const vivi = fileById("d-vivi-plan1")!;
@@ -120,7 +121,7 @@ describe("opening a file: one event, the onOpen line once a day, the body", () =
     expect(ctx.store.getEvents().filter((e) => e.kind === "open" && e.target === "file:c-v01")).toHaveLength(2);
   });
 
-  it("a text body shows the contract's clauses (the contract files carry their own text since 2026-11-12)", () => {
+  it("a text body shows the file's own lines (v16: what Vivi's version says on each page, author 2026-11-27)", () => {
     const ctx = ctxOf(storeAt(1));
     openFilesApp(ctx, "files");
     act(ctx, "file-open", { file: "c-v16" });

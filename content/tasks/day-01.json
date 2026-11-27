@@ -4,12 +4,12 @@
   "tasks": [
     {
       "id": "task3",
-      "title": "未来智能的技术表达（v17）",
+      "title": "未来智能 BP · 技术表达（v17）",
       "app": "docs",
       "done": "task_merge_done",
       "board": {
         "kind": "table",
-        "title": "未来智能的技术表达（v17）",
+        "title": "未来智能 BP · 技术表达（v17）",
         "columns": [
           "",
           "老王要讲清楚的",
@@ -367,7 +367,7 @@
       },
       "deliverable": {
         "id": "d1-tech",
-        "label": "技术表达 v17",
+        "label": "BP 技术表达 v17",
         "to": "boss"
       },
       "judge": {

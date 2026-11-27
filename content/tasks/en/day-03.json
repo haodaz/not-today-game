@@ -893,12 +893,12 @@
     },
     {
       "id": "task3",
-      "title": "Future Intelligence, the technical story (v18)",
+      "title": "Future Intelligence BP: the technical story (v18)",
       "app": "docs",
       "done": "task_d3_3",
       "board": {
         "kind": "table",
-        "title": "Future Intelligence, the technical story (v18)",
+        "title": "Future Intelligence BP: the technical story (v18)",
         "columns": [
           "",
           "What Lao Wang asked for",
@@ -1399,7 +1399,7 @@
       },
       "deliverable": {
         "id": "d3-theory",
-        "label": "the AI theory (after the meeting)",
+        "label": "the BP's technical story v18 (after the call)",
         "to": "boss"
       },
       "judge": {

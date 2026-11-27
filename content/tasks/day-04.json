@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "投资人材料 1/3：「意识」",
+      "title": "尽调材料 1/3：「意识」",
       "app": "docs",
       "done": "task_d4_1",
       "board": {
@@ -100,9 +100,9 @@
             "id": "d2",
             "text": "意识跟我们没关系",
             "from": {
-              "file": "c-v17"
+              "file": "dd-list"
             },
-            "hint": "在合作协议里"
+            "hint": "在投资人尽调清单里"
           }
         ],
         "kuro": {

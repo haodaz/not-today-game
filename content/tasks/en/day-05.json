@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Investor material 2/3: \"The double\"",
+      "title": "Due-diligence material 2/3: \"The double\"",
       "app": "docs",
       "done": "task_d5_1",
       "board": {
@@ -86,9 +86,9 @@
             "id": "c4",
             "text": "It may not sign for you",
             "from": {
-              "file": "c-v17"
+              "file": "dd-list"
             },
-            "hint": "in the agreement's signing clause"
+            "hint": "in the last item of the due-diligence list"
           },
           {
             "id": "d1",

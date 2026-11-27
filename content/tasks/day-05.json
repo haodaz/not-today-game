@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "投资人材料 2/3：「分身」",
+      "title": "尽调材料 2/3：「分身」",
       "app": "docs",
       "done": "task_d5_1",
       "board": {
@@ -86,9 +86,9 @@
             "id": "c4",
             "text": "它不能替你签字",
             "from": {
-              "file": "c-v17"
+              "file": "dd-list"
             },
-            "hint": "在合作协议的签字条款里"
+            "hint": "在尽调清单的最后一条里"
           },
           {
             "id": "d1",

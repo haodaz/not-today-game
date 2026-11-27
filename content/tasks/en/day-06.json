@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Investor material 3/3: \"The entity\"",
+      "title": "Due-diligence material 3/3: \"The entity\"",
       "app": "docs",
       "done": "task_d6_1",
       "board": {

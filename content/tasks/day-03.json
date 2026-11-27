@@ -893,12 +893,12 @@
     },
     {
       "id": "task3",
-      "title": "未来智能的技术表达（v18）",
+      "title": "未来智能 BP · 技术表达（v18）",
       "app": "docs",
       "done": "task_d3_3",
       "board": {
         "kind": "table",
-        "title": "未来智能的技术表达（v18）",
+        "title": "未来智能 BP · 技术表达（v18）",
         "columns": [
           "",
           "老王在会上要的",
@@ -1399,7 +1399,7 @@
       },
       "deliverable": {
         "id": "d3-theory",
-        "label": "AI 理论（会后版）",
+        "label": "BP 技术表达 v18（会后版）",
         "to": "boss"
       },
       "judge": {
