@@ -15,7 +15,7 @@ import { openStarters } from "@world/dialogue/kuro";
 const openStartersOf = (store: Store, ctx: ActionContext) => openStarters(store.getState(), store.getEvents());
 import { repeatEntries } from "@world/desktop/kuro/repeat";
 import { initialSession } from "@world/desktop/model";
-import { coreAnswer, PITY_FROM } from "@world/dialogue/core";
+import { coreAnswer, DICE_FROM, PITY_FROM } from "@world/dialogue/core";
 import { bucketNow, PAGE, playerBox, starterPages } from "@world/dialogue/kuro";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { hasString, setLocale, t } from "@world/i18n";
@@ -58,43 +58,43 @@ function runWith(day: number, q: number, bucket: Bucket, want: "success" | "fail
 }
 
 /** Day 3's q1 carries a layered answer in both languages; its zh low tier. */
-const D3 = kuroDay(3)!;
-const Q1 = D3.layered.find((l) => l.unlock === 302)!;
+const D3 = kuroDay(4)!; // day 4: the first day the dice are rolled (DICE_FROM)
+const Q1 = D3.layered.find((l) => l.unlock === 401)!;
 
 describe("a starter is answered by the core, never the function", () => {
   it("online: the function is not called; the bucket's zh tier is said as written and logged offline", async () => {
     const bodies: unknown[] = [];
     const online: KuroOnline = { turn: async (b) => (bodies.push(b), { mode: "turn", reply: "model", turnsLeft: 4 }), judge: async () => ({ mode: "judge", judgement: { truth: 0, values: 0, bond: 0, evidence: [] } }) };
     setKuroOnlineForTests(online);
-    const store = storeAt(3, runWith(3, 302, "low", "plain"));
+    const store = storeAt(4, runWith(4, 401, "low", "plain"));
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "302" });
+    act(ctx, "kuro-q", { q: "401" });
     await flush();
     expect(bodies).toHaveLength(0);
-    expect(chats(store)[0]).toMatchObject({ q: 302, answer: Q1.zh!.low, offline: true });
+    expect(chats(store)[0]).toMatchObject({ q: 401, answer: Q1.zh!.low, offline: true });
     expect(chats(store)[0]!.taboo).toBeUndefined();
   });
 
   it("the tier follows the bucket: low, mid, high (from state.affinity, as the ending reads it)", () => {
     for (const [affinity, tier] of [[0, "low"], [30, "mid"], [60, "high"]] as const) {
-      const store = storeAt(3, runWith(3, 302, tier, "plain"), affinity);
+      const store = storeAt(4, runWith(4, 401, tier, "plain"), affinity);
       expect(bucketNow(store.getState())).toBe(tier);
-      const a = coreAnswer({ day: D3, runId: store.getRunId(), bucket: tier, q: 302, locale: "zh", events: store.getEvents(), followup: null })!;
+      const a = coreAnswer({ day: D3, runId: store.getRunId(), bucket: tier, q: 401, locale: "zh", events: store.getEvents(), followup: null })!;
       expect(a.answer).toBe(Q1.zh![tier]);
       expect(a.layered).toBe(true);
     }
     // The English line on an en turn.
-    const a = coreAnswer({ day: D3, runId: "x", bucket: "mid", q: 302, locale: "en", events: [], followup: null })!;
+    const a = coreAnswer({ day: D3, runId: "x", bucket: "mid", q: 401, locale: "en", events: [], followup: null })!;
     expect(a.answer).toBe(Q1.mid);
   });
 
   it("大成功: the tier, the unreadable word on its own line, the follow-up; blood (SAN −1, the hand bleeds)", async () => {
-    const store = storeAt(3, runWith(3, 302, "low", "success"));
+    const store = storeAt(4, runWith(4, 401, "low", "success"));
     const san = store.getState().san;
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "302" });
+    act(ctx, "kuro-q", { q: "401" });
     const ev = chats(store)[0]!;
     expect(ev.taboo).toBe("blood");
     const lines = ev.answer!.split("\n");
@@ -103,19 +103,19 @@ describe("a starter is answered by the core, never the function", () => {
     expect(lines[1]!.length).toBeLessThanOrEqual(5);
     if (hasString("kuro.unreadable")) expect(lines[2]).toBe(t("kuro.unreadable"));
     expect(store.getState().san).toBe(san - 3); // meters-v2: a taboo answer −2, the nosebleed one more
-    expect(bleedingToday(store.getEvents(), 3)).toBe(true);
+    expect(bleedingToday(store.getEvents(), 4)).toBe(true);
   });
 
   it("大失败: flicker — nothing shown or remembered, the turn spent; one taboo a day, then the plain tier", async () => {
-    const store = storeAt(3, runWith(3, 302, "low", "failure"));
+    const store = storeAt(4, runWith(4, 401, "low", "failure"));
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "302" });
-    expect(chats(store)[0]).toMatchObject({ q: 302, taboo: "flicker", forgotten: true, answer: "" });
+    act(ctx, "kuro-q", { q: "401" });
+    expect(chats(store)[0]).toMatchObject({ q: 401, taboo: "flicker", forgotten: true, answer: "" });
     expect(store.getState().chatMemory.recent).toEqual([]);
     expect(store.getState().chatTurnsToday).toBe(1);
     // The same day's second layered ask rolls but plays nothing more.
-    const again = coreAnswer({ day: D3, runId: store.getRunId(), bucket: "low", q: 302, locale: "zh", events: store.getEvents(), followup: null })!;
+    const again = coreAnswer({ day: D3, runId: store.getRunId(), bucket: "low", q: 401, locale: "zh", events: store.getEvents(), followup: null })!;
     expect(again.taboo).toBeNull();
     expect(again.answer).toBe(Q1.zh!.low);
   });
@@ -123,17 +123,17 @@ describe("a starter is answered by the core, never the function", () => {
   it("the thresholds move with the bucket; a 大成功 and a 大失败 both exist at every bucket", () => {
     expect(THRESHOLDS.low.failFrom).toBeGreaterThan(THRESHOLDS.high.success);
     for (const b of ["low", "mid", "high"] as const) {
-      expect(() => runWith(3, 302, b, "success")).not.toThrow();
-      expect(() => runWith(3, 302, b, "failure")).not.toThrow();
+      expect(() => runWith(4, 401, b, "success")).not.toThrow();
+      expect(() => runWith(4, 401, b, "failure")).not.toThrow();
     }
   });
 
   it("a red-blue line is said as written and never rolls; a starter without a locked line gets its written answer", () => {
     // Day 3 q3 is a red-blue line (English, as content keeps the uncanny ones).
-    const red = coreAnswer({ day: D3, runId: "x", bucket: "low", q: 303, locale: "zh", events: [], followup: null })!;
+    const red = coreAnswer({ day: D3, runId: "x", bucket: "low", q: 403, locale: "zh", events: [], followup: null })!;
     expect(red.layered).toBe(false);
     expect(red.roll).toBeNull();
-    expect(red.answer).toBe(D3.locked.find((l) => l.unlock === 303)!.text);
+    expect(red.answer).toBe(D3.locked.find((l) => l.unlock === 403)!.text);
     // A starter with no locked line (a synthetic day): null → the caller's written answer.
     const bare = parseKuroDay("# Day 1\n**Idiom of the day (constant):** Hi.\n## Starter questions\n| 1 | 一 | one |  |\n## Offline answers\n- free text → \"Go on.\"\n## Never\n- x\n", "t");
     expect(coreAnswer({ day: bare, runId: "x", bucket: "low", q: 1, locale: "zh", events: [], followup: null })).toBeNull();
@@ -154,6 +154,26 @@ describe("a starter is answered by the core, never the function", () => {
   });
 });
 
+describe("the dice wait for day 4 (author 2026-11-27)", () => {
+  it("days 1–3: whatever the roll, a layered answer is its tier as written; no flicker, no blood", () => {
+    expect(DICE_FROM).toBe(4);
+    for (const [dayNo, q] of [[1, 104], [2, 211], [3, 302]] as const) {
+      const day = kuroDay(dayNo)!;
+      const tier = day.layered.find((l) => l.unlock === q)!;
+      for (const want of ["failure", "success"] as const) {
+        const a = coreAnswer({ day, runId: runWith(dayNo, q, "low", want), bucket: "low", q, locale: "zh", events: [], followup: "x" })!;
+        expect(a.taboo, `day ${dayNo} ${want}`).toBeNull();
+        expect(a.answer).toBe(tier.zh!.low);
+      }
+    }
+  });
+  it("day 4: the same rolls are a flicker and a nosebleed again", () => {
+    const day = kuroDay(4)!;
+    expect(coreAnswer({ day, runId: runWith(4, 401, "low", "failure"), bucket: "low", q: 401, locale: "zh", events: [], followup: null })!.taboo).toBe("flicker");
+    expect(coreAnswer({ day, runId: runWith(4, 401, "low", "success"), bucket: "low", q: 401, locale: "zh", events: [], followup: null })!.taboo).toBe("blood");
+  });
+});
+
 describe("the guarantee (从第 10 天起必出一次)", () => {
   const D = kuroDay(PITY_FROM)!;
   const L = D.layered[0]!;
@@ -167,8 +187,8 @@ describe("the guarantee (从第 10 天起必出一次)", () => {
     }
   });
   it("never before day 10; never once the run has had one; one a day still holds", () => {
-    const early = kuroDay(3)!;
-    const a = coreAnswer({ day: early, runId: runWith(3, 302, "low", "plain"), bucket: "low", q: 302, locale: "zh", events: [], followup: null })!;
+    const early = kuroDay(4)!;
+    const a = coreAnswer({ day: early, runId: runWith(4, 401, "low", "plain"), bucket: "low", q: 401, locale: "zh", events: [], followup: null })!;
     expect(a.taboo).toBeNull();
     const had = [{ kind: "chat", day: 4, q: 1, said: "x", answer: "y", offline: true, taboo: "blur" }] as never;
     const open = D.starters.find((s) => s.n === L.unlock)!;

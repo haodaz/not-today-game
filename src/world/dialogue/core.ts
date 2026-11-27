@@ -22,6 +22,13 @@ import { tabooUsedToday } from "./taboo";
  */
 export const PITY_FROM = 10;
 
+/**
+ * The dice wait for the fourth day (author 2026-11-27: days 1–3 are the ordinary stretch; the walk of
+ * that day showed a question on the first night answered by nothing at all — a flicker, which a new
+ * player can only read as a bug). Before this day a layered answer is always its tier, as written.
+ */
+export const DICE_FROM = 4;
+
 /** The run has had a taboo on any day. */
 export const tabooEver = (events: readonly GameEvent[]): boolean => events.some((e) => e.kind === "chat" && e.taboo !== undefined);
 
@@ -63,6 +70,7 @@ export function coreAnswer(i: CoreInput): CoreAnswer | null {
   if (!locked) return null;
   if (!locked.layered) return { answer: locked.text, taboo: null, layered: false, roll: null };
   const roll = d100(i.runId, i.day.day, locked.q);
+  if (i.day.day < DICE_FROM) return { answer: locked.text, taboo: null, layered: true, roll };
   if (tabooUsedToday(i.events, i.day.day)) return { answer: locked.text, taboo: null, layered: true, roll };
   if (i.day.day >= PITY_FROM && !tabooEver(i.events)) return { answer: locked.text, taboo: locked.taboo ?? "blur", layered: true, roll };
   const outcome = outcomeOf(roll, i.bucket);

@@ -240,6 +240,17 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     if (e.kind === "task" && file.items.some((it) => it.when === "night" && it.done.kind === "flag" && it.done.flag === e.flag)) clock = advanceTo(clock, NIGHT_WORK_DONE);
     // …and what was sent that late is answered a quarter of an hour on (the card keeps its own time, `e.t`)
     if (e.kind === "give" && e.t !== undefined && e.t >= NIGHT_WORK_DONE) clock = advanceTo(clock, plusMinutes(e.t, NIGHT_ANSWER_MINUTES));
+    // author 2026-11-24 (#61 #63), found still open on the 2026-11-27 walk: a hand-in lands in the thread of
+    // whoever it went to through the `taskHome` ending of its closing lines — and a board task whose item has
+    // no closing lines (day 3's engine, days 4–9) had no ending to carry it, so the recipient's answer was
+    // never shown. Such a hand-in says one plain line and lands the same way.
+    if (e.kind === "give" && e.t !== undefined) {
+      const sent = file.items.find((it) => it.done.kind === "flag" && taskByFlag(day, it.done.flag)?.deliverable?.id === e.deliverableId);
+      const to = sent && sent.done.kind === "flag" ? taskByFlag(day, sent.done.flag)?.deliverable?.to : undefined;
+      if (sent && !sent.onDone && (to === "boss" || to === "partner" || to === "group") && hasString("task.sent")) {
+        dialogue = push(dialogue, { key: `d${day}:${sent.id}:sent`, lines: [{ k: "narration", t: t("task.sent") }], ending: { kind: "taskHome", to } });
+      }
+    }
     if (e.kind === "task" && e.mode !== "auto") {
       // A work task played from the workbench: its start, then the chosen path (content/tasks).
       const tree = taskByFlag(day, e.flag);
