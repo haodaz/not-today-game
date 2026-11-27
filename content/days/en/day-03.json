@@ -94,7 +94,8 @@
         {
           "k": "speaker",
           "who": "father_young",
-          "t": "Play with it. Don't press that key."
+          "t": "Play with it. Don't press that key.",
+          "pose": "smile"
         },
         {
           "k": "narration",
@@ -127,7 +128,8 @@
         {
           "k": "speaker",
           "who": "father_young",
-          "t": "Give it here."
+          "t": "Give it here.",
+          "pose": "pager"
         },
         {
           "k": "narration",
@@ -150,7 +152,8 @@
         {
           "k": "speaker",
           "who": "mother_young",
-          "t": "Go to sleep. Your dad isn't coming home tonight."
+          "t": "Go to sleep. Your dad isn't coming home tonight.",
+          "pose": "tired"
         },
         {
           "k": "inner",

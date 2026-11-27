@@ -105,8 +105,9 @@
         },
         {
           "k": "speaker",
-          "who": "family",
-          "t": "Hello? ... Have you eaten? Is the money enough?"
+          "who": "mother_mid",
+          "t": "Hello? ... Have you eaten? Is the money enough?",
+          "pose": "phone"
         },
         {
           "k": "inner",
@@ -114,7 +115,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_mid",
           "t": "Good. Is it cold there? I can't hear you, speak up."
         },
         {

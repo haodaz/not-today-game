@@ -94,7 +94,8 @@
         {
           "k": "speaker",
           "who": "father_young",
-          "t": "玩吧。别按那个键。"
+          "t": "玩吧。别按那个键。",
+          "pose": "smile"
         },
         {
           "k": "narration",
@@ -127,7 +128,8 @@
         {
           "k": "speaker",
           "who": "father_young",
-          "t": "给我。"
+          "t": "给我。",
+          "pose": "pager"
         },
         {
           "k": "narration",
@@ -150,7 +152,8 @@
         {
           "k": "speaker",
           "who": "mother_young",
-          "t": "睡吧。你爸今晚不回来了。"
+          "t": "睡吧。你爸今晚不回来了。",
+          "pose": "tired"
         },
         {
           "k": "inner",

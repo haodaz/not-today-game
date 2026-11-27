@@ -80,13 +80,15 @@
         },
         {
           "k": "speaker",
-          "who": "family",
-          "t": "Call when you land. Doesn't have to be long. Two rings and hang up, then I know you're there."
+          "who": "mother_mid",
+          "t": "Call when you land. Doesn't have to be long. Two rings and hang up, then I know you're there.",
+          "pose": "worry"
         },
         {
           "k": "speaker",
-          "who": "father",
-          "t": "If the money runs short, say so."
+          "who": "father_mid",
+          "t": "If the money runs short, say so.",
+          "pose": "gruff"
         },
         {
           "k": "inner",

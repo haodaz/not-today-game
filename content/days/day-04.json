@@ -105,8 +105,9 @@
         },
         {
           "k": "speaker",
-          "who": "family",
-          "t": "喂？……吃饭了没有？钱够不够？"
+          "who": "mother_mid",
+          "t": "喂？……吃饭了没有？钱够不够？",
+          "pose": "phone"
         },
         {
           "k": "inner",
@@ -114,7 +115,7 @@
         },
         {
           "k": "speaker",
-          "who": "family",
+          "who": "mother_mid",
           "t": "够就行。那边冷不冷。听不清，你大点声。"
         },
         {

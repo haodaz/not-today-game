@@ -80,13 +80,15 @@
         },
         {
           "k": "speaker",
-          "who": "family",
-          "t": "到了打电话。不用长，响两声就挂，我就知道你到了。"
+          "who": "mother_mid",
+          "t": "到了打电话。不用长，响两声就挂，我就知道你到了。",
+          "pose": "worry"
         },
         {
           "k": "speaker",
-          "who": "father",
-          "t": "钱不够就说。"
+          "who": "father_mid",
+          "t": "钱不够就说。",
+          "pose": "gruff"
         },
         {
           "k": "inner",

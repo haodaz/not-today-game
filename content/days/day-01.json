@@ -250,7 +250,8 @@
         {
           "k": "speaker",
           "who": "mother_young",
-          "t": "老师打电话来了。"
+          "t": "老师打电话来了。",
+          "pose": "sigh"
         },
         {
           "k": "speaker",
@@ -264,7 +265,8 @@
         {
           "k": "speaker",
           "who": "mother_young",
-          "t": "一个游戏机，饿不死人。吃饭。"
+          "t": "一个游戏机，饿不死人。吃饭。",
+          "pose": "firm"
         },
         {
           "k": "narration",
