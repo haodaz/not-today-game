@@ -760,7 +760,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .sh-chip.primary{background:#2F6FEB;border-color:#2F6FEB;color:#FFFFFF}
 .wb .sh-chip:disabled{opacity:.4;cursor:default}
 /* author 2026-11-27: the hand-in button after the hand-in — where the work went, in the done chip's green, not a faded "send" */
-.wb .sh-chip.sent:disabled{opacity:1;background:#EAF4EE;border-color:#BFDDCB;color:#2F7A4F}
+.wb .sh-chip.sent:disabled{opacity:1;background:#EAF4EE;border-color:#BFDDCB;color:#2F7A4F;margin-left:auto}
 /* The explorer (R2): a VS Code tree — folder rows 28, file rows 26, 13 px, 8 indent per level. */
 .wb .sh-folder{display:flex;flex-direction:column}
 /* R12.1: the rows keep their own heights, top-aligned, never stretched to the card; the body
