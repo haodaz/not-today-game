@@ -259,7 +259,14 @@
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",
-      "when": "night"
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "Nobody asked for me all afternoon. The work has been handed over."
+          }
+        ]
+      }
     },
     {
       "id": "dpick",
@@ -267,7 +274,6 @@
       "unlock": "event:delivery:arrives:dinner",
       "done": "event:pickup:dinner",
       "required": true,
-      "when": "night",
       "sfx": "doorbell",
       "onUnlock": {
         "say": [
@@ -281,12 +287,25 @@
             "t": "Dinner is here."
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Dinner on the little table. Before you sit, the phone dings."
+          },
+          {
+            "k": "inner",
+            "t": "TingTalk. The boss."
+          }
+        ],
+        "then": "desk"
       }
     },
     {
       "id": "deat",
-      "text": "Dinner is on the table by the window. Eat.",
-      "unlock": "done:dpick",
+      "text": "Dinner has gone cold. Eat it at the window anyway.",
+      "unlock": "done:task4",
       "done": "event:eat:dinner",
       "required": true,
       "when": "night",
@@ -341,6 +360,7 @@
   },
   "call": {
     "at": "18:30",
+    "afterPickup": "dinner",
     "length": "1:12:00",
     "lines": [
       {

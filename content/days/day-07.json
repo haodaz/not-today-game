@@ -259,7 +259,14 @@
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",
-      "when": "night"
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "一下午没人找我。活都交接出去了。"
+          }
+        ]
+      }
     },
     {
       "id": "dpick",
@@ -267,7 +274,6 @@
       "unlock": "event:delivery:arrives:dinner",
       "done": "event:pickup:dinner",
       "required": true,
-      "when": "night",
       "sfx": "doorbell",
       "onUnlock": {
         "say": [
@@ -281,12 +287,25 @@
             "t": "晚饭到了。"
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "饭放小桌上。还没坐下，手机叮了一声。"
+          },
+          {
+            "k": "inner",
+            "t": "汀汀。老板。"
+          }
+        ],
+        "then": "desk"
       }
     },
     {
       "id": "deat",
-      "text": "晚饭在窗边饭桌上，吃饭吧。",
-      "unlock": "done:dpick",
+      "text": "晚饭凉了。还是去窗边吃了吧。",
+      "unlock": "done:task4",
       "done": "event:eat:dinner",
       "required": true,
       "when": "night",
@@ -341,6 +360,7 @@
   },
   "call": {
     "at": "18:30",
+    "afterPickup": "dinner",
     "length": "1:12:00",
     "lines": [
       {

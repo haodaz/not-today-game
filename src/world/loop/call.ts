@@ -77,7 +77,13 @@ export function callPhase(call: Call | null, events: readonly GameEvent[], day: 
   if (ended(events, day)) return "ended";
   if (answered(events, day)) return connected ? "inCall" : "waiting";
   // the ask waits for the meal it interrupts, when content names one
-  if (call.afterPickup && !events.some((e) => e.kind === "pickup" && e.day === day && e.meal === call.afterPickup)) return "before";
+  if (call.afterPickup) {
+    // The meal it interrupts is the trigger (author's days 3, 7, 9: the dinner is at the door, then the
+    // boss). Once that meal is taken in the ask is due whatever the clock reads: the answer moves the
+    // clock on to the call's hour. (2026-11-27: days 7 and 9 had nothing in the afternoon to carry the
+    // clock to 18:30, so the call never came and the day could not end.)
+    return events.some((e) => e.kind === "pickup" && e.day === day && e.meal === call.afterPickup) ? "ask" : "before";
+  }
   return nowTime >= call.at ? "ask" : "before";
 }
 
