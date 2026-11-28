@@ -273,10 +273,12 @@ describe("frameState: what the uniforms are", () => {
     expect(s).toMatchObject({ kindA: KIND.other, kindB: 0, amtA: 0.5, amtB: 0, breath: 0.008, period: 5, grain: 0.05, glitch: 0, split: 0, move: 1 });
   });
 
-  it("day 17: white leads (0.85 over 0.4), so it breathes 0.004 / 9 s", () => {
+  // author 2026-11-28: no white days: day 17 is the other side breaking up, day 18 the other side whole
+  it("day 17: the other side leads with the glitch over it; day 18: the other side alone, no glitch", () => {
     const p = plan(17);
-    expect(leadOf(p.layers)!.stage).toBe("white");
-    expect(frameState(p, 0, false)).toMatchObject({ kindA: KIND.other, kindB: KIND.white, amtA: 0.4, amtB: 0.85, breath: 0.004, period: 9 });
+    expect(leadOf(p.layers)!.stage).toBe("other");
+    expect(frameState(p, 0, false)).toMatchObject({ kindA: KIND.other, kindB: KIND.glitch, amtA: 1, glitch: 1 });
+    expect(frameState(plan(18), 0, false)).toMatchObject({ kindA: KIND.other, kindB: 0, amtA: 1, amtB: 0, glitch: 0 });
   });
 
   it("day 16: glitch on, the RGB split rests at 2 px and widens to 8 in a burst; blocks jump only in a burst", () => {
@@ -511,15 +513,15 @@ describe("the renderer, against a recording fake context", () => {
     expect(counts).toEqual({ room: [2], desk: [3], door: [0] });
   });
 
-  it("day 17: two stage photos, 60 + 40 particles; day 11 (wall): no particle pass", async () => {
+  it("day 17: two stage photos (the other side and the glitch) and their particles; day 11 (wall): no particle pass", async () => {
     const g = fakeGl();
     const r = createFxRenderer(g.gl, { loadImage });
     r.setScene(plan(17), BACKDROPS.room);
     await flush();
     r.frame(0, 0);
     const url = (unit: number) => (g.units.get(unit) as { image?: { url: string } } | null)?.image?.url;
-    expect([url(1), url(2)]).toEqual(["/room/fx/room_other.jpg", "/room/fx/room_white.jpg"]);
-    expect(g.named("drawArrays").map(([, a]) => a[2])).toEqual([4, 60, 40]);
+    expect([url(1), url(2)]).toEqual(["/room/fx/room_other.jpg", "/room/fx/room_glitch.jpg"]);
+    expect(g.named("drawArrays").map(([, a]) => a[2])).toEqual([4, particleCount("other"), particleCount("glitch")].filter((n) => n > 0));
     const g2 = fakeGl();
     const r2 = createFxRenderer(g2.gl, { loadImage });
     r2.setScene(plan(11), BACKDROPS.room);

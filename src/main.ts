@@ -59,6 +59,7 @@ import { net, type RunSnapshot } from "@net/supabase";
 import { pushDue } from "@net/sync";
 import { RUN_VERSION as RUN_FORMAT_VERSION } from "@state/saves";
 import { readCoat } from "@world/room/coat";
+import { textLifeForGame } from "@world/desktop/textlife/layer";
 
 const search = window.location.search;
 const params = new URLSearchParams(search);
@@ -174,6 +175,7 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     splat: splatForGame(window),
     // The breathing collapse on the stills: a WebGL2 shader over the photo stack (the stack is its fallback).
     fx: fxForGame(window),
+    textLife: textLifeForGame(),
     // Moving is pointing: hover, picking, back gestures, the head turn.
     nav: createNav(),
     // The day-18 pull-out's frames (splat or photo fallback).

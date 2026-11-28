@@ -308,8 +308,12 @@ html,body{height:100%;overflow:hidden}
 .missing{outline:1px dashed var(--red);color:var(--red);font-family:var(--mono);font-size:11px}
 /* Ring layer (screen and beyond): stronger each ring; calm daytime renders as software. */
 .monitor[data-ring="screen"]{--tint:4deg;--drift-x:1px}
-.monitor[data-ring="desk"]{--tint:8deg;--drift-x:1px;--drift-y:1px;--blur:.2px}
-.monitor[data-ring="wall"],.monitor[data-ring="room"],.monitor[data-ring="door"]{--tint:12deg;--drift-x:2px;--drift-y:1px;--blur:.35px}
+/* 2026-11-28: no blur on the screen (it read as a veil over nine days of text): the tint and the drift stay */
+.monitor[data-ring="desk"]{--tint:8deg;--drift-x:1px;--drift-y:1px}
+.monitor[data-ring="wall"],.monitor[data-ring="room"],.monitor[data-ring="door"]{--tint:12deg;--drift-x:2px;--drift-y:1px}
+/* The screen's own collapse (textlife): creatures made of the screen's characters, over the windows, under the bar and the dock; never takes a click */
+.monitor .os > canvas.textlife{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:8;mix-blend-mode:multiply}
+.monitor.night .os > canvas.textlife{mix-blend-mode:screen;filter:invert(1)}
 button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* author 2026-11-27 (#103): `.msgs` is also the chat list (overflow) — on the dock tile it cut the badge and the dot */
 .dock .app{border:0;overflow:visible}

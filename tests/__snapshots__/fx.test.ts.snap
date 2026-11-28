@@ -1,9 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`the collapse is in the photos > snapshot: the desktop on days 13 and 17 keeps only the pores on the left monitor and the dimmed text 1`] = `
+exports[`the collapse is in the photos > snapshot: the desktop on days 13 and 17 keeps only the pores on the left monitor 1`] = `
 {
   "day 13": "<div class="stage one-monitor" data-day="13" data-beat="work" data-focus="left" data-fx="pores" style="--fx-pores:0.5">",
-  "day 17": "<div class="stage one-monitor" data-day="17" data-beat="work" data-focus="left" data-fx="pores dim" style="--fx-pores:0.3">",
+  "day 17": "<div class="stage one-monitor" data-day="17" data-beat="work" data-focus="left" data-fx="pores" style="--fx-pores:1">",
 }
 `;
 
@@ -57,20 +57,20 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   "desk day 17": [
     [
       "other",
-      0.4,
+      1,
       "/room/fx/desk_other.jpg",
     ],
     [
-      "white",
-      0.85,
-      "/room/fx/desk_white.jpg",
+      "glitch",
+      0.6,
+      "/room/fx/desk_glitch.jpg",
     ],
   ],
   "desk day 18": [
     [
-      "white",
+      "other",
       1,
-      "/room/fx/desk_white.jpg",
+      "/room/fx/desk_other.jpg",
     ],
   ],
   "door day 10": [],
@@ -117,20 +117,20 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   "door day 17": [
     [
       "other",
-      0.4,
+      1,
       "/room/fx/door_other.jpg",
     ],
     [
-      "white",
-      0.85,
-      "/room/fx/door_white.jpg",
+      "glitch",
+      0.6,
+      "/room/fx/door_glitch.jpg",
     ],
   ],
   "door day 18": [
     [
-      "white",
+      "other",
       1,
-      "/room/fx/door_white.jpg",
+      "/room/fx/door_other.jpg",
     ],
   ],
   "room day 10": [],
@@ -177,20 +177,20 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   "room day 17": [
     [
       "other",
-      0.4,
+      1,
       "/room/fx/room_other.jpg",
     ],
     [
-      "white",
-      0.85,
-      "/room/fx/room_white.jpg",
+      "glitch",
+      0.6,
+      "/room/fx/room_glitch.jpg",
     ],
   ],
   "room day 18": [
     [
-      "white",
+      "other",
       1,
-      "/room/fx/room_white.jpg",
+      "/room/fx/room_other.jpg",
     ],
   ],
 }

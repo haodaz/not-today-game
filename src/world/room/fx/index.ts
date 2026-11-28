@@ -36,8 +36,6 @@ export interface FxPlan {
   readonly layers: readonly FxLayer[];
   /** The desktop's left monitor takes the pore tile on its `.os` from ring room; the level, or null. */
   readonly pores: number | null;
-  /** Days 17 and 18: the desktop's text is at 60 %. */
-  readonly dimText: boolean;
 }
 
 /** The stack by day (spec): `[stage, opacity]` bottom to top. Days not listed are clean. */
@@ -48,16 +46,17 @@ export const STACK_BY_DAY: Readonly<Record<number, readonly (readonly [FxStage, 
   14: [["other", 0.8]],
   15: [["other", 1]],
   16: [["other", 1], ["glitch", 0.45]],
-  17: [["other", 0.4], ["white", 0.85]],
-  18: [["white", 1]],
+  // author 2026-11-28: 「18天应该是血肉最多的，白乎乎的效果很奇怪」, 「走廊是白的和屋里啥样其实没关系啊」. The last two
+  // days were the washed-out `white` photo (a misreading of the delivery line about the corridor). The room
+  // stays on the other side to the end: day 17 breaks up most, day 18 has arrived and holds.
+  17: [["other", 1], ["glitch", 0.6]],
+  18: [["other", 1]],
 };
 export const LAST_STACK_DAY = 18;
 
-/** The pores on the left monitor: first, second, third day of a ring; 0.3 on the white days. */
+/** The pores on the left monitor: first, second, third day of the ring they begin in; full from then on (they never go back). */
 export const PORES_BY_DAY_IN_RING: readonly number[] = [0.5, 0.75, 1];
-export const PORES_WHITE = 0.3;
 const FIRST_PORES_RING = "room";
-const WHITE_DAYS = [17, 18];
 
 /** The glitch flicker: opacity ± this around the layer's own, at intervals in this range (ms). */
 export const FLICKER_SWING = 0.3;
@@ -72,18 +71,16 @@ function dayInRing(day: number): number {
   return Math.max(0, days.indexOf(day));
 }
 
-/** Clean before day 11 and on day 10; the desktop has no stack, only the monitor's pores and dimmed text. */
+/** Clean before day 11 and on day 10; the desktop has no stack, only the monitor's pores (its own collapse is its text: desktop/textlife). */
 export function fxPlan(day: number, view: FxView): FxPlan | null {
   if (isCalmDaytime(day)) return null;
   const stack = STACK_BY_DAY[stackDay(day)];
   const ring = cycleOf(day).ring;
   const poresOn = RINGS.indexOf(ring) >= RINGS.indexOf(FIRST_PORES_RING);
   if (!stack && !poresOn) return null;
-  const white = WHITE_DAYS.includes(stackDay(day));
-  const pores = view !== "desktop" || !poresOn ? null : white ? PORES_WHITE : PORES_BY_DAY_IN_RING[Math.min(dayInRing(day), PORES_BY_DAY_IN_RING.length - 1)]!;
+  const pores = view !== "desktop" || !poresOn ? null : ring !== FIRST_PORES_RING ? 1 : PORES_BY_DAY_IN_RING[Math.min(dayInRing(day), PORES_BY_DAY_IN_RING.length - 1)]!;
   const layers = view === "desktop" ? [] : (stack ?? []).map(([stage, opacity]): FxLayer => ({ stage, opacity, flicker: stage === "glitch" }));
-  const dimText = view === "desktop" && white;
-  return layers.length === 0 && pores === null && !dimText ? null : { day, view, layers, pores, dimText };
+  return layers.length === 0 && pores === null ? null : { day, view, layers, pores };
 }
 
 /** A small seeded generator (mulberry32). */
@@ -142,10 +139,10 @@ export function renderFx(plan: FxPlan | null): SafeHtml | null {
   return html`<div class="fx" data-view="${plan.view}" aria-hidden="true">${photos}${css ? html`<style>${raw(flickerCss(plan.day, css.opacity))}</style>` : null}</div>`;
 }
 
-/** Attributes for the desktop's stage: the pore tile and the dimmed text are CSS on the monitor itself. */
+/** Attributes for the desktop's stage: the pore tile is CSS on the monitor itself. */
 export function fxStageAttrs(plan: FxPlan | null): SafeHtml | null {
   if (!plan) return null;
-  const flags = [plan.pores !== null ? "pores" : null, plan.dimText ? "dim" : null].filter((x): x is string => x !== null);
+  const flags = [plan.pores !== null ? "pores" : null].filter((x): x is string => x !== null);
   if (!flags.length) return null;
   return html` data-fx="${flags.join(" ")}"${plan.pores !== null ? html` style="--fx-pores:${num(plan.pores)}"` : null}`;
 }
