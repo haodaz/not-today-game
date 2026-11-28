@@ -1,0 +1,66 @@
+{
+  "day": 16,
+  "site": "Today · Tech",
+  "weather": "",
+  "lead": {
+    "h": "Shop closed",
+    "p": [
+      "All four shops are closed, the convenience store too.",
+      "Is the door locked."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "0",
+      "l": "Takeaways delivered today",
+      "dir": ""
+    },
+    {
+      "v": "Not much",
+      "l": "The answer most people got today",
+      "dir": ""
+    },
+    {
+      "v": "—",
+      "l": "",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Is the door locked",
+      "sec": "",
+      "when": "Today"
+    },
+    {
+      "h": "Lao Zhou",
+      "sec": "",
+      "when": "Today",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "这个不用看。",
+        "en": "You don’t need this one."
+      }
+    },
+    {
+      "h": "How much",
+      "sec": "",
+      "when": "Today",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "这个不用看。",
+        "en": "You don’t need this one."
+      }
+    },
+    {
+      "h": "",
+      "sec": "",
+      "when": ""
+    },
+    {
+      "h": "",
+      "sec": "",
+      "when": ""
+    }
+  ]
+}

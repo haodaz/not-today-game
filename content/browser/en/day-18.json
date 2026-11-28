@@ -1,0 +1,66 @@
+{
+  "day": 18,
+  "site": "Today · Tech",
+  "weather": "",
+  "lead": {
+    "h": "Send the box off today.",
+    "p": [
+      "You did great. Rest now.",
+      ""
+    ]
+  },
+  "numbers": [
+    {
+      "v": "18",
+      "l": "days",
+      "dir": ""
+    },
+    {
+      "v": "1",
+      "l": "shipping slip",
+      "dir": ""
+    },
+    {
+      "v": "",
+      "l": "",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "You worked hard today too.",
+      "sec": "",
+      "when": "Today",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "今天不读了。睡吧。",
+        "en": "Not today. Sleep."
+      }
+    },
+    {
+      "h": "Sleep early.",
+      "sec": "",
+      "when": "Today",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "今天不读了。睡吧。",
+        "en": "Not today. Sleep."
+      }
+    },
+    {
+      "h": "",
+      "sec": "",
+      "when": ""
+    },
+    {
+      "h": "",
+      "sec": "",
+      "when": ""
+    },
+    {
+      "h": "",
+      "sec": "",
+      "when": ""
+    }
+  ]
+}

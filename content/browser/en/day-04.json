@@ -1,0 +1,56 @@
+{
+  "day": 4,
+  "site": "Today · Tech",
+  "weather": "Heavy rain",
+  "lead": {
+    "h": "Major code tools change their changelogs to \"one horizontal line\". Makers: users do not need to know what changed",
+    "p": [
+      "From this week the changelogs of several code tools no longer list what was changed. One horizontal line is all that is left on the page. A maker's statement says users \"only need to know it got better\".",
+      "Someone who builds products asked in the comments: then how do I know when it got worse. An hour later the comment could not be seen."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "1",
+      "l": "Entries in this week's changelog · last week 12",
+      "dir": "down"
+    },
+    {
+      "v": "470,000",
+      "l": "People whose jobs were adjusted for AI this quarter",
+      "dir": "down"
+    },
+    {
+      "v": "0.7734",
+      "l": "The most searched number today · source unknown",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Pagers are back? A batch of 1990s numeric pagers sells on second-hand platforms",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "\"the the\": a repeated word is turning up in several news feeds",
+      "sec": "Tech",
+      "when": "Today"
+    },
+    {
+      "h": "Assistants add a \"safe\" mode: every check runs twice",
+      "sec": "AI",
+      "when": "Yesterday"
+    },
+    {
+      "h": "There are more full stops in company group chats. A linguist explains",
+      "sec": "Culture",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Day fourteen of the rainy season; flooding in several parts of the city",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

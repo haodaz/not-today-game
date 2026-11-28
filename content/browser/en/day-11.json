@@ -1,0 +1,56 @@
+{
+  "day": 11,
+  "site": "Today · Tech",
+  "weather": "Rain",
+  "lead": {
+    "h": "Good to see you: workplace messaging switches over to the assistant's grammar",
+    "p": [
+      "From this week the short phrases the assistant likes have begun to appear in the internal messages of many companies. Linguists call it \"the language of efficiency\". Asked what \"One step at a time\" means, three managers gave three different answers.",
+      "A fourth manager answered: it means what it says."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "560,000",
+      "l": "People whose jobs were adjusted for AI this quarter",
+      "dir": "down"
+    },
+    {
+      "v": "#f0c0c8",
+      "l": "The average tint of the city's screens today · towards pink",
+      "dir": ""
+    },
+    {
+      "v": "v4.3.1",
+      "l": "The version number most people saw today",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "\"You changed models\": one question, and not one maker answers",
+      "sec": "AI",
+      "when": "Today"
+    },
+    {
+      "h": "Good morning. Good morning. Good morning. Good morning.",
+      "sec": "Culture",
+      "when": "Today"
+    },
+    {
+      "h": "Screens are turning pink. Eye doctors: it is not your eyes",
+      "sec": "Health",
+      "when": "Today"
+    },
+    {
+      "h": "An eye in a pager's screen? A second-hand platform takes a batch of goods down",
+      "sec": "Local",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Rain",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}
