@@ -9,6 +9,7 @@
       "done": "task_d7_4",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/day-07-minutes.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3, "r5": 4 } },
         "title": "晨会纪要 · 2028-10-22",
         "columns": [
           "",

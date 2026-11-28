@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seating plan</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "title": "Seating plan",
+ "sub": "Online meeting room · tomorrow's meeting",
+ "head": {
+  "org": "THE ADVISERS",
+  "sub": "Meeting seating · standard template",
+  "code": [
+   "Template M-09",
+   "72nd edition"
+  ]
+ },
+ "meta": [
+  [
+   "Meeting",
+   "Tomorrow's meeting"
+  ],
+  [
+   "Room",
+   "Online"
+  ],
+  [
+   "Seated by",
+   "You"
+  ],
+  [
+   "In the circle",
+   "4 seats"
+  ],
+  [
+   "Triangle",
+   "1 seat"
+  ],
+  [
+   "Guests",
+   "1"
+  ]
+ ],
+ "names": {
+  "c1": "Lao Zhou",
+  "c2": "Lao Wang",
+  "c3": "Vivi",
+  "c4": "You",
+  "c5": "The guest",
+  "d1": "Vivi",
+  "d2": "Empty",
+  "k1": "You"
+ },
+ "cols": [
+  "Seat",
+  "Who",
+  "The template asks"
+ ],
+ "rules": [
+  "Four seats in the circle. Nobody in the circle leaves before the meeting ends.",
+  "One seat in the triangle, outside the circle, kept for the guest.",
+  "The guest's name is not written on the plan."
+ ],
+ "sign": [
+  [
+   "Seated by",
+   "You"
+  ],
+  [
+   "Reviewed by",
+   "The advisers"
+  ]
+ ],
+ "words": {
+  "plan": "FLOOR PLAN",
+  "planNote": "circle + triangle",
+  "circle": "CIRCLE",
+  "gap": "apart",
+  "vacant": "empty",
+  "list": "LIST",
+  "empty": "(not seated yet)",
+  "foot": "The advisers' template · set the day before",
+  "page": "Page 1 of 1"
+ },
+ "cards": {
+  "c1": "Lao Zhou",
+  "c2": "Lao Wang (I sit in the middle)",
+  "c3": "Vivi",
+  "c4": "You (you need to be there too)",
+  "c5": "The guest (name not to be said)",
+  "d1": "Triangle: Vivi (she wants the centre)",
+  "d2": "Triangle: leave it empty, no one needed",
+  "k1": "Triangle: you"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "Circle · chair",
+   "answer": "c1",
+   "seat": "chair",
+   "note": "Chairs; reads the opening and the closing words"
+  },
+  {
+   "slot": "r2",
+   "label": "Circle · 1",
+   "answer": "c2",
+   "seat": "s1",
+   "note": "In the circle"
+  },
+  {
+   "slot": "r3",
+   "label": "Circle · 2",
+   "answer": "c3",
+   "seat": "s2",
+   "note": "In the circle"
+  },
+  {
+   "slot": "r4",
+   "label": "Circle · 3",
+   "answer": "c4",
+   "seat": "s3",
+   "note": "In the circle"
+  },
+  {
+   "slot": "r5",
+   "label": "Triangle",
+   "answer": "c5",
+   "seat": "tri",
+   "note": "Outside the circle, a seat of its own"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/seating.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+/* work-doc kit (#165): the pages of days 7–9, on the advisers' template. One light tone. */
+:root{--paper:#FDFDFB;--ink:#1D2330;--ink2:#6A7180;--ink3:#A3A8B3;--line:rgba(29,35,48,.14);--blue:#23395D;--brass:#A8842C;--amber:rgba(245,166,35,.18);--red:#9C2318;--kuro:#3B3F8F}
+html,body{margin:0;background:#E6E8EC;color:var(--ink);font:14px/1.7 -apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+.sheet{max-width:760px;margin:22px auto 40px;background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.10);padding-bottom:22px}
+.lh{display:flex;align-items:center;gap:12px;padding:14px 40px;border-bottom:3px solid var(--blue)}
+.lh svg{width:36px;height:36px;flex:none}
+.lh .org{font-weight:600;letter-spacing:.14em;font-size:13px;color:var(--blue)}
+.lh .org small{display:block;font-weight:400;letter-spacing:.06em;font-size:11px;color:var(--ink2)}
+.lh .code{margin-left:auto;text-align:right;font-size:11px;line-height:1.5;color:var(--ink2);letter-spacing:.06em}
+.head{padding:24px 40px 0}
+h1{margin:0;font-size:24px;font-weight:600;letter-spacing:.14em}
+.sub{margin:4px 0 0;color:var(--ink2);font-size:13px}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);margin:16px 40px 0;border:1px solid var(--line);border-bottom:0;border-right:0}
+.meta div{padding:6px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px}
+.meta b{display:block;font-weight:500;color:var(--ink2);font-size:11px;letter-spacing:.1em}
+.body{padding:6px 40px 0}
+h2{font-size:12px;letter-spacing:.2em;color:var(--blue);margin:20px 0 8px;font-weight:600;display:flex;align-items:center;gap:8px}
+h2::after{content:"";flex:1;border-top:1px solid var(--line)}
+h2 small{font-weight:400;letter-spacing:.04em;color:var(--ink3)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-weight:500;font-size:11px;letter-spacing:.1em;color:var(--ink2);text-align:left;padding:5px 8px;border-bottom:1px solid var(--ink)}
+td{padding:5px 8px;border-bottom:1px solid var(--line)}
+td.num{font-variant-numeric:tabular-nums}
+td.off{color:var(--ink3)}
+.guide{color:var(--ink3);font-size:12px;margin:0}
+.empty{color:#B5B9C2}
+.kuro{color:var(--kuro)}
+.cur{background:var(--amber);box-shadow:0 0 0 4px var(--amber)}
+.rules{margin:14px 0 0;padding:10px 14px;background:#F4F5F7;border-left:3px solid var(--blue);font-size:12px;color:var(--ink2);list-style:none}
+.rules li{padding:1px 0}
+.rules li::before{content:"·";margin-right:8px;color:var(--blue)}
+.sign{display:flex;gap:28px;margin:22px 0 0;font-size:12px;color:var(--ink2)}
+.sign span b{display:inline-block;min-width:92px;margin-left:8px;padding:0 4px 2px;border-bottom:1px solid var(--ink);color:var(--ink);font-weight:500}
+.foot{display:flex;justify-content:space-between;margin:22px 40px 0;padding-top:10px;border-top:1px solid var(--line);color:var(--ink2);font-size:11px;letter-spacing:.06em}
+
+/* minutes (day 7) */
+.step{display:grid;grid-template-columns:118px 1fr;gap:0 16px;padding:11px 0;border-bottom:1px solid var(--line)}
+.step .name{font-weight:600;letter-spacing:.06em}
+.step .said{margin:5px 0 0;padding:6px 12px;border-left:3px solid var(--brass);background:#FBF8EF;font-size:15px}
+.step .said.empty{border-left-color:#D5D8DE;background:none;border-bottom:1px dashed #C9CDD5}
+.step .said small{display:block;font-size:11px;letter-spacing:.1em;color:var(--ink2)}
+
+/* schedule (day 8) */
+.gantt{border:1px solid var(--line)}
+.gantt .row{display:grid;grid-template-columns:104px 1fr 190px;align-items:center;border-bottom:1px solid var(--line);min-height:46px}
+.gantt .row:last-child{border-bottom:0}
+.gantt .row.axis{min-height:26px;background:#F4F5F7;font-size:11px;color:var(--ink2);letter-spacing:.06em}
+.gantt .who{padding:0 12px;font-weight:600}
+.gantt .who small{display:block;font-weight:400;font-size:11px;color:var(--ink2)}
+.gantt .track{position:relative;align-self:stretch;border-left:1px solid var(--line);border-right:1px solid var(--line);background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/6 - 1px),var(--line) calc(100%/6 - 1px),var(--line) calc(100%/6))}
+.gantt .tick{position:absolute;top:5px;transform:translateX(-50%)}
+.gantt .tick:first-child{transform:none}
+.gantt .tick:last-child{transform:translateX(-100%)}
+.gantt .bar{position:absolute;top:11px;bottom:11px;border-radius:3px;background:var(--blue);color:#fff;font-size:11px;line-height:24px;padding:0 8px;white-space:nowrap;overflow:visible}
+.gantt .tag{position:absolute;top:11px;font-size:11px;line-height:24px;color:var(--blue);white-space:nowrap}
+.gantt .bar:empty{padding:0}
+.gantt .bar.any{background:repeating-linear-gradient(90deg,var(--brass) 0 10px,#B9963F 10px 20px)}
+.gantt .bar.off{left:0;right:0;background:repeating-linear-gradient(135deg,#ECEEF1 0 8px,#DFE2E7 8px 16px);color:var(--ink2);text-align:center}
+.gantt .bar.open{background:none;border:1.5px dashed var(--blue);color:var(--blue)}
+.gantt .bar.none{left:0;right:0;background:none;color:var(--ink3);text-align:center}
+.gantt .bar.kuro{background:repeating-linear-gradient(90deg,var(--kuro) 0 10px,#4B50A8 10px 20px)}
+.gantt .note{padding:0 12px;font-size:12px;color:var(--ink2);line-height:1.5}
+.gantt .row.cur .who,.gantt .row.cur .note{background:var(--amber);align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+
+/* seating (day 9) */
+.plan{display:block;width:100%;height:auto;margin:6px 0 0}
+.plan text{font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif}

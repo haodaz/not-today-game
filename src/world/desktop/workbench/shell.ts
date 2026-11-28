@@ -69,6 +69,8 @@ export function shellDefaults(task: Task, live: boolean): ShellState {
   // compare: 老王的话 and the preview open; nothing else.
   if (isCompare(task)) panes = panes.filter((p) => p === "preview");
   // work-doc (#165): the document is what opens; the table stays a toggle away
+  // (a meeting is where the lines are said: the call stays open above its minutes)
+  else if (task.board?.doc && task.board.view === "meeting") panes = [...panes].sort((a, b) => (a === "meeting" ? -1 : b === "meeting" ? 1 : 0));
   else if (task.board?.doc && task.board.view !== "ide") panes = panes.filter((p) => p === "preview");
   // A tuning board has no pages and no sources to list: no explorer. A compare board neither.
   return { explorer: !!task.board && !task.board.tune && !isCompare(task) && live, panes, max: null, slot: null, slotAt: 0, source: null };

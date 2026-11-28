@@ -56,3 +56,36 @@ describe("work-doc: the due-diligence material (days 4–6)", () => {
     expect(ideSrc(board, s, [], "r3")).toBe("/docs/player/dd-material.html?ch=2&theme=light&pane=preview&c=2&fill=r1:c1,r3:k1");
   });
 });
+
+// days 7–9 (author 2026-11-27: 「尽调材料这个方向可以，其他天也照这样铺」): the advisers' template, one page a day
+const KIT = [[7, "task_d7_4", "day-07-minutes.html", "minutes"], [8, "task_d8_1", "day-08-schedule.html", "schedule"], [9, "task_d9_3", "day-09-seating.html", "seating"]] as const;
+describe("work-doc: the advisers' template (days 7–9)", () => {
+  it.each(["zh", "en"] as const)("%s: each board names its page; the page has every slot, every card word for word, and its form", (lang) => {
+    setLocale(lang);
+    for (const [day, flag, file, form] of KIT) {
+      const board = taskByFlag(day, flag)!.board!;
+      const dir = lang === "en" ? "en/" : "";
+      expect(board.doc!.src).toBe(`/docs/player/${dir}${file}`);
+      expect(board.doc!.pages).toEqual(Object.fromEntries(board.slots.map((s, i) => [s.id, i])));
+      const html = readFileSync(resolve(__dirname, `../public/docs/player/${dir}${file}`), "utf8");
+      expect(html).toContain(`/docs/player/kit/${form}.js`);
+      const doc = JSON.parse(/const DOC = (\{[\s\S]*?\n\});/.exec(html)![1]!) as { cards: Record<string, string>; items: { slot: string; label: string; answer: string }[]; bars?: Record<string, unknown>; names?: Record<string, string>; end?: { values: Record<string, string> } };
+      expect(doc.items.map((i) => [i.slot, i.label, i.answer])).toEqual(board.slots.map((s) => [s.id, s.label, s.answer]));
+      const cards = [...board.cards, ...(board.kuro?.cards ?? [])];
+      expect(Object.keys(doc.cards).sort()).toEqual(cards.map((c) => c.id).sort());
+      for (const c of cards) expect(doc.cards[c.id]).toBe(c.text);
+      // what the form draws from a card (a bar, a name on the plan) exists for every card
+      for (const extra of [doc.bars, doc.names]) if (extra) expect(Object.keys(extra).sort()).toEqual(cards.map((c) => c.id).sort());
+    }
+    setLocale("zh");
+  });
+
+  it("the three forms and the kit are on disk; a meeting day opens the call above its minutes, a table day the page alone", () => {
+    setLocale("zh");
+    for (const f of ["doc.css", "doc.js", "minutes.js", "schedule.js", "seating.js"]) expect(readFileSync(resolve(__dirname, `../public/docs/player/kit/${f}`), "utf8").length).toBeGreaterThan(200);
+    expect(shellDefaults(taskByFlag(7, "task_d7_4")!, true).panes).toEqual(["meeting", "preview"]);
+    expect(shellDefaults(taskByFlag(9, "task_d9_3")!, true).panes).toEqual(["meeting", "preview"]);
+    expect(shellDefaults(taskByFlag(8, "task_d8_1")!, true).panes).toEqual(["preview"]);
+    expect(panesOf(taskByFlag(8, "task_d8_1")!, true)).toEqual(["files", "preview", "table"]);
+  });
+});

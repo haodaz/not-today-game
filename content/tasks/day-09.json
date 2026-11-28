@@ -9,6 +9,7 @@
       "done": "task_d9_3",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/day-09-seating.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3, "r5": 4 } },
         "title": "线上会议室 · 座位",
         "columns": [
           "",

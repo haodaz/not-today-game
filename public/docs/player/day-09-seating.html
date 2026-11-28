@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>座位表</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "title": "座位表",
+ "sub": "线上会议室 · 明天的会",
+ "head": {
+  "org": "顾问组",
+  "sub": "会议排座 · 标准模板",
+  "code": [
+   "模板 M-09",
+   "第 72 版"
+  ]
+ },
+ "meta": [
+  [
+   "会议",
+   "明天的会"
+  ],
+  [
+   "会议室",
+   "线上"
+  ],
+  [
+   "排座",
+   "你"
+  ],
+  [
+   "圈内",
+   "4 席"
+  ],
+  [
+   "三角",
+   "1 席"
+  ],
+  [
+   "来宾",
+   "1 位"
+  ]
+ ],
+ "names": {
+  "c1": "老周",
+  "c2": "老王",
+  "c3": "Vivi",
+  "c4": "你",
+  "c5": "贵客",
+  "d1": "Vivi",
+  "d2": "空着",
+  "k1": "你"
+ },
+ "cols": [
+  "座位",
+  "谁",
+  "模板要求"
+ ],
+ "rules": [
+  "圈内四席。会议结束前，圈内的人不离席。",
+  "三角一席，在圈外，留给来宾。",
+  "来宾的名字不写进表里。"
+ ],
+ "sign": [
+  [
+   "排座",
+   "你"
+  ],
+  [
+   "审核",
+   "顾问组"
+  ]
+ ],
+ "words": {
+  "plan": "平面图",
+  "planNote": "圈 + 三角",
+  "circle": "圈",
+  "gap": "隔开",
+  "vacant": "空",
+  "list": "名单",
+  "empty": "（还没排）",
+  "foot": "顾问组模板 · 会前一天排定",
+  "page": "第 1 页 / 共 1 页"
+ },
+ "cards": {
+  "c1": "老周",
+  "c2": "老王（我坐中间）",
+  "c3": "Vivi",
+  "c4": "你（你也要在）",
+  "c5": "贵客（名字不念）",
+  "d1": "三角：Vivi（她想坐 C 位）",
+  "d2": "三角：空着，不用排",
+  "k1": "三角：你"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "圈 · 主持",
+   "answer": "c1",
+   "seat": "chair",
+   "note": "主持，念开场和结束语"
+  },
+  {
+   "slot": "r2",
+   "label": "圈 · 1",
+   "answer": "c2",
+   "seat": "s1",
+   "note": "圈内"
+  },
+  {
+   "slot": "r3",
+   "label": "圈 · 2",
+   "answer": "c3",
+   "seat": "s2",
+   "note": "圈内"
+  },
+  {
+   "slot": "r4",
+   "label": "圈 · 3",
+   "answer": "c4",
+   "seat": "s3",
+   "note": "圈内"
+  },
+  {
+   "slot": "r5",
+   "label": "三角",
+   "answer": "c5",
+   "seat": "tri",
+   "note": "圈外，单独一席"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/seating.js"></script>
+</body>
+</html>

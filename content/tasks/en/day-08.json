@@ -9,6 +9,7 @@
       "done": "task_d8_1",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/en/day-08-schedule.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3 } },
         "title": "Friday online team night · toasts",
         "columns": [
           "",
