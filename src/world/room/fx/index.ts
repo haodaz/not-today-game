@@ -8,18 +8,30 @@ import { cycleOf, isCalmDaytime } from "@state/stages";
 import { RINGS } from "@world/desktop/rings";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 
-export type FxView = "room" | "desk" | "door" | "desktop" | "bed" | "window";
-/**
- * The facings with no edited stage stills yet (room-turn R4): their stack uses the base still for
- * every stage (so the CSS stack shows the clean wall), and the breathing shader does the collapse on
- * it. Claude supplies `/room/fx/{bed,window}_<stage>.jpg` later, in the same pattern; then this goes.
- */
-export const BASE_STILL_ONLY: Readonly<Partial<Record<FxView, string>>> = { bed: "/room/shots/bed.jpg", window: "/room/shots/window.jpg" };
+/** `lying` is the ceiling from the bed by day, `lyingnight` the same at night (two photographs of their own). */
+export type FxView = "room" | "desk" | "door" | "desktop" | "bed" | "window" | "lying" | "lyingnight";
 /** The photo for a stage of a view's stack. */
-export const stagePhoto = (view: FxView, stage: FxStage): string => BASE_STILL_ONLY[view] ?? `/room/fx/${view}_${stage}.jpg`;
-/** The stages in the order the world goes through them; the stack never goes back. */
-export const STAGES = ["wall", "other", "glitch", "white"] as const;
+export const stagePhoto = (view: FxView, stage: FxStage): string => `/room/fx/${view}_${stage}.jpg`;
+/**
+ * The stages in the order the world goes through them. `flesh` is the last day's (author 2026-11-28:
+ * 「18天应该是血肉最多的」, 「18是真实崩坏」); until that day it was a washed-out `white`.
+ */
+export const STAGES = ["wall", "other", "glitch", "flesh"] as const;
 export type FxStage = (typeof STAGES)[number];
+/**
+ * Which edited photographs each view has (author 2026-11-28: 「只有面对2个屏幕的时候是真实照片崩坏，别的视角都
+ * 正常」: the bed wall, the window wall and the ceiling had none). A stage a view has no photograph for is
+ * left out of that view's stack (the bed and the window have no broken-pixel one; the ceiling starts at `other`).
+ */
+export const VIEW_STAGES: Readonly<Record<Exclude<FxView, "desktop">, readonly FxStage[]>> = {
+  room: STAGES,
+  desk: STAGES,
+  door: STAGES,
+  bed: ["wall", "other", "flesh"],
+  window: ["wall", "other", "flesh"],
+  lying: ["other", "flesh"],
+  lyingnight: ["other", "flesh"],
+};
 
 export interface FxLayer {
   readonly stage: FxStage;
@@ -48,9 +60,9 @@ export const STACK_BY_DAY: Readonly<Record<number, readonly (readonly [FxStage, 
   16: [["other", 1], ["glitch", 0.45]],
   // author 2026-11-28: 「18天应该是血肉最多的，白乎乎的效果很奇怪」, 「走廊是白的和屋里啥样其实没关系啊」. The last two
   // days were the washed-out `white` photo (a misreading of the delivery line about the corridor). The room
-  // stays on the other side to the end: day 17 breaks up most, day 18 has arrived and holds.
+  // stays on the other side: day 17 breaks up most; day 18 is flesh, in every view.
   17: [["other", 1], ["glitch", 0.6]],
-  18: [["other", 1]],
+  18: [["flesh", 1]],
 };
 export const LAST_STACK_DAY = 18;
 
@@ -79,7 +91,7 @@ export function fxPlan(day: number, view: FxView): FxPlan | null {
   const poresOn = RINGS.indexOf(ring) >= RINGS.indexOf(FIRST_PORES_RING);
   if (!stack && !poresOn) return null;
   const pores = view !== "desktop" || !poresOn ? null : ring !== FIRST_PORES_RING ? 1 : PORES_BY_DAY_IN_RING[Math.min(dayInRing(day), PORES_BY_DAY_IN_RING.length - 1)]!;
-  const layers = view === "desktop" ? [] : (stack ?? []).map(([stage, opacity]): FxLayer => ({ stage, opacity, flicker: stage === "glitch" }));
+  const layers = view === "desktop" ? [] : (stack ?? []).filter(([stage]) => VIEW_STAGES[view].includes(stage)).map(([stage, opacity]): FxLayer => ({ stage, opacity, flicker: stage === "glitch" }));
   return layers.length === 0 && pores === null ? null : { day, view, layers, pores };
 }
 

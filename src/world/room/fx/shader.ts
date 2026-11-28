@@ -14,7 +14,7 @@ import { ROOM_SHOT, type Rect } from "../shots";
 import { STAGES, stagePhoto, type FxLayer, type FxPlan, type FxStage, type FxView } from "./index";
 
 /** Shader kind per stage; 0 is "no layer". */
-export const KIND: Readonly<Record<FxStage, number>> = { wall: 1, other: 2, glitch: 3, white: 4 };
+export const KIND: Readonly<Record<FxStage, number>> = { wall: 1, other: 2, glitch: 3, flesh: 4 };
 
 type PerStage<T> = Readonly<Record<FxStage, T>>;
 
@@ -31,7 +31,7 @@ export const FX = {
     softness: 0.35,
     /** How much the patch field is replaced by "distance from the centre" (centre turns last). */
     centreBias: 0.65,
-    /** White grows from the top: how much the patch field is replaced by "distance from the top". */
+    /** Flesh grows from the top (it hangs from the ceiling): how much the patch field is replaced by "distance from the top". */
     topBias: 0.6,
     /** Stretch the fbm's mid-grey cluster so an amount of 0.5 covers about half. */
     contrast: 1.8,
@@ -39,10 +39,10 @@ export const FX = {
     centreAmount: 0.55,
     /** Patches crawl this much per second (uv units). */
     drift: [0.004, 0.0025] as const,
-    scale: { wall: 5, other: 4, glitch: 4, white: 2.5 } as PerStage<number>,
+    scale: { wall: 5, other: 4, glitch: 4, flesh: 3 } as PerStage<number>,
     /** More octaves, `[scale multiplier, weight]`: `other` has three in all. */
-    octave2: { wall: [1, 0], other: [2.3, 0.35], glitch: [1, 0], white: [1, 0] } as PerStage<readonly [number, number]>,
-    octave3: { wall: [1, 0], other: [5.3, 0.2], glitch: [1, 0], white: [1, 0] } as PerStage<readonly [number, number]>,
+    octave2: { wall: [1, 0], other: [2.3, 0.35], glitch: [1, 0], flesh: [2.1, 0.3] } as PerStage<readonly [number, number]>,
+    octave3: { wall: [1, 0], other: [5.3, 0.2], glitch: [1, 0], flesh: [1, 0] } as PerStage<readonly [number, number]>,
   },
 
   /**
@@ -56,11 +56,12 @@ export const FX = {
     wall: { a: 0.003, period: 7 },
     other: { a: 0.008, period: 5 },
     glitch: { a: 0, period: 1 },
-    white: { a: 0.004, period: 9 },
+    // flesh breathes: deeper and a little faster than the other side
+    flesh: { a: 0.012, period: 4 },
   } as PerStage<{ readonly a: number; readonly period: number }>,
 
   /** Film grain amplitude per stage (glitch takes `other`'s), and in a burst. */
-  grain: { wall: 0.02, other: 0.05, glitch: 0.05, white: 0.04, burst: 0.15 } as PerStage<number> & { readonly burst: number },
+  grain: { wall: 0.02, other: 0.05, glitch: 0.05, flesh: 0.05, burst: 0.15 } as PerStage<number> & { readonly burst: number },
 
   /** Static bursts: at seeded irregular gaps (from the end of one to the start of the next). */
   bursts: {
@@ -93,7 +94,7 @@ export const FX = {
     wall: null,
     glitch: null,
     other: { count: 60, size: [1, 3], alpha: 0.3, color: [0.78, 0.72, 0.66], speed: [0.004, 0.012] },
-    white: { count: 40, size: [2, 4], alpha: 0.5, color: [1, 1, 1], speed: [0.01, 0.03] },
+    flesh: { count: 40, size: [1, 3], alpha: 0.32, color: [0.72, 0.2, 0.17], speed: [0.004, 0.012] },
   } as PerStage<Particles | null>,
 } as const;
 

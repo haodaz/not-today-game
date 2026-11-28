@@ -11,7 +11,7 @@ import { desktopApps } from "@world/desktop/apps";
 import type { Beat, BeatClock } from "@world/desktop/beat";
 import { buildShell, initialSession, type Session } from "@world/desktop/model";
 import { renderDesktop } from "@world/desktop/shell";
-import { flickerCss, FLICKER_MS, FLICKER_STEPS, FLICKER_SWING, fxPlan, fxStageAttrs, glitchFlicker, renderFx, STACK_BY_DAY, STAGES, type FxView } from "@world/room/fx";
+import { flickerCss, FLICKER_MS, FLICKER_STEPS, FLICKER_SWING, fxPlan, fxStageAttrs, glitchFlicker, renderFx, STACK_BY_DAY, stagePhoto, STAGES, VIEW_STAGES, type FxView } from "@world/room/fx";
 import { renderRoom } from "@world/room/hud";
 
 const STILLS = ["room", "desk", "door"] as const;
@@ -66,6 +66,22 @@ describe("the collapse is in the photos", () => {
     for (const page of [d13, d17]) expect(page).not.toContain('class="fx"');
   });
 
+  it("every view has its collapsed photographs, the ceiling too; the last day is flesh in every view (author 2026-11-28)", () => {
+    for (const [view, stages] of Object.entries(VIEW_STAGES)) {
+      for (const stage of stages) expect(existsSync(`public${stagePhoto(view as FxView, stage)}`), `${view} ${stage}`).toBe(true);
+      expect(stages, view).toContain("flesh");
+      expect(fxPlan(18, view as FxView)?.layers.map((l) => l.stage), view).toEqual(["flesh"]);
+    }
+    // the bed wall and the window wall are no longer clean on the days the room is not
+    expect(fxPlan(13, "bed")?.layers.map((l) => [l.stage, l.opacity])).toEqual([["other", 0.5]]);
+    expect(fxPlan(11, "window")?.layers.map((l) => l.stage)).toEqual(["wall"]);
+    // a view without a photograph for a stage leaves it out: no broken-pixel bed, the ceiling starts at the other side
+    expect(fxPlan(16, "bed")?.layers.map((l) => l.stage)).toEqual(["other"]);
+    expect(fxPlan(12, "lying")).toBeNull();
+    expect(fxPlan(14, "lyingnight")?.layers.map((l) => l.stage)).toEqual(["other"]);
+    expect(stagePhoto("lyingnight", "flesh")).toBe("/room/fx/lyingnight_flesh.jpg");
+  });
+
   it("the stack by day, exactly as the spec has it", () => {
     const at = (day: number) => (fxPlan(day, "room")?.layers ?? []).map((l) => [l.stage, l.opacity]);
     expect(at(11)).toEqual([["wall", 0.6]]);
@@ -74,7 +90,7 @@ describe("the collapse is in the photos", () => {
     expect(at(16)).toEqual([["other", 1], ["glitch", 0.45]]);
     // author 2026-11-28: no white days (「18天应该是血肉最多的，白乎乎的效果很奇怪」): the other side to the end
     expect(at(17)).toEqual([["other", 1], ["glitch", 0.6]]);
-    expect(at(18)).toEqual([["other", 1]]);
+    expect(at(18)).toEqual([["flesh", 1]]); // 「18天应该是血肉最多的」
     for (let day = 1; day <= 19; day++) expect(at(day).map(([stage]) => stage), `day ${day}`).not.toContain("white");
     // The good ending's day 19 keeps day 18's photos.
     expect(at(19)).toEqual(at(18));
@@ -140,8 +156,9 @@ describe("the collapse is in the photos", () => {
           const stages = (fxPlan(day, "room")?.layers ?? []).map((l) => stageIndex(l.stage));
           expect([...stages].sort((a, b) => a - b)).toEqual(stages);
           expect(new Set(stages).size).toBe(stages.length);
-          // from day 15 the room is wholly on the other side and never comes back (the breaking-up on top comes and goes)
-          if (day >= 15) expect((fxPlan(day, "room")?.layers ?? [])[0]).toMatchObject({ stage: "other", opacity: 1 });
+          // from day 15 the room is wholly on the other side (the breaking-up on top comes and goes); the last day is flesh
+          if (day >= 15 && day <= 17) expect((fxPlan(day, "room")?.layers ?? [])[0]).toMatchObject({ stage: "other", opacity: 1 });
+          if (day >= 18) expect(fxPlan(day, "room")?.layers).toEqual([{ stage: "flesh", opacity: 1, flicker: false }]);
         }),
       );
     });

@@ -68,9 +68,9 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   ],
   "desk day 18": [
     [
-      "other",
+      "flesh",
       1,
-      "/room/fx/desk_other.jpg",
+      "/room/fx/desk_flesh.jpg",
     ],
   ],
   "door day 10": [],
@@ -128,9 +128,9 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   ],
   "door day 18": [
     [
-      "other",
+      "flesh",
       1,
-      "/room/fx/door_other.jpg",
+      "/room/fx/door_flesh.jpg",
     ],
   ],
   "room day 10": [],
@@ -188,9 +188,9 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
   ],
   "room day 18": [
     [
-      "other",
+      "flesh",
       1,
-      "/room/fx/room_other.jpg",
+      "/room/fx/room_flesh.jpg",
     ],
   ],
 }

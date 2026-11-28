@@ -72,21 +72,21 @@ describe("the FX table", () => {
 
   it("carries the spec's numbers", () => {
     // The correction after seeing the shader: soft, fine, centre last, protected monitors.
-    expect(FX.dissolve.scale).toMatchObject({ wall: 5, other: 4, white: 2.5 });
+    expect(FX.dissolve.scale).toMatchObject({ wall: 5, other: 4, flesh: 3 });
     expect(FX.dissolve.softness).toBe(0.35);
     expect(FX.dissolve.octave2.other[1]).toBeGreaterThan(0);
     expect(FX.dissolve.octave3.other[1]).toBeGreaterThan(0);
     expect(FX.dissolve.centreAmount).toBe(0.55);
     expect(FX.protect).toMatchObject({ featherPx: 40 });
     expect(FX.glitch.burstAmount).toBe(0.9);
-    expect(FX.breath).toEqual({ wall: { a: 0.003, period: 7 }, other: { a: 0.008, period: 5 }, glitch: { a: 0, period: 1 }, white: { a: 0.004, period: 9 } });
-    expect([FX.grain.wall, FX.grain.other, FX.grain.white, FX.grain.burst]).toEqual([0.02, 0.05, 0.04, 0.15]);
+    expect(FX.breath).toEqual({ wall: { a: 0.003, period: 7 }, other: { a: 0.008, period: 5 }, glitch: { a: 0, period: 1 }, flesh: { a: 0.012, period: 4 } });
+    expect([FX.grain.wall, FX.grain.other, FX.grain.flesh, FX.grain.burst]).toEqual([0.02, 0.05, 0.05, 0.15]);
     expect(FX.bursts.other).toMatchObject({ gapMs: [4000, 15000], lengthMs: [150, 500] });
     expect(FX.bursts.glitch).toMatchObject({ gapMs: [1000, 4000], lengthMs: [150, 500] });
     expect(FX.bursts.tearPx).toBe(12);
     expect(FX.glitch).toMatchObject({ grid: [24, 14], blocks: [5, 12], jumpPx: 40, split: { rest: 2, burst: 8 }, scanline: { every: 3, dark: 0.1 } });
     expect(FX.particles.other).toMatchObject({ count: 60, size: [1, 3], alpha: 0.3 });
-    expect(FX.particles.white).toMatchObject({ count: 40, size: [2, 4] });
+    expect(FX.particles.flesh).toMatchObject({ count: 40, size: [1, 3] });
   });
 });
 
@@ -100,7 +100,7 @@ describe("the seeded burst schedule", () => {
 
   it("only other and glitch have bursts", () => {
     expect(burstSchedule(11, "wall")).toEqual([]);
-    expect(burstSchedule(18, "white")).toEqual([]);
+    expect(burstSchedule(18, "flesh")).toEqual([]);
     expect(burstAt(11, "wall", 5000)).toBeNull();
   });
 
@@ -250,19 +250,19 @@ describe("the protected zone and the soft dissolve (pure mirrors of the GLSL)", 
 
 // ---------------------------------------------------------------------------------------------
 describe("particles", () => {
-  it("counts per stage: 60 dust motes on other, 40 flakes on white, none on wall or glitch", () => {
+  it("counts per stage: 60 dust motes on other, 40 red motes on flesh, none on wall or glitch", () => {
     expect(STAGES.map(particleCount)).toEqual([0, 60, 0, 40]);
   });
 
   it("seeds: (x, y, random) per particle in [0, 1), the same every time", () => {
-    for (const stage of ["other", "white"] as const) {
+    for (const stage of ["other", "flesh"] as const) {
       const s = particleSeeds(stage);
       expect(s).toHaveLength(particleCount(stage) * 3);
       expect([...s].every((v) => v >= 0 && v < 1)).toBe(true);
       expect(particleSeeds(stage)).toEqual(s);
     }
     expect(particleSeeds("wall")).toHaveLength(0);
-    expect(particleSeeds("other")).not.toEqual(particleSeeds("white"));
+    expect(particleSeeds("other")).not.toEqual(particleSeeds("flesh"));
   });
 });
 
@@ -274,11 +274,11 @@ describe("frameState: what the uniforms are", () => {
   });
 
   // author 2026-11-28: no white days: day 17 is the other side breaking up, day 18 the other side whole
-  it("day 17: the other side leads with the glitch over it; day 18: the other side alone, no glitch", () => {
+  it("day 17: the other side leads with the glitch over it; day 18: flesh alone, breathing, no glitch", () => {
     const p = plan(17);
     expect(leadOf(p.layers)!.stage).toBe("other");
     expect(frameState(p, 0, false)).toMatchObject({ kindA: KIND.other, kindB: KIND.glitch, amtA: 1, glitch: 1 });
-    expect(frameState(plan(18), 0, false)).toMatchObject({ kindA: KIND.other, kindB: 0, amtA: 1, amtB: 0, glitch: 0 });
+    expect(frameState(plan(18), 0, false)).toMatchObject({ kindA: KIND.flesh, kindB: 0, amtA: 1, amtB: 0, glitch: 0, breath: 0.012, period: 4 });
   });
 
   it("day 16: glitch on, the RGB split rests at 2 px and widens to 8 in a burst; blocks jump only in a burst", () => {
@@ -398,8 +398,8 @@ describe("the GLSL (generated from FX)", () => {
   });
 
   it("the table's numbers are in it", () => {
-    expect(FRAGMENT).toContain("const float SCALE[5] = float[5](1.0, 5.0, 4.0, 4.0, 2.5);");
-    expect(FRAGMENT).toContain("const float OCT2W[5] = float[5](0.0, 0.0, 0.35, 0.0, 0.0);");
+    expect(FRAGMENT).toContain("const float SCALE[5] = float[5](1.0, 5.0, 4.0, 4.0, 3.0);"); // the last stage is flesh (2026-11-28)
+    expect(FRAGMENT).toContain("const float OCT2W[5] = float[5](0.0, 0.0, 0.35, 0.0, 0.3);");
     expect(FRAGMENT).toContain("const float OCT3W[5] = float[5](0.0, 0.0, 0.2, 0.0, 0.0);");
     expect(FRAGMENT).toContain("const float SOFT = 0.35;");
     expect(FRAGMENT).toContain("const float AMT_MIN = 0.55;");
@@ -465,7 +465,7 @@ describe("the renderer, against a recording fake context", () => {
     expect(g.count("compileShader")).toBe(4);
     expect(g.count("linkProgram")).toBe(2);
     expect(g.named("shaderSource").map(([, a]) => String(a[1]).startsWith("#version 300 es"))).toEqual([true, true, true, true]);
-    // quad + other + white
+    // quad + other + flesh
     expect(g.count("createBuffer")).toBe(3);
   });
 

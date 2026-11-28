@@ -843,8 +843,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const top = view === "desk" && !desk3d && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
   // The collapse stack and the evening look apply to all four facings (room-turn R4).
   // The table up close has no stack of its own (its photos would not be pushed in like the still).
-  // The ceiling has no edited stage stills either (lying-view R2: its own two photos, day and night).
-  const fx = dream || view === "table" || lying || desk3d ? null : renderFx(fxPlan(state.day, view as Exclude<typeof view, "table" | "lying">));
+  // The ceiling has its own two photographs, day and night, and from 2026-11-28 their collapsed ones (author: 「第18天的崩坏，在躺着的时候没效果啊」).
+  const fx = dream || view === "table" || desk3d ? null : renderFx(fxPlan(state.day, lying ? (isEvening(session.clock) ? "lyingnight" : "lying") : (view as Exclude<typeof view, "table" | "lying">)));
   const evening = dream || desk3d ? null : eveningLook(view, isEvening(session.clock), lampLit(session), ceilLit(session));
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);

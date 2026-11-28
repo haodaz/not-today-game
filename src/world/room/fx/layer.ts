@@ -160,7 +160,8 @@ export function createFxLayer(deps: FxLayerDeps = {}): (root: HTMLElement, ctx: 
       if (canvas.parentElement !== host) host.appendChild(canvas);
       // A new day or a new still starts the clock again; a re-render of the same one does not.
       // 换一件: the door wall is drawn with whatever hangs on the hook
-      const photo = view === "door" ? backdropFor("door", true, ctx.session.coat) : BACKDROPS[view];
+      // the ceiling's two photographs are the lying view's, day and night
+      const photo = view === "door" ? backdropFor("door", true, ctx.session.coat) : view === "lyingnight" ? "/room/shots/ceiling_night.jpg" : BACKDROPS[view];
       const next = `${state.day}:${view}:${reduced ? "r" : "m"}:${photo}`;
       if (next !== key) {
         key = next;
