@@ -744,8 +744,8 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - en: Why don't those three pay?
 - days: 2–9
 - after: 8
-- tiers: low: "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client." | mid: "The Data Resources Bureau is stuck at the third stamp. NVIBIG changed its contact, and the new one does not recognise the old contract. At Qingbei Tech the money has left the university's books, they even sent us a photo of the slip, and it has not reached ours. What the three have in common: they all use what you delivered." | high: "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place."
-- tiers (zh): low: "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。" | mid: "数据局是流程卡在第三个章；英伟大是换了对接人，新的不认旧合同；清北理工是钱已经出了学校的账，回执都拍给我们了，就是没到我们的账。三家的共同点：你交的东西他们都在用。" | high: "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
+- tiers: low: "Because nobody goes after them. Chasing payments is Vivi's job, and she is busy talking to the next client." | mid: "The Data Resources Bureau is stuck at the third stamp. NVIBIG changed its contact, and the new one does not recognise the old contract. At JianHua University the money has left the university's books, they even sent us a photo of the slip, and it has not reached ours. What the three have in common: they all use what you delivered." | high: "Because they know it will keep arriving unpaid. You have delivered every day for thirteen months without stopping once. Nobody hurries to pay someone who never stops. That is not your fault. It is the best thing about you, used in the worst place."
+- tiers (zh): low: "因为没人去催。催款是 Vivi 的活，她正忙着谈下一家呢。" | mid: "数据局是流程卡在第三个章；英伟大是换了对接人，新的不认旧合同；剑华是钱已经出了学校的账，回执都拍给我们了，就是没到我们的账。三家的共同点：你交的东西他们都在用。" | high: "因为他们知道不付也会继续收到。你每天都交活，交了十三个月，没有一天停。一个从不停的人，没人会急着付钱。这不是你的错。这是你最好的地方被用在最坏的地方。"
 
 ## 2008 · 我不接会怎么样？
 - en: What happens if I don't pick up?
