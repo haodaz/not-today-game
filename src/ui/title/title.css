@@ -259,6 +259,7 @@
 .title-page .idle.window{inset:0;background:linear-gradient(90deg,rgba(205,218,236,.9) 0,rgba(205,218,236,.35) 120px,transparent 420px);opacity:0}
 .title-page .idle.window.on{opacity:.5}
 @media (prefers-reduced-motion:reduce){
+  .title-pick .big img{animation:none!important}
   .title-room .amb.led{animation:none;opacity:.5}
   .title-room .amb.daylight{animation:none;opacity:.11}
   .title-room .amb.daylight.b{opacity:.055}
@@ -358,3 +359,17 @@ html[lang="en"] :is(.game-menu,.title-page,.room .hud-left) *{letter-spacing:.02
 html[lang="en"] .title-q-left .row label,html[lang="en"] .title-q-left .row>span:first-child{width:250px}
 .title-pick .big,.title-badge-card .title-pick .big{border:1px solid var(--gm-hair2);border-radius:2px;background:radial-gradient(circle at 50% 42%,rgba(250,247,240,.96),rgba(226,220,208,.9) 78%)}
 .title-pick .big img{filter:grayscale(.3) sepia(.12)}
+/* The look moves a little, once in a while (author 2026-11-27, ledger #163: the five looks are five
+   people, so five small habits; each sits still for most of its cycle). */
+.title-pick .big{overflow:hidden}
+.title-pick .big img{transform-origin:50% 88%;will-change:transform}
+.title-pick .big[data-portrait="p1"] img{animation:look-tilt 7s ease-in-out infinite}
+.title-pick .big[data-portrait="p2"] img{animation:look-nod 8.5s ease-in-out infinite}
+.title-pick .big[data-portrait="p3"] img{animation:look-sway 9.5s ease-in-out infinite}
+.title-pick .big[data-portrait="p4"] img{animation:look-duck 8s ease-in-out infinite}
+.title-pick .big[data-portrait="p5"] img{animation:look-breath 7.5s ease-in-out infinite}
+@keyframes look-tilt{0%,58%,74%,100%{transform:rotate(0)}64%,68%{transform:rotate(-1.5deg)}}
+@keyframes look-nod{0%,60%,70%,100%{transform:translateY(0)}64%{transform:translateY(3px)}67%{transform:translateY(-1px)}}
+@keyframes look-sway{0%,52%,72%,100%{transform:translateX(0)}59%{transform:translateX(3px)}66%{transform:translateX(-2px)}}
+@keyframes look-duck{0%,55%,78%,100%{transform:translateY(0) rotate(0)}61%,70%{transform:translateY(3px) rotate(1deg)}}
+@keyframes look-breath{0%,40%,72%,100%{transform:scale(1)}54%,60%{transform:scale(1.02)}}
