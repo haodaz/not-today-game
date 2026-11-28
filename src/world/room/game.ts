@@ -1288,7 +1288,9 @@ export const loopActions: Record<string, ActionHandler> = {
     if (session.view !== "lying" || session.dialogue.queue.length > 0 || overlayOpen(session) || session.objbarOpen) return;
     const day = store.getState().day;
     const said = session.lyingSaid?.day === day ? session.lyingSaid.said : [];
-    const key = `room.lying.${look}`;
+    // a day may have its own line for a thing above the bed (author 2026-11-28, day 18: 「房子这样，押金肯定不退了吧」)
+    const own = `room.lying.${look}.d${String(day)}`;
+    const key = hasString(own) ? own : `room.lying.${look}`;
     if (said.includes(look) || !hasString(key)) return;
     session.lyingSaid = { day, said: [...said, look] };
     session.dialogue = push(session.dialogue, { key: `d${day}:lying:${look}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });

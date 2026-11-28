@@ -108,3 +108,16 @@ describe("the old veil is gone", () => {
     expect(textLifeEnabled("?day=18")).toBe(true);
   });
 });
+
+describe("day 18, looking up from the bed", () => {
+  it("the ceiling and the light have day 18's own line (author 2026-11-28)", async () => {
+    const { t, hasString, setLocale } = await import("@world/i18n");
+    expect(t("room.lying.ceiling.d18")).toBe("房子这样，押金肯定不退了吧。");
+    expect(hasString("room.lying.lamp.d18")).toBe(true);
+    setLocale("en");
+    expect(t("room.lying.ceiling.d18")).toContain("deposit");
+    setLocale("zh");
+    const game = fs.readFileSync("src/world/room/game.ts", "utf8");
+    expect(game).toContain("const own = `room.lying.${look}.d${String(day)}`;");
+  });
+});

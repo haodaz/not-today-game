@@ -484,6 +484,8 @@
   "room.rise.ask": "Get up?",
   "room.rise.up": "Get up",
   "room.lying.ceiling": "A thin crack in the ceiling. The landlord has been saying it's fine for three years.",
+  "room.lying.ceiling.d18": "With the place like this, I am not getting the deposit back, am I.",
+  "room.lying.lamp.d18": "With the place like this, I am not getting the deposit back, am I.",
   "room.lying.lamp": "The ceiling light is off. On, it's a flat white glare that makes getting up even harder.",
   "room.rise.stay": "Stay a little longer",
   "room.bed.sleep": "Sleep",
