@@ -1109,6 +1109,14 @@ body:has(.dlg.kuro.chat) .hud-kuro.talking{visibility:hidden}
    has drawn), under the marks, the back strip, the HUD and the dialogue box. */
 .room > .outside-host.room.hidden{display:none}
 .room > .outside-host.room.desk{z-index:auto}
+/* room-3d-room R2: on a frame day 房间 / 窗 / 门 / 床 are the room frame: no photograph under it, the
+   game's marks and HUD over it; at the turn edges (TURN_EDGE, 8 %) two plain strips over the frame so
+   the nav layer still sees the pointer there (the iframe would take it) */
+.stage.room.frame-on:is(.room-view,.window-view,.door-view,.bed-view){background:#0b0b0c}
+.room > .outside-host.room.face{z-index:auto}
+.stage.room.frame-on > .frame-edge{position:absolute;top:0;bottom:0;width:8%;z-index:16;background:transparent}
+.stage.room.frame-on > .frame-edge.left{left:0}
+.stage.room.frame-on > .frame-edge.right{right:0}
 .desk3d-marks{position:absolute;inset:0;pointer-events:none}
 .desk3d-marks > .room-mark{position:absolute;display:block;pointer-events:none;border-radius:10px}
 .desk3d-marks > .room-mark.lifted{visibility:hidden}

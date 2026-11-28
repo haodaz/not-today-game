@@ -18,7 +18,7 @@ import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
 import { actWant, bossPosts, HOME_KURO_STEP, homeKept, homePosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
 import { guideNow } from "@world/loop/guide";
-import { CHICK_STEP_MS, clampDay, glowTarget, deskCommand, deskPick, desk3dOn, locateCommand, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
+import { CHICK_STEP_MS, clampDay, glowTarget, deskCommand, deskPick, desk3dOn, faceCommand, faceLocateCommand, locateCommand, room3dOn, roomPick, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
 
 export { outsideCommand, roomHour, ROOM_TARGET, type RoomCommand } from "./desk3d";
 
@@ -55,11 +55,13 @@ export function outsideHost(o: { readonly kind: string; readonly src: string; re
 export const outsideSrc = (day: number): string => `/room3d/index.html?embed=1&day=${String(clampDay(day))}`;
 
 /** Where the shared frame is now: 桌子, the look-out on 窗, or hidden. */
-export function roomMode(session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame" | "boss">): "desk" | "window" | "boss" | "hidden" {
+export function roomMode(session: Session, day: number): "desk" | "face" | "window" | "boss" | "hidden" {
   // boss-phase2-world R1: the fight owns the frame until boss-done
   if (session.boss) return "boss";
   if (desk3dOn(session)) return "desk";
   if (session.outside !== null && session.view === "window") return "window";
+  // room-3d-room R2: 房间 / 窗 / 门 / 床 on a frame day, in the day beats
+  if (room3dOn(day, session)) return "face";
   return "hidden";
 }
 
@@ -69,8 +71,8 @@ export function roomMode(session: Pick<Session, "view" | "deskPhoto" | "outside"
  * way back; elsewhere hidden (`display: none`) once it has been made. Null before it is made and not
  * wanted.
  */
-export function roomHost(day: number, session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame" | "boss">): SafeHtml | null {
-  const mode = roomMode(session);
+export function roomHost(day: number, session: Session): SafeHtml | null {
+  const mode = roomMode(session, day);
   if (mode === "boss") return null;
   if (mode === "hidden" && session.roomFrame === null) return null;
   const src = outsideSrc(session.roomFrame?.day ?? day);
@@ -136,13 +138,18 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
     const mode = (): RoomWant["mode"] | "boss" | "home" => {
       const h = sharedHost();
       const kind = h?.dataset.host;
-      return kind === "desk" || kind === "window" || kind === "boss" || kind === "home" ? kind : "hidden";
+      return kind === "desk" || kind === "face" || kind === "window" || kind === "boss" || kind === "home" ? kind : "hidden";
     };
     const want = (): RoomWant => {
       const m = mode() as RoomWant["mode"];
       const state = ctx.store.getState();
       const events = ctx.store.getEvents();
-      const main = m === "desk" ? deskCommand(state, ctx.session) : m === "window" ? outsideCommand(state, ctx.session) : null;
+      const main = m === "desk" ? deskCommand(state, ctx.session) : m === "face" ? faceCommand(state, ctx.session) : m === "window" ? outsideCommand(state, ctx.session) : null;
+      // room-3d-room R2 / R3: a facing posts the room's things as 桌子 does; the guided mark's thing glows
+      if (m === "face") {
+        const glow = root.querySelector<HTMLElement>('.face-marks > [data-guide="on"]')?.dataset.id ?? null;
+        return { mode: m, main, objects: [...(state.found as readonly string[])], prints: printsOnDesk(state.day, events).length > 0, chick: chickFrameNow(state, events, ctx.session, now(), ctx.store.getRunId?.() ?? "run"), glow, mug: null };
+      }
       if (m !== "desk") return { mode: m, main, objects: [], prints: false, chick: "" };
       // R6: the guided object glows in the room itself
       const g = guideNow(state, events, ctx.session);
@@ -194,7 +201,9 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       // #104: a drink or a set-down is said once; only "hold" is kept (a frame that reloads lifts it again)
       const mugNow = ctx.session.mug;
       if (mugNow && mugNow.act !== "hold" && posted.mug === `${mugNow.act}:${mugNow.seq}`) ctx.session.mug = null;
-      if (plan.locate) send(locateCommand());
+      // room-3d-room R3: a facing's marks wait for its own `where` (the last wall's rectangles are elsewhere)
+      if (plan.locate && mode() === "face") ctx.session.roomRects = null;
+      if (plan.locate) send(mode() === "face" ? faceLocateCommand() : locateCommand());
     };
     const chickTick = (on: boolean) => {
       if (!win) return;
@@ -244,8 +253,8 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       }
       if (msg.type === "where") {
         const rects = rectsFromWhere(msg);
-        if (rects === "moving") ctx.later(LOCATE_RETRY_MS, () => { if (mode() === "desk") send(locateCommand()); });
-        else if (rects && mode() === "desk") {
+        if (rects === "moving") ctx.later(LOCATE_RETRY_MS, () => { if (mode() === "desk") send(locateCommand()); else if (mode() === "face") send(faceLocateCommand()); });
+        else if (rects && (mode() === "desk" || mode() === "face")) {
           ctx.session.roomRects = rects;
           ctx.rerender();
         }
@@ -272,8 +281,12 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       if (msg.type === "pick") {
         // the keys belong to the game again, not the frame the click went into
         if (doc.activeElement === shared) shared.blur();
-        if (mode() !== "desk" || pickBlocked(ctx.session, now())) return;
-        const to = deskPick(msg.id, ctx.store.getState());
+        const m = mode();
+        if ((m !== "desk" && m !== "face") || pickBlocked(ctx.session, now())) return;
+        const state = ctx.store.getState();
+        // room-3d-room R3: on a facing, the photo hot area's action there (the door's delivery step from the marks)
+        const step = root.querySelector<HTMLElement>(".face-marks")?.dataset.doorStep ?? null;
+        const to = m === "face" ? roomPick(msg.id, { view: ctx.session.view, day: state.day, found: state.found as readonly string[], doorStep: step }) : deskPick(msg.id, state);
         const handler = to ? actions[to.action] : undefined;
         if (!to || !handler) return;
         try {
@@ -290,11 +303,12 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       else win.removeEventListener("message", onWindowMessage);
     };
     const fallback = () => {
-      if (readyWin || mode() !== "desk" || ctx.session.deskPhoto) return;
+      const fm = mode();
+      if (readyWin || (fm !== "desk" && fm !== "face") || ctx.session.deskPhoto) return;
       ctx.session.deskPhoto = true;
       if (!warned) {
         warned = true;
-        console.warn("room-3d-desk: the room frame said nothing within 8 s; 桌子 is the photo for this run");
+        console.warn("room-3d-desk / room-3d-room: the room frame said nothing within 8 s; the photographs for this run");
       }
       ctx.rerender();
     };
@@ -311,8 +325,8 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
           here.classList.toggle("ready", readyWin !== null);
         }
         const m = mode();
-        // R6: 桌子 shown, the room not ready: wait 8 s, then the photo
-        if (m === "desk" && !readyWin) {
+        // R6: 桌子 (or a facing on a frame day, room-3d-room R6) shown, the room not ready: wait 8 s, then the photographs
+        if ((m === "desk" || m === "face") && !readyWin) {
           if (deskShownAt === null) {
             deskShownAt = now();
             ctx.later(ROOM_READY_NET_MS, fallback);

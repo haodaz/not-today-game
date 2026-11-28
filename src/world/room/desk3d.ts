@@ -4,7 +4,8 @@
 // what each post-state change sends, the room's picks as the game's own actions, the rectangles the
 // room reports in stage px. The DOM side is outside.ts's layer.
 import type { State } from "@state/types.gen";
-import { weatherOf } from "@state/stages";
+import { cycleOf, ringOf, weatherOf } from "@state/stages";
+import { sceneOf } from "@world/loop/dialogue";
 import type { Session } from "@world/desktop/model";
 import type { Rect } from "./shots";
 import { somethingOpen } from "./stare";
@@ -83,7 +84,105 @@ export const desk3dOn = (session: Pick<Session, "view" | "deskPhoto" | "roomFram
  */
 export function settleRoomFrame(session: Session, day: number): void {
   if (session.roomFrame !== null) return;
-  if (session.view === "lying" || deskWantsRoom(session) || session.outside !== null || session.boss !== null) session.roomFrame = { day: clampDay(day) };
+  if (session.view === "lying" || deskWantsRoom(session) || room3dWants(day, session) || session.outside !== null || session.boss !== null) session.roomFrame = { day: clampDay(day) };
+}
+
+// ——— room-3d-room: 房间 / 窗 / 门 / 床 on the frame days ———
+
+/** room-3d-room R2: the four facings the frame stands for, and the room's own wall for each (room.js FACES: 桌墙 0, 床墙 1, 门墙 2, 窗墙 3). */
+export const FRAME_FACES = { room: 0, bed: 1, door: 2, window: 3 } as const;
+export type FrameView = keyof typeof FRAME_FACES;
+const isFrameView = (view: string): view is FrameView => Object.hasOwn(FRAME_FACES, view);
+
+/**
+ * R1: the day's ring has reached the walls (content/stages.json through @state/stages): `wall` or
+ * `room`, or the first two days of `door` (the last one is the flesh photographs). Today: days 10–17.
+ */
+export function frameDay(day: number): boolean {
+  if (!Number.isInteger(day) || day < 1) return false;
+  const ring = ringOf(day);
+  if (ring === "wall" || ring === "room") return true;
+  if (ring !== "door") return false;
+  const days = [...cycleOf(day).days].sort((a, b) => a - b);
+  return days.indexOf(day) >= 0 && days.indexOf(day) < 2;
+}
+
+type FrameSession = Pick<Session, "view" | "clock" | "dialogue" | "cut" | "endingPage" | "endingPreview" | "boss" | "deskPhoto" | "noWebGL">;
+
+/**
+ * R1: one of the four facings wants the frame. R5: only in the day beats (`boot`, `work`, `afternoon`,
+ * `desk`) — from the moment the clock is in `night` the four views are photographs again, so the
+ * night look, the hand and the dream scenes play exactly as before. Nothing that needs the
+ * photograph is up (a line's backdrop or standing NPC, a cut, an ending page or the fight); not the
+ * `desk=photo` switch or a failed `ready` (`deskPhoto`, shared with 桌子); not without WebGL. The
+ * box-less arrival still is day 1's only, never a frame day.
+ */
+export function room3dWants(day: number, session: FrameSession): boolean {
+  if (!frameDay(day) || !isFrameView(session.view) || session.clock.beat === "night") return false;
+  if (session.deskPhoto || session.noWebGL) return false;
+  if (session.cut !== null || session.endingPage !== null || session.endingPreview !== null || session.boss !== null) return false;
+  const scene = sceneOf(session.dialogue);
+  return scene.backdrop === null && scene.stand === undefined;
+}
+/** R1: the view is the room frame — wanted, and the shared frame exists (the settle makes it). */
+export const room3dOn = (day: number, session: FrameSession & Pick<Session, "roomFrame">): boolean => room3dWants(day, session) && session.roomFrame !== null;
+
+/** R2: the facing's command: its wall, standing back (`spot: null`). */
+export const faceCommand = (state: Pick<State, "day">, session: CommandSession & Pick<Session, "view">): RoomCommand =>
+  command(state, session, isFrameView(session.view) ? FRAME_FACES[session.view] : 0, null);
+
+/** R3: what the game asks the room to locate on a facing: every id it maps there, and the found objects and the mug. */
+export const FACE_LOCATE_IDS: readonly string[] = ["screen-left", "screen-right", "keyboard", "desk", "tower", "lamp", "switch", "window", "door", "coat", "bag", "bed", "box", "shelf", "meal", ...DESK_OBJECTS, "mug"];
+export const faceLocateCommand = (): object => ({ target: ROOM_TARGET, locate: [...FACE_LOCATE_IDS] });
+
+/** What `roomPick` reads besides the id: the view, the day, the found objects, and the door's next step if a delivery waits there. */
+export interface FacePickCtx {
+  readonly view: string;
+  readonly day: number;
+  readonly found: readonly string[];
+  /** The delivery's next input at 门 (`loop-door` `data-input`), or null when none waits. */
+  readonly doorStep: string | null;
+}
+
+/**
+ * R3: a pick on a facing as the action the photo's hot area runs there (hud.ts PROXIES / FLAT_PROXY /
+ * lookHits / glassHit / switchHit / shelfBook, game.ts), or null. `slit` has no action by day (the
+ * gap's glow is the night's), `deskphone` / `prints` are 桌子's.
+ */
+export function roomPick(id: unknown, c: FacePickCtx): { readonly action: string; readonly data: Readonly<Record<string, string>> } | null {
+  if (typeof id !== "string") return null;
+  if ((DESK_OBJECTS as readonly string[]).includes(id) || id === "mug") return deskPick(id, { found: c.found as State["found"] });
+  switch (id) {
+    case "screen-left":
+    case "screen-right":
+    case "lamp":
+    case "tower":
+    case "switch":
+      return deskPick(id, { found: c.found as State["found"] });
+    case "keyboard":
+    case "desk":
+      return { action: "view", data: { view: "desk" } };
+    case "window":
+      return c.view === "window" ? { action: "window-out", data: {} } : null;
+    case "door":
+      if (c.view === "room") return { action: "view", data: { view: "door" } };
+      if (c.view === "door" && c.doorStep !== null) return { action: "loop-door", data: { input: c.doorStep } };
+      return { action: "room-look", data: { look: "door" } };
+    case "coat":
+      return { action: "room-look", data: { look: "coat" } };
+    case "bag":
+      return { action: "room-look", data: { look: "bag" } };
+    case "bed":
+      return { action: "bed", data: {} };
+    case "box":
+      return c.view === "bed" ? { action: "bed-box", data: {} } : c.view === "room" ? { action: "pick-box", data: {} } : null;
+    case "shelf":
+      return c.day >= 2 ? { action: "book-open", data: {} } : null;
+    case "meal":
+      return c.view === "window" ? { action: "meal-table", data: {} } : null;
+    default:
+      return null;
+  }
 }
 
 // ——— R2 / R4: what to post ———
@@ -106,7 +205,8 @@ export const NOTHING_POSTED: RoomPosted = { main: null, day: null, faceSpot: nul
 
 /** What the frame should show now: hidden (paused), the desk (with its things) or the look-out. */
 export interface RoomWant {
-  readonly mode: "desk" | "window" | "hidden";
+  /** room-3d-room R2: `face` is 房间 / 窗 / 门 / 床 on a frame day (the room's things posted as on 桌子). */
+  readonly mode: "desk" | "face" | "window" | "hidden";
   readonly main: RoomCommand | null;
   readonly objects: readonly string[];
   readonly prints: boolean;
@@ -143,7 +243,7 @@ export function roomPosts(prev: RoomPosted, want: RoomWant): { readonly posts: r
   }
   let locate = faceSpot !== prev.faceSpot;
   next = { ...next, faceSpot };
-  if (want.mode === "desk") {
+  if (want.mode === "desk" || want.mode === "face") {
     const objects = JSON.stringify(want.objects);
     if (objects !== prev.objects || dayAgain) {
       posts.push({ target: ROOM_TARGET, objects: [...want.objects] });

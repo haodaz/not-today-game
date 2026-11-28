@@ -11,6 +11,7 @@ import { createFrameKeeper } from "./keepframes";
 import { dayTune, playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, backdropFor } from "@world/fit";
+import { room3dOn } from "@world/room/desk3d";
 import { boxArrived } from "@world/room/arrival";
 import { onEmailChange, setEmailDraft } from "@net/email";
 import { appOn, buildShell, initialSession, shownConversation, type AppRenderers, type Session } from "./model";
@@ -409,7 +410,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    applyFit(root, stage, stageSize(session.view), session.pullOut ? null : backdropFor(session.view, boxArrived(deps.store.getState(), deps.store.getEvents()), session.coat));
+    // room-3d-room R2: a facing that is the room frame has a plain dark letterbox (no photo behind it)
+    applyFit(root, stage, stageSize(session.view), session.pullOut || room3dOn(deps.store.getState().day, session) ? null : backdropFor(session.view, boxArrived(deps.store.getState(), deps.store.getEvents()), session.coat));
     // 换一件: the door wall's picture (the stage's and the turning walls') follows the hook's garment (room.css)
     if (session.coat > 0) root.dataset.coat = String(session.coat);
     else delete root.dataset.coat;

@@ -42,6 +42,7 @@ import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
+import { hasWebGL } from "@world/room/splat/gate";
 import { endingHost, onBossRoom } from "@world/endings/flow";
 import { watchEndings, watchObjects } from "@world/endings/record";
 import { getLocale, initialLocale, setLocale } from "@world/i18n";
@@ -203,6 +204,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   if (import.meta.env.DEV) (window as unknown as { __nt: unknown }).__nt = { ...game, store };
   // room-3d-desk R6: `?desk=photo` keeps the photo 桌子 (the author's comparison; the replay driver passes it).
   game.session.deskPhoto = new URLSearchParams(search).get("desk") === "photo";
+  // room-3d-room R6: no WebGL, no room frame on 房间 / 窗 / 门 / 床 (photographs)
+  game.session.noWebGL = !hasWebGL(document);
   // 换一件: the garment left on the hook by the door is the browser's to remember
   game.session.coat = readCoat(window.localStorage);
   // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that

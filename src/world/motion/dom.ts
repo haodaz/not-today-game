@@ -970,7 +970,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       } else if (snap.view !== prev.view) {
         // Between two facings a turn slides (room-turn R2); anything else walks and crossfades.
         const turn = ctx.session.cam?.turn;
-        if (turn && isFacing(prev.view) && isFacing(snap.view) && !reducedMotion()) turnChange(t, prev.view, snap.view, turn);
+        // room-3d-room R2: between two frame views the room turns by itself (the new face is posted)
+        if (turn && isFacing(prev.view) && isFacing(snap.view) && !reducedMotion() && !q(root, ".stage.room.frame-on")) turnChange(t, prev.view, snap.view, turn);
         else {
           turnMove = null;
           viewChange(t, prev.view, snap.view);

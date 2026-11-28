@@ -57,7 +57,7 @@ import { printsOnDesk } from "@state/days/prints";
 import { sheetLayer, viewfinderLayer } from "./viewfinder";
 import { wakeHost } from "./wake";
 import { roomHost } from "./outside";
-import { desk3dOn, glowTarget } from "./desk3d";
+import { desk3dOn, FACE_LOCATE_IDS, glowTarget, room3dOn, roomPick } from "./desk3d";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -371,6 +371,72 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
   return html`<div class="desk3d-marks">${lit}${mark("screen-left", 'data-action="view" data-view="desktop" data-screen="left"')}${mark("screen-right", 'data-action="view" data-view="desktop" data-screen="right"')}${mark("deskphone", 'data-action="loop-phone"', session.phoneOpen && "lifted")}${objects}${printsOnDesk(state.day, events).length > 0 ? mark("prints", 'data-action="prints-open"') : null}${slipThing(state, events) ? mark("slip", 'data-action="desk-slip"') : null}${mark("lamp", 'data-action="lamp"')}${on ? null : mark("tower", 'data-action="tower-power"')}</div><div class="desk3d-back" aria-hidden="true"></div>`;
 }
 
+/**
+ * room-3d-room R3: what the game draws over the frame on 房间 / 窗 / 门 / 床, at the rectangles the room
+ * reported: the lit monitors (as on 桌子), and a mark on each thing the room can pick that the photo's
+ * hot areas answer there (roomPick), carrying the hot area's own action attributes (so the guide's
+ * ring lands on it) and its hover chip. The marks take no clicks: the room reports the pick. The
+ * delivery's next step at 门 rides on the container (the layer reads it for a pick on the door).
+ */
+function faceMarks(state: State, events: readonly GameEvent[], session: Session, view: string): SafeHtml {
+  const rects = session.roomRects ?? {};
+  const on = booted(state, events);
+  const step = view === "door" ? doorStep(state, events, session) : null;
+  const ctx = { view, day: state.day, found: state.found as readonly string[], doorStep: step };
+  const arrived = boxArrived(state, events);
+  const marks = FACE_LOCATE_IDS.map((id) => {
+    const r = rects[id];
+    if (!r) return null;
+    if (id === "tower" && on) return null; // once on, the tower is only the picture (PROXIES.tower)
+    if (id === "box" && !arrived) return null;
+    const to = roomPick(id, ctx);
+    if (!to) return null;
+    const attrs = Object.entries(to.data).map(([k, v]) => ` data-${k === "object" ? "object" : k}="${v}"`).join("");
+    const chip = faceChip(id, to.action, state, events, session);
+    return html`<i class="${cls("room-mark", id)}" data-id="${id}" data-action="${to.action}"${raw(attrs)}${chip ? html` data-chip="${chip}"` : null}${session.deskHover === id ? raw(" data-hover") : null} style="${rectStyle(r)}" aria-hidden="true"></i>`;
+  });
+  const lit = on
+    ? html`${rects["screen-left"] ? html`<i class="monitor-lit left" style="${rectStyle(rects["screen-left"])}" aria-hidden="true"></i>` : null}${rects["screen-right"] ? html`<i class="monitor-lit right" style="${rectStyle(rects["screen-right"])}" aria-hidden="true"></i>` : null}`
+    : null;
+  return html`<div class="desk3d-marks face-marks"${step !== null ? html` data-door-step="${step}"` : null}>${lit}${marks}</div>`;
+}
+/** room-3d-room R3: the hover chip the photo's hot area carries for that thing there (null: it has none). */
+function faceChip(id: string, action: string, state: State, events: readonly GameEvent[], session: Session): string | null {
+  const own = (key: string, label: string) => (hasString(key) ? t(key) : t(label));
+  switch (action) {
+    case "view":
+      if (id === "screen-left") return own("room.chip.monitorL", "hud.cam.screen");
+      if (id === "screen-right") return own("room.chip.monitorR", "hud.cam.screen");
+      if (id === "door") return own("room.chip.door", "hud.cam.door");
+      return own("room.chip.desk", "hud.cam.desk");
+    case "tower-power":
+      return own("room.chip.tower", "room.tower.off");
+    case "lamp":
+      return t(lampLit(session) ? "room.chip.lampOff" : "room.chip.lampOn");
+    case "switch":
+      return t(ceilLit(session) ? "room.chip.lightOff" : "room.chip.lightOn");
+    case "window-out":
+      return t("room.chip.glass");
+    case "room-look": {
+      const look = id === "coat" || id === "bag" ? id : "door";
+      return hasString(`room.chip.look.${look}`) ? t(`room.chip.look.${look}`) : null;
+    }
+    case "bed":
+      return own("room.chip.bed", "room.bed");
+    case "bed-box":
+    case "pick-box":
+      return own("room.chip.box", "room.box");
+    case "book-open":
+      return t("room.book");
+    case "meal-table":
+      return own("room.chip.mealTable", "room.mealTable");
+    case "loop-hold":
+      return deskChip(id, state, events, session);
+    default:
+      return null;
+  }
+}
+
 /** author 2026-11-25 (#71): what a 3D desk thing does, in a word, for its hover chip; null: none. */
 function deskChip(id: string, state: State, events: readonly GameEvent[], session: Session): string | null {
   if (id === "screen-left" || id === "screen-right") return t("room.chip.screenUse");
@@ -623,7 +689,16 @@ const DOOR_OPEN = new Set<DoorState>(["chainOpen", "holding"]);
 export const DOOR_SPOTS: Readonly<Partial<Record<DoorInput, Rect>>> = { openChain: DOOR_SHOT.chain, reach: DOOR_SHOT.bag, close: DOOR_SHOT.close };
 
 /** The door beat in 门: only the current step exists, as a hotspot on the thing itself; its hint is the step's caption. */
-function doorContent(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
+/** room-3d-room R3: the delivery's next step at 门 (its `loop-door` input), or null when none waits. */
+export function doorStep(state: State, events: readonly GameEvent[], session: Session): string | null {
+  const meal = doorMeal(state, events, session);
+  if (!meal) return null;
+  const view = mealView(state.day, meal, state, events, session.clock.time)!;
+  const beat: DoorBeat | null = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
+  const at = beat?.state ?? null;
+  return (at ? nextInputs(at)[0] : undefined) ?? null;
+}
+function doorContent(state: State, events: readonly GameEvent[], session: Session, frame = false): SafeHtml {
   const meal = doorMeal(state, events, session);
   if (!meal) return html``;
   const view = mealView(state.day, meal, state, events, session.clock.time)!;
@@ -635,6 +710,8 @@ function doorContent(state: State, events: readonly GameEvent[], session: Sessio
     input && r
       ? html`<button type="button" class="${cls("door-spot", input)}" data-action="loop-door" data-input="${input}" style="${rectStyle(r)}" aria-label="${doorCaption(DOOR_STATES[DOOR_STATES.indexOf(at!) + 1]!)}"></button>`
       : null;
+  // room-3d-room R4: over the frame only the beat's captions; the spot, the chain and the hand are placed on the photo
+  if (frame) return html`${raw(renderDoorView(view, beat, state.names))}`;
   // renderDoorView escapes its own text (content strings) and returns markup.
   return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${spot}${raw(renderDoorView(view, beat, state.names))}${at === "holding" ? html`<div class="${cls("door-hand", bleedingToday(events, state.day) && "blood")}"></div>` : null}`;
 }
@@ -827,7 +904,10 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const table = view === "table" ? tableThings(state, events, session) : null;
   // room-3d-desk R2: 桌子 is the shared room frame; its things are the room's, the game draws its marks over them
   const desk3d = desk3dOn(session);
-  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door", session)}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events, session)}${kept}` : (flat ?? table);
+  // room-3d-room R1 / R2: on the frame days the four facings are the shared room frame too (day beats only)
+  const room3d = room3dOn(state.day, session);
+  const frame = desk3d || room3d;
+  const scene = room3d ? (waiting || dream ? null : html`${faceMarks(state, events, session, view)}${door ? doorContent(state, events, session, true) : null}${view === "room" ? figureCard(session.collection, session.figureOpen) : null}`) : desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door", session)}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events, session)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
   // camera-viewfinder: the viewfinder (R1) and the sheet in hand (R3) take the held layer's place;
   // the viewfinder also hides the HUD (the list, the corner, the buttons, Kuro's body).
@@ -844,8 +924,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // The collapse stack and the evening look apply to all four facings (room-turn R4).
   // The table up close has no stack of its own (its photos would not be pushed in like the still).
   // The ceiling has its own two photographs, day and night, and from 2026-11-28 their collapsed ones (author: 「第18天的崩坏，在躺着的时候没效果啊」).
-  const fx = dream || view === "table" || desk3d ? null : renderFx(fxPlan(state.day, lying ? (isEvening(session.clock) ? "lyingnight" : "lying") : (view as Exclude<typeof view, "table" | "lying">)));
-  const evening = dream || desk3d ? null : eveningLook(view, isEvening(session.clock), lampLit(session), ceilLit(session));
+  const fx = dream || view === "table" || frame ? null : renderFx(fxPlan(state.day, lying ? (isEvening(session.clock) ? "lyingnight" : "lying") : (view as Exclude<typeof view, "table" | "lying">)));
+  const evening = dream || frame ? null : eveningLook(view, isEvening(session.clock), lampLit(session), ceilLit(session));
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
   // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).
@@ -855,8 +935,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // box-arrival R1: 房间 and 床 show their box-less stills until the case has arrived (room.css `.nobox`).
   const nobox = !arrived && (view === "room" || view === "bed");
   // room-light-switch R3: by day the ceiling light makes the photo a little brighter (room.css, the backdrop only)
-  const ceilDay = !dream && !desk3d && !isEvening(session.clock) && ceilLit(session);
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene, state.names.login.trim())}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${edgeLeads(view, "back") && !dream ? backPill() : null}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
+  const ceilDay = !dream && !frame && !isEvening(session.clock) && ceilLit(session);
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", room3d && "frame-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream && !room3d ? windowLight(state.day) : null}${evening}${frame ? roomHost(state.day, session) : null}${room3d ? raw('<div class="frame-edge left" aria-hidden="true"></div><div class="frame-edge right" aria-hidden="true"></div>') : null}${renderScene(lineScene, state.names.login.trim())}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${edgeLeads(view, "back") && !dream ? backPill() : null}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${frame ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
 }
 
 export { raidShowing };

@@ -492,6 +492,8 @@ export interface Session {
   roomRects: Readonly<Record<string, import("@world/room/shots").Rect | null>> | null;
   /** room-3d-desk R6: 桌子 is the photo (the `desk=photo` URL, or the room never said `ready`). */
   deskPhoto: boolean;
+  /** room-3d-room R6: the machine has no WebGL (main.ts asks once): 房间 / 窗 / 门 / 床 stay photographs. */
+  noWebGL: boolean;
   /**
    * boss-phase2-world R2: the holds from the burst (set by the flow): the eye dislocated, the head
    * rising, then up (the clock runs again). Null before the burst, and when phase 2 plays without the room.
@@ -756,6 +758,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     roomFrame: null,
     roomRects: null,
     deskPhoto: false,
+    noWebGL: false,
     phase2: null,
     bossRoom: null,
     wakeFlash: null,
