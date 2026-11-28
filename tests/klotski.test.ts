@@ -16,7 +16,7 @@ import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { gradeGame } from "@world/desktop/workbench/grades";
-import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves, KLOTSKI_ROOM_MS, klotskiRoomSrc } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves, KLOTSKI_ROOM_MS, klotskiRoomSrc, klotskiStage } from "@world/desktop/workbench/klotski";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
@@ -242,6 +242,11 @@ describe("klotski: the stage", () => {
     expect(klotskiRoomSrc(17, 1000)).toBe(`/room3d/index.html?embed=1&day=17&low=1&surge=1&at=${String(1000 + KLOTSKI_ROOM_MS)}`);
     expect(KLOTSKI_ROOM_MS).toBeLessThan(KLOTSKI_DONE_MS - 4000);
     expect(fs.readFileSync(new URL("../room3d/room.js", import.meta.url), "utf8")).toContain('if (q.get("surge") === "1") surge(q.get("at"));');
+    // the photo look (`?desk=photo`, the walk's software renderer): no 3D page is loaded; the flat tentacles stand in
+    const flat = klotskiStage(r.task, r.board, boardState(r.board, 17, r.task.id, r.store.getEvents()), r.session, false, r.clock.now, null, false).value;
+    expect(flat).not.toContain("<iframe");
+    expect(flat).toContain('class="kl-tent');
+    expect(fs.readFileSync(new URL("../src/world/desktop/desktop.css", import.meta.url), "utf8")).toContain(".kl-board.open:has(.kl-flesh) .kl-tent");
     // parted, not covered (「感觉是盖在上面的，不是从通道过去的」): the blocks standing on your way are pushed off it; you are not
     const shoves = klotskiShoves(g);
     expect(Object.keys(shoves).length).toBeGreaterThan(0);

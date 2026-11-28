@@ -344,7 +344,8 @@ export const KLOTSKI_ROOM_MS = 3600;
 export const KLOTSKI_ROOM_DAY = 17;
 export const klotskiRoomSrc = (day: number, outAt: number): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=1&at=${String(Math.round(outAt + KLOTSKI_ROOM_MS))}`;
 
-export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null): SafeHtml {
+export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null, flesh = true): SafeHtml {
+  // `flesh` false (the photo look: `?desk=photo`, the walk driver's software renderer): no 3D pages at the door moment, the flat tentacles instead
   const game = board.game as Game;
   const g: KlotskiGame | null = session.klotski?.key === task.id ? session.klotski : null;
   const lv = g ?? klotskiStart(task.id, game);
@@ -361,7 +362,7 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
     tentacles = cover.map(([x, y], i) => html`<i class="${cls("kl-tent", i === cover.length - 1 && "last")}" aria-hidden="true" style="--x:${String(x)};--y:${String(y)};--d:${String(Math.round(KLOTSKI_SLIDE_MS + i * step))}ms"></i>`);
   }
   // the surge over the board at the door moment: the flesh page, kept across re-renders (its clock is the door's own)
-  const surge = g && out && g.outAt !== null
+  const surge = flesh && g && out && g.outAt !== null
     ? html`<iframe class="kl-flesh" data-keep="kl-flesh" src="/room3d/flesh.html#${encodeURIComponent(JSON.stringify({ at: g.outAt, cols: KLOTSKI_COLS, rows: KLOTSKI_ROWS, m: KLOTSKI_FLESH_MARGIN, s: klotskiSurge(g) }))}" title="" aria-hidden="true" tabindex="-1"></iframe>`
     : null;
   const field = html`<div class="${cls("kl-board", !g && "blank", out && "open")}" style="--cols:${String(KLOTSKI_COLS)};--rows:${String(KLOTSKI_ROWS)};--rot:${rot}"><i class="kl-veins" aria-hidden="true"></i>${blocks}<i class="kl-door" aria-hidden="true"><b class="kl-leaf l"></b><b class="kl-leaf r"></b><em>${S("klotski.stage.door")}</em></i><i class="kl-road" aria-hidden="true"></i>${tentacles}${surge}</div>`;
@@ -387,7 +388,7 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   else foot = html`<div class="mn-ctl sn-ctl"><span class="mn-left">${S("klotski.stage.moves", { n: String(g.moves) })}</span><div class="sk-pad sn-pad">${pad}</div><button type="button" class="mn-mode" data-action="klotski-undo"${g.history.length ? null : html` disabled`}>${S("klotski.stage.undo")}</button><button type="button" class="mn-mode" data-action="klotski-start">${S("klotski.stage.reset")}</button><span class="sn-hint">${S("klotski.stage.keys")}</span>${nameless}</div>`;
   // the room's own picture of it, over the tray for the second half of the moment (its lines stay in the header)
   const since = g && out && g.outAt !== null ? nowMs - g.outAt : -1;
-  const room = g && out && g.outAt !== null
+  const room = flesh && g && out && g.outAt !== null
     ? html`<iframe class="${cls("kl-room", since >= KLOTSKI_ROOM_MS && "in")}" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY, g.outAt)}" style="--at:${String(Math.max(0, Math.round(KLOTSKI_ROOM_MS - since)))}ms" title="" aria-hidden="true" tabindex="-1"></iframe>`
     : null;
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="klotski-cheat" aria-hidden="true" tabindex="-1"></button>` : null;

@@ -252,7 +252,7 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
     body = tuneStage({ state, events, session, nowMs }, task, board);
   } else if (board.game?.kind === "klotski" && (() => { const st = boardState(board, state.day, task.id, events); const slot = board.game.slot; return board.slots.every((x) => x.id === slot || x.id in st.slots) && (!st.approved || (session.klotski?.key === task.id && klotskiApproving(session.klotski, nowMs))); })()) {
     // klotski (game-swaps §1): every slot but the caller filled — the callers as blocks, one out through the door
-    body = klotskiStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs, playerPortraitSrc(state.names.portrait, false));
+    body = klotskiStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs, playerPortraitSrc(state.names.portrait, false), !session.deskPhoto);
   } else if (board.game?.kind === "echo" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.echo?.key === task.id && echoApproving(session.echo, nowMs))); })()) {
     // echo (game-swaps §2): the filled minutes' roll call, repeated round by round
     body = echoStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

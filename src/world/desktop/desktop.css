@@ -2357,7 +2357,7 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 @keyframes kl-leave{to{transform:translateY(calc(var(--cell) * 2.2));opacity:0}}
 /* the surge (author 2026-11-27): the code-built room's flesh tentacles (room3d/flesh.js), a transparent page over the tray and a cell or two beyond it */
 .kl-flesh{position:absolute;left:calc(8px - 1 * var(--cell));top:calc(8px - 1 * var(--cell));width:calc((var(--cols) + 2) * var(--cell));height:calc((var(--rows) + 3) * var(--cell));border:0;background:transparent;pointer-events:none;z-index:5;color-scheme:normal;-webkit-mask-image:linear-gradient(180deg,#000 90%,transparent);mask-image:linear-gradient(180deg,#000 90%,transparent)}
-.kl-board.open .kl-tent,.kl-board.open .kl-peek{display:none}
+.kl-board.open:has(.kl-flesh) .kl-tent,.kl-board.open:has(.kl-flesh) .kl-peek{display:none}
 /* the blocks on the way are parted as the front reaches them */
 .kl-block.shoved{animation:kl-shove 300ms cubic-bezier(.2,1.5,.4,1) var(--sd,700ms) forwards}
 @keyframes kl-shove{to{translate:calc(var(--sx) * var(--cell)) calc(var(--sy) * var(--cell));rotate:var(--sr);box-shadow:0 8px 14px rgba(0,0,0,.55)}}
