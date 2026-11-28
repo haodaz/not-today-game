@@ -64,12 +64,13 @@ On waking, from day 2, if the chick is found, not upgraded, and was not fed the 
 | status.chick.hungry | 它饿着 | It is hungry |
 | status.chick.days | 喂了 {n} 天 | Fed on {n} days |
 | status.chick.fight.none | 今天还没上场 | No fight yet today |
-| status.chick.fight | 今天上场 {n} 次，抬了 {w} 单 | Today: {n} fights, {w} won |
+| status.chick.fight | 今天上场 {n} 次，帮上了 {w} 次 | Today: {n} fights, helped {w} times |
 | status.chick.kuro | 克总在带它，还有 {n} 天 | Kuro has it in hand: {n} more days |
 | status.chick.taken | 它是克总的了 | It is Kuro's now |
 | battle.hungry | 饿着 | hungry |
 | battle.taken | 是克总的了 | Kuro's now |
-| battle.win.grade | 这一单抬了一格。 | This one goes up a grade. |
+| battle.win.banner | 大鸡大利，工作顺意！ (the author's, 2026-11-27: "winner winner, chicken dinner" turned round) | Chicken winner, work better! |
+| battle.win.grade | 小鸡的胜利使你的工作变得更优秀了。 (the author's own sentence, 2026-11-27) | The chick's win made your work better. |
 | chick.hungry.morning | 昨天忘了喂它。 | I forgot to feed it yesterday. |
 
 ## Done when

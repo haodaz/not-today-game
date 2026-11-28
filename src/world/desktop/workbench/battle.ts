@@ -161,7 +161,7 @@ export function battleTurn(s: BattleState, moveId: string, at: number): BattleSt
   let { ours, theirs } = a;
   let after: BattlePhase = "menu";
   if (theirs.hp <= 0) {
-    lines.push({ t: S("battle.won", { foe: s.foe }), fx: "down", side: "theirs" }, { t: S("battle.win.grade"), fx: "none", side: "none" });
+    lines.push({ t: S("battle.won", { foe: s.foe }), fx: "down", side: "theirs" }, { t: S("battle.win.banner"), fx: "none", side: "none" }, { t: S("battle.win.grade"), fx: "none", side: "none" });
     after = "won";
   } else {
     const foeMove = FOE_MOVES[Math.floor(roll() * FOE_MOVES.length)]!;
@@ -277,7 +277,9 @@ export function battleScene(s: BattleState, nowMs: number): SafeHtml {
   } else if (s.phase === "moves") {
     box = html`<div class="bt-box bt-moves"><div class="bt-cmds">${OUR_MOVES.map((m) => html`<button type="button" class="bt-cmd" data-action="battle-act" data-cmd="move" data-move="${m.id}">${S(`battle.move.${m.id}`)}</button>`)}</div><button type="button" class="bt-back" data-action="battle-act" data-cmd="back">${S("battle.back")}</button></div>`;
   } else if (over) {
-    box = html`<div class="bt-box"><p class="bt-line">${S(s.phase === "won" ? "battle.win.grade" : s.phase === "lost" ? "battle.lost" : "battle.ran")}</p><button type="button" class="bt-done" data-action="battle-done">${S("battle.done")}</button></div>`;
+    // the win's banner (author 2026-11-27: 「winner winner, chicken dinner，我们也可以反过来」): 大鸡大利，工作顺意
+    const banner = s.phase === "won" ? html`<p class="bt-line bt-banner">${S("battle.win.banner")}</p>` : null;
+    box = html`<div class="${cls("bt-box", s.phase === "won" && "bt-won")}">${banner}<p class="bt-line">${S(s.phase === "won" ? "battle.win.grade" : s.phase === "lost" ? "battle.lost" : "battle.ran")}</p><button type="button" class="bt-done" data-action="battle-done">${S("battle.done")}</button></div>`;
   } else {
     box = html`<button type="button" class="bt-box bt-textbtn" data-action="battle-act" data-cmd="next"><p class="bt-line">${line?.t ?? ""}</p><span class="bt-more">▼</span></button>`;
   }

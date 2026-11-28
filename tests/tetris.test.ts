@@ -9,7 +9,7 @@ import { boardState, canPrint } from "@state/days/board";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
-import { fits, kindFor, PIECES, tetrisDropMs, tetrisKey, tetrisStart, tetrisTick, YPNOS, YPNOS_EVERY, type TetrisGame } from "@world/desktop/workbench/tetris";
+import { fits, isBlack, isOdd, kindFor, PIECES, rotSides, tetrisDropMs, tetrisKey, tetrisStage, tetrisStart, tetrisTick, YPNOS, YPNOS_EVERY, type TetrisGame } from "@world/desktop/workbench/tetris";
 import { dice } from "@world/desktop/workbench/battle";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { setLocale, t } from "@world/i18n";
@@ -18,12 +18,52 @@ import { completeUntil } from "./complete-items";
 const GAME = { kind: "tetris" as const, cols: 7, rows: 12, goal: 7 };
 
 describe("tetris", () => {
-  it("day 12's board is a tetris; every seventh piece is ΥΠΝΟΣ", () => {
+  it("day 12's board is a tetris; every seventh piece is a wrong shape, the first of them ΥΠΝΟΣ", () => {
     expect(taskByFlag(12, "task_d12_work")!.board!.game).toEqual(GAME);
     expect(PIECES[YPNOS]!.name).toBe("Y");
     expect(PIECES[YPNOS]!.rots[0]).toHaveLength(5);
-    for (let n = 1; n < 30; n++) expect(kindFor(n, dice(`k${n}`)) === YPNOS).toBe(n % YPNOS_EVERY === 0);
+    for (let n = 1; n < 60; n++) expect(isOdd(kindFor(n, dice(`k${n}`)))).toBe(n % YPNOS_EVERY === 0);
     for (let n = 1; n < 7; n++) expect(kindFor(n, dice(`k${n}`))).toBeLessThan(YPNOS);
+    expect(kindFor(YPNOS_EVERY, dice("any"))).toBe(YPNOS);
+  });
+
+  // #167 (author 2026-11-27): 「中间偶尔会出现一些奇怪的图形或者边缘溃烂、红色黑色的方块」
+  it("the later wrong shapes: a cross, a jaw and one black block come up too; every piece keeps its cells through its turns and fits the well", () => {
+    expect(PIECES.slice(YPNOS).map((p) => p.name)).toEqual(["Y", "X", "U", "dot"]);
+    const seen = new Set<string>();
+    for (let n = 2; n < 400; n++) seen.add(PIECES[kindFor(n * YPNOS_EVERY, dice(`w${n}`))]!.name);
+    expect([...seen].sort()).toEqual(["U", "X", "Y", "dot"]);
+    expect(PIECES.filter((_, k) => isBlack(k)).map((p) => p.name)).toEqual(["U", "dot"]);
+    for (const p of PIECES) {
+      expect(new Set(p.rots.map((r) => r.length)).size, p.name).toBe(1);
+      for (const r of p.rots) {
+        expect(new Set(r.map(([x, y]) => `${x},${y}`)).size, p.name).toBe(r.length);
+        for (const [x, y] of r) { expect(x).toBeGreaterThanOrEqual(0); expect(x).toBeLessThan(4); expect(y).toBeGreaterThanOrEqual(0); expect(y).toBeLessThan(4); }
+      }
+    }
+    // each enters the empty well where pieces enter
+    const g = tetrisStart("t", GAME, dice("s1"), 1);
+    for (let k = 0; k < PIECES.length; k++) expect(fits(g, { kind: k, rot: 0, x: Math.floor((GAME.cols - 4) / 2), y: -1 }), PIECES[k]!.name).toBe(true);
+  });
+
+  it("the rot is drawn only: an ordinary block lying against a wrong one gets the side it touches; the cells and the grade do not change", () => {
+    const cols = 4, rows = 2;
+    //  row 0: . Y . .      row 1: a b . c   (a under nothing, b under the wrong block)
+    const cells = [0, YPNOS + 1, 0, 0, 1, 2, 0, 3];
+    const at = (i: number) => cells[i]!;
+    expect(rotSides(at, cols, rows, 5)).toEqual([false, false, true, false]); // the wrong block is above it
+    expect(rotSides(at, cols, rows, 4)).toEqual([false, false, false, false]); // diagonal: not touching
+    expect(rotSides(at, cols, rows, 7)).toEqual([false, false, false, false]);
+    expect(rotSides((i) => [1, YPNOS + 2, 1][i]!, 3, 1, 0)).toEqual([false, true, false, false]);
+    expect(rotSides((i) => [1, YPNOS + 2, 1][i]!, 3, 1, 2)).toEqual([true, false, false, false]);
+    // in the page: the wrong block red with an eaten outline, its neighbour marked, and the game as it was
+    const g: TetrisGame = { ...tetrisStart("12:t", GAME, dice("s1"), 1), key: "t", piece: null, cells: Array.from({ length: GAME.cols * GAME.rows }, (_, i) => (i === 80 ? YPNOS + 1 : i === 81 ? 1 : i === 79 ? YPNOS + 3 : 0)) };
+    const task = taskByFlag(12, "task_d12_work")!;
+    const out = tetrisStage({ ...task, id: "t" }, task.board!, { slots: {} } as never, { tetris: g }, false, 0).value;
+    expect(out).toMatch(/class="tt-px on s3 y r\d"/);
+    expect(out).toMatch(/class="tt-px on s3 k r\d"/);
+    expect(out).toContain('class="tt-px on s0 rot" style="--rl:1;--rr:0;--rt:0;--rb:0"');
+    expect((out.match(/ rot"/g) ?? []).length).toBe(1);
   });
 
   it("starts with a piece entering mid-well; gravity lowers it; walls and blocks stop moves; a turn kicks off the wall", () => {

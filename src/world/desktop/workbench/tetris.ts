@@ -4,6 +4,10 @@
 // (`goal`) and the rota is done: the form is approved (the chain's `approve` step). The stack
 // reaching the top ends it (重来 / 让克总帮忙). Every seventh piece is the ΥΠΝΟΣ one — the shape no
 // shift is, a Y of five blocks, drawn in the wrong colour — and it still has to go somewhere.
+// author 2026-11-27 (#167: 「中间偶尔会出现一些奇怪的图形或者边缘溃烂、红色黑色的方块」): after the first
+// ΥΠΝΟΣ, the seventh pieces come in other wrong shapes too (a cross, a jaw, a single black block), red
+// or black, their edges eaten; and the ordinary blocks that lie against them rot along that edge.
+// The rot is drawn only: it changes no rule and no grade.
 // Pure engine + view; the actions keep the game in the session and run the clock.
 import type { BoardGame, Task, TaskBoard } from "@state/days/tasks";
 import type { BoardState } from "@state/days/board";
@@ -28,9 +32,17 @@ export const PIECES: readonly { readonly name: string; readonly rots: readonly (
   { name: "J", rots: [[[0, 0], [0, 1], [1, 1], [2, 1]], [[1, 0], [2, 0], [1, 1], [1, 2]], [[0, 1], [1, 1], [2, 1], [2, 2]], [[1, 0], [1, 1], [0, 2], [1, 2]]] },
   { name: "L", rots: [[[2, 0], [0, 1], [1, 1], [2, 1]], [[1, 0], [1, 1], [1, 2], [2, 2]], [[0, 1], [1, 1], [2, 1], [0, 2]], [[0, 0], [1, 0], [1, 1], [1, 2]]] },
   { name: "Y", rots: [[[0, 1], [1, 1], [2, 1], [3, 1], [1, 0]], [[1, 0], [1, 1], [1, 2], [1, 3], [0, 2]], [[0, 1], [1, 1], [2, 1], [3, 1], [2, 2]], [[1, 0], [1, 1], [1, 2], [1, 3], [2, 1]]] },
+  // the other wrong shapes (#167): the cross, the jaw (a U), the one black block
+  { name: "X", rots: [[[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]], [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]], [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]], [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2]]] },
+  { name: "U", rots: [[[0, 0], [2, 0], [0, 1], [1, 1], [2, 1]], [[1, 0], [2, 0], [1, 1], [1, 2], [2, 2]], [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1]], [[0, 0], [1, 0], [1, 1], [0, 2], [1, 2]]] },
+  { name: "dot", rots: [[[1, 1]], [[1, 1]], [[1, 1]], [[1, 1]]] },
 ];
-export const YPNOS = PIECES.length - 1;
-/** Every nth piece is ΥΠΝΟΣ. */
+/** ΥΠΝΟΣ, the first wrong shape; every kind from it on is one (no shift's shape). */
+export const YPNOS = PIECES.findIndex((p) => p.name === "Y");
+export const isOdd = (kind: number): boolean => kind >= YPNOS;
+/** The wrong shapes drawn black (the rest are red). */
+export const isBlack = (kind: number): boolean => PIECES[kind]?.name === "U" || PIECES[kind]?.name === "dot";
+/** Every nth piece is a wrong shape: the first of a game is ΥΠΝΟΣ itself, the later ones any of them. */
 export const YPNOS_EVERY = 7;
 
 export interface Falling { readonly kind: number; readonly rot: number; readonly x: number; readonly y: number }
@@ -72,7 +84,8 @@ export function fits(g: Pick<TetrisGame, "cols" | "rows" | "cells">, p: Falling)
 const spawn = (g: Pick<TetrisGame, "cols">, kind: number): Falling => ({ kind, rot: 0, x: Math.floor((g.cols - 4) / 2), y: -1 });
 
 /** The kind of the nth piece spawned (1-based): ΥΠΝΟΣ every `YPNOS_EVERY`th, else a tetromino by the dice. */
-export const kindFor = (n: number, roll: () => number): number => (n % YPNOS_EVERY === 0 ? YPNOS : Math.floor(roll() * YPNOS));
+export const kindFor = (n: number, roll: () => number): number =>
+  n % YPNOS_EVERY !== 0 ? Math.floor(roll() * YPNOS) : n === YPNOS_EVERY ? YPNOS : YPNOS + Math.floor(roll() * (PIECES.length - YPNOS));
 
 export function tetrisStart(key: string, game: Game, roll: () => number, gen: number): TetrisGame {
   const g0 = { cols: game.cols, rows: game.rows, cells: Array.from({ length: game.cols * game.rows }, () => 0) };
@@ -136,7 +149,19 @@ export const tetrisRoll = (runId: string, key: string, attempt: number): (() => 
 // ——— the screen ———
 
 /** The shift a piece kind stands for: the three night shifts take turns; ΥΠΝΟΣ is its own. */
-export const shiftOf = (kind: number): number => (kind === YPNOS ? 3 : kind % 3);
+export const shiftOf = (kind: number): number => (isOdd(kind) ? 3 : kind % 3);
+
+/** #167: the sides of a cell (left, right, top, bottom) on which a wrong block lies against it, for the drawn rot. */
+export function rotSides(at: (i: number) => number, cols: number, rows: number, i: number): readonly [boolean, boolean, boolean, boolean] {
+  const x = i % cols, y = Math.floor(i / cols);
+  const odd = (dx: number, dy: number): boolean => {
+    const nx = x + dx, ny = y + dy;
+    if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) return false;
+    const v = at(ny * cols + nx);
+    return v > 0 && isOdd(v - 1);
+  };
+  return [odd(-1, 0), odd(1, 0), odd(0, -1), odd(0, 1)];
+}
 
 export function tetrisStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly tetris: TetrisGame | null }, approved: boolean, nowMs: number): SafeHtml {
   const game = board.game as Game;
@@ -145,13 +170,19 @@ export function tetrisStage(task: Task, board: TaskBoard, s: BoardState, session
   const live = new Map<number, number>();
   if (g?.piece) for (const [x, y] of blocks(g.piece)) if (y >= 0) live.set(y * g.cols + x, g.piece.kind + 1);
   const flashing = g && nowMs - g.flashAt < TETRIS_FLASH_MS ? new Set(g.flash) : new Set<number>();
+  const at = (i: number): number => (g ? g.cells[i] || live.get(i) || 0 : 0);
+  // the classes of a wrong block: red or black, and one of three eaten outlines (by its place, so it holds still)
+  const oddCls = (kind: number, i: number) => [isOdd(kind) && (isBlack(kind) ? "k" : "y"), isOdd(kind) && `r${String(i % 3)}`];
   const cells = Array.from({ length: game.cols * game.rows }, (_, i) => {
-    const v = g ? (g.cells[i] || live.get(i) || 0) : 0;
+    const v = at(i);
     const y = Math.floor(i / game.cols);
-    return html`<i class="${cls("tt-px", v > 0 && "on", v > 0 && `s${shiftOf(v - 1)}`, v === YPNOS + 1 && "y", live.has(i) && "live", flashing.has(y) && "clear")}"></i>`;
+    // an ordinary locked block lying against a wrong one rots along that edge (drawn only)
+    const sides = g && v > 0 && !isOdd(v - 1) && !live.has(i) ? rotSides((j) => g.cells[j] ?? 0, game.cols, game.rows, i) : null;
+    const rot = sides && sides.some(Boolean) ? html` style="--rl:${sides[0] ? "1" : "0"};--rr:${sides[1] ? "1" : "0"};--rt:${sides[2] ? "1" : "0"};--rb:${sides[3] ? "1" : "0"}"` : null;
+    return html`<i class="${cls("tt-px", v > 0 && "on", v > 0 && `s${shiftOf(v - 1)}`, ...(v > 0 ? oddCls(v - 1, i) : []), rot && "rot", live.has(i) && "live", flashing.has(y) && "clear")}"${rot}></i>`;
   });
   const days = (S("tetris.stage.days") || "一,二,三,四,五,六,日").split(",").slice(0, game.cols).map((d) => html`<b>${d}</b>`);
-  const next = g && !g.done && !g.over ? PIECES[g.nextKind]!.rots[0]!.map(([x, y]) => html`<i class="${cls("tt-px", "on", `s${shiftOf(g.nextKind)}`, g.nextKind === YPNOS && "y")}" style="grid-column:${String(x + 1)};grid-row:${String(y + 1)}"></i>`) : null;
+  const next = g && !g.done && !g.over ? PIECES[g.nextKind]!.rots[0]!.map(([x, y], i) => html`<i class="${cls("tt-px", "on", `s${shiftOf(g.nextKind)}`, ...oddCls(g.nextKind, i))}" style="grid-column:${String(x + 1)};grid-row:${String(y + 1)}"></i>`) : null;
   const side = html`<aside class="tt-side"><span class="tt-h">${S("tetris.stage.next")}</span><div class="tt-next">${next}</div><span class="tt-h">${S("tetris.stage.lines")}</span><span class="tt-n">${String(g?.lines ?? 0)}<small>/${String(game.goal)}</small></span></aside>`;
   const well = html`<div class="tt-gb"><div class="tt-well" style="--cols:${String(game.cols)};--rows:${String(game.rows)}"><div class="tt-days">${days}</div><div class="tt-grid">${cells}</div></div>${side}</div>`;
   // the shifts the pieces stand for, as the form filled them: the pattern of each shift beside its row

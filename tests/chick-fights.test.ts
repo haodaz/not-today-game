@@ -13,7 +13,7 @@ import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { initialSession } from "@world/desktop/model";
-import { battleOffered, battleTurn, battleCmd, chickStrength, chickToday, fightControl, foeStrength, startBattle, FED_HP, HP_PER_LEVEL, KURO_LEVELS, OURS_HP, OURS_HP_MIN, FOE_HP } from "@world/desktop/workbench/battle";
+import { battleOffered, battleScene, battleTurn, battleCmd, chickStrength, chickToday, fightControl, foeStrength, startBattle, FED_HP, HP_PER_LEVEL, KURO_LEVELS, OURS_HP, OURS_HP_MIN, FOE_HP } from "@world/desktop/workbench/battle";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { settleActions } from "@world/desktop/workbench/settle-sheet";
 import { setLocale, t } from "@world/i18n";
@@ -95,6 +95,19 @@ describe("R3: strength", () => {
     const base = hit({ ...plain, theirs: { ...plain.theirs, hp: 500, max: 500 } });
     const up = hit({ ...plain, oursMul: 1.36, theirs: { ...plain.theirs, hp: 500, max: 500 } });
     expect(Math.abs(up - base * 1.36)).toBeLessThanOrEqual(1);
+  });
+
+  it("a win reads: the foe is down, the banner (大鸡大利，工作顺意), then what it did for the work; the last screen keeps both", () => {
+    let s = { ...startBattle("3:t", "foe", "/x.png", 0), phase: "menu" as const, queue: [] } as ReturnType<typeof startBattle>;
+    s = battleTurn({ ...s, theirs: { ...s.theirs, hp: 1 } }, "grind", 1);
+    expect(s.queue.slice(-3).map((l) => l.t)).toEqual([t("battle.won", { foe: "foe" }), t("battle.win.banner"), t("battle.win.grade")]);
+    expect(t("battle.win.banner")).toBe("大鸡大利，工作顺意！");
+    expect(t("battle.win.grade")).toBe("小鸡的胜利使你的工作变得更优秀了。");
+    while (s.phase === "text") s = battleCmd(s, "next", 2);
+    const out = battleScene(s, 3).value;
+    expect(out).toContain(`<div class="bt-box bt-won"><p class="bt-line bt-banner">${t("battle.win.banner")}</p><p class="bt-line">${t("battle.win.grade")}</p>`);
+    const lost = battleScene({ ...s, phase: "lost" }, 3).value;
+    expect(lost).not.toContain("bt-banner");
   });
 
   it("fed every day it wins on every day; never fed it loses in the late days (the same moves, the seeded dice)", () => {
