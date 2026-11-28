@@ -45,7 +45,7 @@ describe("the loader", () => {
   it("accepts every listed place on a line", () => {
     expect(PLACES).toEqual([
       "room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser",
-      ...["boss", "partner", "group", "xiaozhang", "laozhou", "family", "clan"].map((id) => `screen:msgs:${id}`),
+      ...["boss", "partner", "group", "xiaozhang", "laozhou", "g_invest", "g_merge", "g_mgmt", "g_gov", "g_uni", "g_corp", "family", "clan"].map((id) => `screen:msgs:${id}`),
       ...["home", "tasks", "docs", "code", "ledger", "tickets", "projects"].map((p) => `screen:workbench:${p}`),
     ]);
     for (const where of PLACES) expect(parseDayFile(base({ where }), "day-03.json").beats.boot!.say[0]!.where, where).toBe(where);

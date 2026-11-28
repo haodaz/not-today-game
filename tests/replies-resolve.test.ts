@@ -159,7 +159,10 @@ describe("menu", () => {
   });
 
   it("lists every recipient of the day", () => {
-    expect(recipientsOn(1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...FAMILY_GROUPS]);
+    // the outside groups (author 2026-11-27): the three client project groups from day 1, the investment group from day 4
+    expect(recipientsOn(1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "g_gov", "g_uni", "g_corp", ...FAMILY_GROUPS]);
+    expect(recipientsOn(4)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "g_invest", "g_gov", "g_uni", "g_corp", ...FAMILY_GROUPS]);
+    expect(recipientsOn(10)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...FAMILY_GROUPS]);
     expect(recipientsOn(99)).toEqual([]);
   });
 });

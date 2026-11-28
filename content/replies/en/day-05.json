@@ -505,6 +505,276 @@
           }
         ]
       }
+    },
+    "g_invest": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Investment：Good morning. We read yesterday's page three times.",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "Investment：We read the three of you as well. We like every one of you very much.",
+          "kind": "work"
+        },
+        {
+          "t": "09:02",
+          "text": "Boss：Thank you for the recognition!",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Legal：All three confidentiality agreements are in. One had no signature. We added it for you. Please don't worry.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Investment：No hurry with page two. Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:31",
+            "text": "Investment：No need to reply. When you have read it, we know."
+          }
+        ],
+        "inner": "I never signed that agreement."
+      }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Sun：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Wu：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Director Liu：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Xiao Wu：The notice has been corrected. Nothing needs correcting any more.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Director Liu：Very good. Thank you all for your hard work.",
+          "kind": "work"
+        },
+        {
+          "t": "12:00",
+          "text": "Ms Sun：Lunch was very good.",
+          "kind": "work"
+        },
+        {
+          "t": "12:00",
+          "text": "Xiao Wu：Lunch was very good.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Director Liu：@Future Intelligence The payment has been made. Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Ms Sun：Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Xiao Wu：Thank you for your patience.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Sun：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Wu：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Director Liu：Received. Thank you for your patience."
+          }
+        ],
+        "inner": "Three lines, the same second."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Zhao：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Lin：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Prof. Chen：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Xiao Lin：The comma in reference 3 is correct. All the commas are correct.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Prof. Chen：Very good. No more changes are needed.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Prof. Chen：Group meeting. No topic today. It is enough that we sit together.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Xiao Lin：Yes. Sitting together is good.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Ms Zhao：Sitting together is good.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Ms Zhao：@Future Intelligence The funds have been paid. Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Xiao Lin：Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Prof. Chen：Thank you for your patience.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Zhao：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Lin：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Prof. Chen：Received. Thank you for your patience."
+          }
+        ],
+        "inner": "Three lines, the same second."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Lisa：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Kevin：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Tony：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Kevin：The font size is correct. All the font sizes are correct.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Tony：Very good. Aligned.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Lisa：The afternoon tea was very good.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Kevin：The afternoon tea was very good.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Tony：@Future Intelligence The payment has been made. Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Lisa：Thank you for your patience.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Kevin：Thank you for your patience.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Lisa：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Kevin：Received. Thank you for your patience."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Tony：Received. Thank you for your patience."
+          }
+        ],
+        "inner": "Three lines, the same second."
+      }
     }
   }
 }

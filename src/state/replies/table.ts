@@ -21,6 +21,12 @@ export const FAMILY = "family";
 export const CLAN = "clan";
 /** The 家里 conversations, each in its own file beside the day files, in menu order. */
 export const FAMILY_GROUPS: readonly string[] = [FAMILY, CLAN];
+/**
+ * The outside groups in 汀汀 (author 2026-11-27): the parent company's groups with us (investment from
+ * day 4, fusion days 7–9, management from day 9) and the three project groups of the clients that owe
+ * us (government, university, big enterprise). Group-type threads: a `名字：` prefix says who talks.
+ */
+export const OUTSIDE_GROUPS: readonly string[] = ["g_invest", "g_merge", "g_mgmt", "g_gov", "g_uni", "g_corp"];
 
 export interface Line {
   readonly who: string;

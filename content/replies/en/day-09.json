@@ -547,6 +547,72 @@
           }
         ]
       }
+    },
+    "g_invest": {
+      "incoming": [
+        {
+          "t": "17:30",
+          "text": "Investment：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Sun：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Wu：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Director Liu：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        }
+      ]
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Zhao：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Lin：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Prof. Chen：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        }
+      ]
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Lisa：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Kevin：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Tony：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

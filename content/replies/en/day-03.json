@@ -339,6 +339,157 @@
           }
         ]
       }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:10",
+          "text": "Ms Sun：Crayfish today, from 11:30. Come late and there's none left",
+          "kind": "work"
+        },
+        {
+          "t": "09:11",
+          "text": "Xiao Wu：Received!",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Director Liu：Xiao Wu, send the notice out",
+          "kind": "work"
+        },
+        {
+          "t": "10:01",
+          "text": "Xiao Wu：Sent",
+          "kind": "work"
+        },
+        {
+          "t": "10:02",
+          "text": "Director Liu：Well done. That's the week's work",
+          "kind": "work"
+        },
+        {
+          "t": "13:30",
+          "text": "Xiao Wu：[Photo]",
+          "kind": "work",
+          "card": {
+            "type": "image",
+            "alt": "A plate of peeled crayfish"
+          }
+        },
+        {
+          "t": "13:31",
+          "text": "Ms Sun：Peeled so clean",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Lao Zhou：Director Liu, the payment",
+          "kind": "work"
+        },
+        {
+          "t": "16:21",
+          "text": "Director Liu：Paid",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. 33 days overdue."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:15",
+          "text": "Ms Zhao：Union badminton this afternoon, one player short",
+          "kind": "work"
+        },
+        {
+          "t": "09:16",
+          "text": "Prof. Chen：I'll come",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Xiao Lin：Professor, I looked at reference 4. Nothing wrong with it",
+          "kind": "work"
+        },
+        {
+          "t": "10:31",
+          "text": "Prof. Chen：Then that's it for this week. Well done",
+          "kind": "work"
+        },
+        {
+          "t": "15:50",
+          "text": "Lao Zhou：Ms Zhao, we saw the slip. The money still hasn't come",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Ms Zhao：But the system says paid [smile]",
+          "kind": "work"
+        },
+        {
+          "t": "16:21",
+          "text": "Prof. Chen：Young people shouldn't think about money all the time. Do the work well first",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Professor Chen is arranging next week's badminton."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:40",
+          "text": "Lisa：@all Family Day on Friday. Two family members each. There's a whole roast lamb",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "Kevin：Signing up, three of us",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Tony：Everyone fill in this week's OKR. One line will do",
+          "kind": "work"
+        },
+        {
+          "t": "10:31",
+          "text": "Kevin：Done: \"stay aligned\"",
+          "kind": "work"
+        },
+        {
+          "t": "10:32",
+          "text": "Tony：Good. Loop closed",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "Lao Zhou：Kevin, it still hasn't arrived",
+          "kind": "work"
+        },
+        {
+          "t": "16:01",
+          "text": "Kevin：paid",
+          "kind": "work"
+        },
+        {
+          "t": "16:02",
+          "text": "Lisa：It's paid [rose]",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. They are counting heads for Family Day."
+      }
     }
   }
 }

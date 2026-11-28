@@ -329,6 +329,6 @@ describe("no letters in a face: property over every conversation of every day", 
   });
 
   it("group-type conversations are the company group and both family groups", () => {
-    expect([...SPEAKER_CONVERSATIONS].sort()).toEqual(["clan", "family", "group"]);
+    expect([...SPEAKER_CONVERSATIONS].sort()).toEqual(["clan", "family", "g_corp", "g_gov", "g_invest", "g_merge", "g_mgmt", "g_uni", "group"]);
   });
 });

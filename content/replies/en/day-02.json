@@ -388,6 +388,147 @@
           }
         ]
       }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:05",
+          "text": "Xiao Wu：Yesterday's notice: I added \"sharp\" after \"14:30\"",
+          "kind": "work"
+        },
+        {
+          "t": "09:40",
+          "text": "Director Liu：Good. Thorough",
+          "kind": "work"
+        },
+        {
+          "t": "11:20",
+          "text": "Ms Sun：@all Health check sign-up. 1. Sun",
+          "kind": "work"
+        },
+        {
+          "t": "11:21",
+          "text": "Xiao Wu：2. Wu",
+          "kind": "work"
+        },
+        {
+          "t": "11:21",
+          "text": "Director Liu：3. Liu",
+          "kind": "work"
+        },
+        {
+          "t": "15:10",
+          "text": "Lao Zhou：Director Liu, the payment still hasn't arrived",
+          "kind": "work"
+        },
+        {
+          "t": "15:45",
+          "text": "Director Liu：On my side it says paid. Wait a little, the money is on its way",
+          "kind": "work"
+        },
+        {
+          "t": "16:50",
+          "text": "Xiao Wu：Today's work is done. I'm off to pick up my kid",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. 32 days overdue."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Xiao Lin：Professor, the comma in reference 3 is changed",
+          "kind": "work"
+        },
+        {
+          "t": "09:50",
+          "text": "Prof. Chen：Very good. Reference 4 can wait till tomorrow, no hurry",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Ms Zhao：A new counter on the second floor of the staff canteen: free soup with your staff card",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Prof. Chen：Group meeting. Today's topic: who brings the tangerines",
+          "kind": "work"
+        },
+        {
+          "t": "14:01",
+          "text": "Xiao Lin：I brought them",
+          "kind": "work"
+        },
+        {
+          "t": "14:40",
+          "text": "Ms Zhao：@Future Intelligence Your funds: the finance office shows them as paid. Here is a photo of the slip",
+          "kind": "work"
+        },
+        {
+          "t": "14:40",
+          "text": "Ms Zhao：[Photo]",
+          "kind": "work",
+          "card": {
+            "type": "image",
+            "alt": "Payment slip: PAID"
+          }
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. The slip says paid. The account says nothing."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:35",
+          "text": "Kevin：Yesterday's font: Tony said 30 was too big. I put it back to 28",
+          "kind": "work"
+        },
+        {
+          "t": "09:50",
+          "text": "Tony：Mm. That feels right",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Lisa：This month's gym allowance has been paid. Please check",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Kevin：Let's have a call to align on today's afternoon tea",
+          "kind": "work"
+        },
+        {
+          "t": "14:30",
+          "text": "Kevin：Aligned. Fruit tea today",
+          "kind": "work"
+        },
+        {
+          "t": "16:10",
+          "text": "Lao Zhou：Kevin, where is the approval now",
+          "kind": "work"
+        },
+        {
+          "t": "16:40",
+          "text": "Kevin：But it's been paid. The system says paid. Try refreshing",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. I refreshed. Nothing."
+      }
     }
   }
 }

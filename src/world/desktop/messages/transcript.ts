@@ -9,7 +9,7 @@ import type { GameEvent } from "@state/events";
 import { f } from "@state/fday";
 import { step } from "@state/replay";
 import { condHolds } from "@state/replies/resolve";
-import { dayTable, FAMILY_GROUPS } from "@state/replies/table";
+import { dayTable, FAMILY_GROUPS, OUTSIDE_GROUPS } from "@state/replies/table";
 import type { State } from "@state/types.gen";
 import { taskByFlag } from "@state/days/tasks";
 import { npcIdOf } from "@world/npc";
@@ -22,7 +22,7 @@ import { bodyOf, splitSpeaker, transcriptOf, type Body } from "./bubbles";
  * group). In them `who` is the resolved speaker: an npc id, or `member` with the written name in
  * `alias` (大姨, Big Aunt), which gets a silhouette.
  */
-export const SPEAKER_CONVERSATIONS: ReadonlySet<string> = new Set(["group", ...FAMILY_GROUPS]);
+export const SPEAKER_CONVERSATIONS: ReadonlySet<string> = new Set(["group", ...OUTSIDE_GROUPS, ...FAMILY_GROUPS]);
 
 export type Bubble =
   | { readonly kind: "day"; readonly day: number }

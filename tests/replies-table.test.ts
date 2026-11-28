@@ -26,7 +26,9 @@ describe("the real reply tables", () => {
     expect([...replyTable.keys()]).toEqual(days);
     for (const day of days) {
       const recipients = [...replyTable.get(day)!.recipients.keys()];
-      expect(recipients, `day ${day}`).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...FAMILY_GROUPS]);
+      // outside groups (author 2026-11-27): client project groups days 1–9, the investment group days 4–9
+      const outside = day <= 3 ? ["g_gov", "g_uni", "g_corp"] : day <= 9 ? ["g_invest", "g_gov", "g_uni", "g_corp"] : [];
+      expect(recipients, `day ${day}`).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...outside, ...FAMILY_GROUPS]);
     }
   });
 

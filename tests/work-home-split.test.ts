@@ -54,7 +54,8 @@ describe("which app shows which conversation", () => {
       for (const id of WORK_THREADS) expect(home, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
     }
     expect(threadsIn("msgs", 1)).toEqual(["family", "clan"]);
-    expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou"]);
+    expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "g_gov", "g_uni", "g_corp"]);
+    expect(threadsIn("tingtalk", 4)).toContain("g_invest");
     expect(appOfThread("laozhou")).toBe("tingtalk");
     expect(appOfThread("clan")).toBe("msgs");
   });

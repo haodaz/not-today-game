@@ -429,6 +429,261 @@
           }
         ]
       }
+    },
+    "g_invest": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "Boss：Hello everyone. All three of us are in the group now",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Investment：Welcome, all three. We are slow at reading projects and quick at reading people.",
+          "kind": "work"
+        },
+        {
+          "t": "09:22",
+          "text": "Investment：No hurry with the material. A page a day will do. We have all the time there is.",
+          "kind": "work"
+        },
+        {
+          "t": "09:25",
+          "text": "Legal：@all The confidentiality agreement has been sent. Please sign and return it today, all three",
+          "kind": "work"
+        },
+        {
+          "t": "09:26",
+          "text": "Vivi：Received [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Investment：Thank you for today, all three. Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:27",
+            "text": "Investment：No need to reply. When you have read it, we know."
+          }
+        ],
+        "inner": "I had only just sent it. It had already answered."
+      }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:02",
+          "text": "Ms Sun：@all This week's canteen menu is out. Crayfish on Wednesday",
+          "kind": "work"
+        },
+        {
+          "t": "09:03",
+          "text": "Xiao Wu：Received [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "09:03",
+          "text": "Director Liu：Received [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Xiao Wu：Director Liu, I changed \"afternoon\" in the notice to \"14:30\"",
+          "kind": "work"
+        },
+        {
+          "t": "10:52",
+          "text": "Director Liu：Fine. That will do for today",
+          "kind": "work"
+        },
+        {
+          "t": "10:53",
+          "text": "Xiao Wu：Yes, Director",
+          "kind": "work"
+        },
+        {
+          "t": "15:58",
+          "text": "Director Liu：It's paid. The whole process is finished",
+          "kind": "work"
+        },
+        {
+          "t": "15:59",
+          "text": "Ms Sun：It's paid [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "15:59",
+          "text": "Xiao Wu：It's paid [rose]",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Sun：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Wu：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Director Liu：Received [rose]"
+          }
+        ],
+        "inner": "All three answered. Nobody in this group ever answered me before."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "Ms Zhao：@all Expense claims close on Friday. Glue the receipts to the top left of an A4 sheet",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Xiao Lin：Received. Thank you, Ms Zhao",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Prof. Chen：Received. Thank you, Ms Zhao",
+          "kind": "work"
+        },
+        {
+          "t": "10:15",
+          "text": "Prof. Chen：Xiao Lin, reference 3: change the comma to an English comma",
+          "kind": "work"
+        },
+        {
+          "t": "10:16",
+          "text": "Xiao Lin：Yes, Professor. I'll finish it today",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Prof. Chen：Group meeting. Today's topic: who brings the tangerines",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Xiao Lin：I brought them",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Ms Zhao：I brought them",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Prof. Chen：I brought them",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Zhao：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Lin：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Prof. Chen：Received [rose]"
+          }
+        ],
+        "inner": "All three answered. Nobody in this group ever answered me before."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Lisa：@all Afternoon tea orders. 1. Lisa, coconut latte",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Kevin：2. Kevin, coconut latte",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Tony：3. Tony, coconut latte",
+          "kind": "work"
+        },
+        {
+          "t": "10:40",
+          "text": "Kevin：Weekly report, page two, the title: I took the font from 28 to 30. Tony, please review",
+          "kind": "work"
+        },
+        {
+          "t": "11:15",
+          "text": "Tony：Fine. Very granular. Let's leave the alignment there for today",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Lisa：Afternoon tea is here. One cup each, all the same",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Kevin：@Future Intelligence The payment loop is closed",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Lisa：Loop closed [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Tony：Loop closed [rose]",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Lisa：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Kevin：Received [rose]"
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Tony：Received [rose]"
+          }
+        ],
+        "inner": "All three answered. Nobody in this group ever answered me before."
+      }
     }
   }
 }

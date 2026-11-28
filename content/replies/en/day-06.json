@@ -459,6 +459,310 @@
           }
         ]
       }
+    },
+    "g_invest": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Investment：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Legal：Good morning.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "The Advisers：Good morning. We are the advisers. We come in tomorrow, to help you set your material out again on the template.",
+          "kind": "work"
+        },
+        {
+          "t": "09:05",
+          "text": "Boss：Welcome, welcome!",
+          "kind": "work"
+        },
+        {
+          "t": "09:06",
+          "text": "Vivi：Welcome [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "The Advisers：@all Morning meeting tomorrow at 09:00. Please use the shared background. The file will follow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Investment：Three pages and it is done. No need to worry about money any more. Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:07",
+            "text": "Investment：No need to reply. When you have read it, we know."
+          }
+        ]
+      }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Sun：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Wu：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Director Liu：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "member：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Director Liu：There is no work that needs doing today. Please stay happy, everyone.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Xiao Wu：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Ms Sun：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Director Liu：@Future Intelligence Your payment has been made. You need not worry about money any more.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "member：No need to worry any more.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Ms Sun：Work is over. See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Xiao Wu：See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Director Liu：See you tomorrow.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Sun：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Wu：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Director Liu：Received. So glad to be working with you again today."
+          }
+        ],
+        "inner": "The other two groups answer with this same sentence."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Ms Zhao：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Xiao Lin：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Prof. Chen：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "member：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Prof. Chen：There is no work that needs doing today. Please stay happy, everyone.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Xiao Lin：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Ms Zhao：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Prof. Chen：@Future Intelligence Your payment has been made. You need not worry about money any more.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "member：No need to worry any more.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Ms Zhao：Work is over. See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Xiao Lin：See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Prof. Chen：See you tomorrow.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Ms Zhao：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Xiao Lin：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Prof. Chen：Received. So glad to be working with you again today."
+          }
+        ],
+        "inner": "The other two groups answer with this same sentence."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Lisa：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Kevin：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Tony：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "member：Good morning. So glad to be working with all of you again today.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Tony：There is no work that needs doing today. Please stay happy, everyone.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Kevin：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Lisa：Yes. I am happy.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Tony：@Future Intelligence Your payment has been made. You need not worry about money any more.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "member：No need to worry any more.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Lisa：Work is over. See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Kevin：See you tomorrow.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Tony：See you tomorrow.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Lisa：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Kevin：Received. So glad to be working with you again today."
+          },
+          {
+            "who": "member",
+            "t": "11:00",
+            "text": "Tony：Received. So glad to be working with you again today."
+          }
+        ],
+        "inner": "The other two groups answer with this same sentence."
+      }
     }
   }
 }

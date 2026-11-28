@@ -391,6 +391,158 @@
           }
         ]
       }
+    },
+    "g_gov": {
+      "incoming": [
+        {
+          "t": "09:02",
+          "text": "Ms Sun：@all This week's canteen menu is out. Crayfish on Wednesday",
+          "kind": "work"
+        },
+        {
+          "t": "09:03",
+          "text": "Xiao Wu：Received [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Xiao Wu：Director Liu, I changed \"afternoon\" in the notice to \"14:30\"",
+          "kind": "work"
+        },
+        {
+          "t": "10:52",
+          "text": "Director Liu：Fine. That will do for today",
+          "kind": "work"
+        },
+        {
+          "t": "10:53",
+          "text": "Xiao Wu：Yes, Director",
+          "kind": "work"
+        },
+        {
+          "t": "15:40",
+          "text": "Lao Zhou：Director Liu, the final payment for phase one hasn't reached us yet. Let me buy you dinner one of these days",
+          "kind": "work"
+        },
+        {
+          "t": "15:58",
+          "text": "Director Liu：It's paid. The whole process is finished",
+          "kind": "work"
+        },
+        {
+          "t": "15:59",
+          "text": "Ms Sun：It's paid [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "16:30",
+          "text": "Ms Sun：The union is handing out rice and oil. Room 302, before you leave",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Nobody answers. The payment is 31 days overdue."
+      }
+    },
+    "g_uni": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "Ms Zhao：@all Expense claims close on Friday. Glue the receipts to the top left of an A4 sheet",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Xiao Lin：Received. Thank you, Ms Zhao",
+          "kind": "work"
+        },
+        {
+          "t": "10:15",
+          "text": "Prof. Chen：Xiao Lin, reference 3: change the comma to an English comma",
+          "kind": "work"
+        },
+        {
+          "t": "10:16",
+          "text": "Xiao Lin：Yes, Professor. I'll finish it today",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Prof. Chen：Group meeting moved to tomorrow. The weather is good, go out for a walk",
+          "kind": "work"
+        },
+        {
+          "t": "14:01",
+          "text": "Xiao Lin：Thank you, Professor!",
+          "kind": "work"
+        },
+        {
+          "t": "16:10",
+          "text": "Lao Zhou：Professor Chen, the project funds haven't reached us yet",
+          "kind": "work"
+        },
+        {
+          "t": "16:35",
+          "text": "Prof. Chen：Released, released. You know how the university's process is",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Nobody answers."
+      }
+    },
+    "g_corp": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Lisa：@all Afternoon tea orders. 1. Lisa, coconut latte",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Kevin：2. Kevin, iced americano",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Tony：3. Tony, same",
+          "kind": "work"
+        },
+        {
+          "t": "10:40",
+          "text": "Kevin：Weekly report, page two, the title: I took the font from 28 to 30. Tony, please review",
+          "kind": "work"
+        },
+        {
+          "t": "11:15",
+          "text": "Tony：Fine. Very granular. Let's leave the alignment there for today",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Lisa：Afternoon tea is here. Pick it up at the front desk",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "Lao Zhou：Kevin, the invoice for the annual service fee went out a month ago",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Kevin：Noted. The payment is submitted and in approval. We'll close the loop this week for sure",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Nobody answers."
+      }
     }
   }
 }
