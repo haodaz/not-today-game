@@ -2315,23 +2315,55 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .mn.sk2.haunted .sk2-floor{box-shadow:0 12px 30px rgba(0,0,0,.2),0 0 0 2px rgba(139,30,30,.25)}
 .mn.sk2.done .sk2-floor{animation:m3-flash 600ms ease-out both}
 /* klotski (game-swaps §1): the classic wooden 华容道; the door under the bottom row's middle two; the tentacle comes in through it */
-.kl-main{padding:0 28px}
-.kl-board{--cell:64px;position:relative;width:calc(var(--cols) * var(--cell));height:calc(var(--rows) * var(--cell));padding:6px;background:#8a5a33;border-radius:8px;box-shadow:inset 0 0 0 4px #6b4224,0 12px 30px rgba(0,0,0,.25);margin-bottom:14px}
-.kl-board.blank{opacity:.55}
-.kl-block{position:absolute;left:calc(6px + var(--x) * var(--cell) + 2px);top:calc(6px + var(--y) * var(--cell) + 2px);width:calc(var(--w) * var(--cell) - 4px);height:calc(var(--h) * var(--cell) - 4px);border:0;border-radius:6px;background:#E8C99B;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),inset 0 0 0 2px #c79f68;cursor:pointer;transition:left 120ms ease,top 120ms ease;display:flex;align-items:center;justify-content:center;padding:0}
-.kl-block.small{background:#D9B98A}
-.kl-block.big{background:#B48A5C;cursor:pointer}
-.kl-block.named .kl-name{font-size:15px;font-weight:800;color:#3b2716}
-.kl-block.picked{box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),0 0 0 3px #F6B73C}
+/* klotski, day 17 (author 2026-11-27, #166): the toy keeps its look (a lacquered tray, carved wooden pieces); the day is in the grain */
+.kl-main{padding:18px 28px;display:flex;flex-direction:column;align-items:center}
+.kl-board{--cell:92px;position:relative;width:calc(var(--cols) * var(--cell));height:calc(var(--rows) * var(--cell));padding:8px;border-radius:6px;margin-bottom:14px;
+  background:repeating-linear-gradient(93deg,rgba(0,0,0,.16) 0 2px,rgba(0,0,0,0) 2px 11px),repeating-linear-gradient(88deg,rgba(255,220,170,.05) 0 1px,rgba(0,0,0,0) 1px 23px),linear-gradient(180deg,#3a2415,#22140b);
+  box-shadow:inset 0 0 0 5px #170d07,inset 0 0 0 7px #6e4a25,inset 0 0 40px rgba(0,0,0,.6),0 0 0 10px #2a1a0f,0 0 0 12px #815a2e,0 22px 46px rgba(0,0,0,.45)}
+.kl-board.blank{filter:saturate(.7) brightness(.82)}
+.kl-veins{position:absolute;inset:0;border-radius:6px;pointer-events:none;opacity:var(--rot,0);
+  background:radial-gradient(ellipse 60% 46% at 50% 104%,rgba(150,16,16,.85),rgba(110,10,10,.35) 46%,rgba(0,0,0,0) 72%),
+    repeating-conic-gradient(from 200deg at 50% 106%,rgba(140,14,14,.5) 0 1.2deg,rgba(0,0,0,0) 1.2deg 9deg);
+  -webkit-mask-image:radial-gradient(ellipse 78% 72% at 50% 104%,#000 30%,rgba(0,0,0,0) 100%);mask-image:radial-gradient(ellipse 78% 72% at 50% 104%,#000 30%,rgba(0,0,0,0) 100%);
+  animation:kl-pulse 3.2s ease-in-out infinite}
+@keyframes kl-pulse{50%{filter:brightness(1.35)}}
+.kl-block{position:absolute;left:calc(8px + var(--x) * var(--cell) + 2px);top:calc(8px + var(--y) * var(--cell) + 2px);width:calc(var(--w) * var(--cell) - 4px);height:calc(var(--h) * var(--cell) - 4px);border:0;border-radius:5px;cursor:pointer;transition:left 120ms ease,top 120ms ease;display:flex;align-items:center;justify-content:center;gap:10px;padding:0;
+  background:repeating-linear-gradient(91deg,rgba(90,52,18,.16) 0 2px,rgba(0,0,0,0) 2px 9px),repeating-linear-gradient(86deg,rgba(255,240,210,.14) 0 1px,rgba(0,0,0,0) 1px 17px),linear-gradient(180deg,#e9c995,#cfa56a);
+  box-shadow:inset 0 2px 0 rgba(255,245,220,.55),inset 0 -6px 0 rgba(70,38,12,.38),inset 0 0 0 2px #a97a43,0 3px 5px rgba(0,0,0,.5)}
+.kl-block.small,.kl-block.tall{background:repeating-linear-gradient(91deg,rgba(80,44,14,.2) 0 2px,rgba(0,0,0,0) 2px 9px),linear-gradient(180deg,#d6b17a,#b98d55)}
+.kl-block.big{background:repeating-linear-gradient(94deg,rgba(20,8,4,.3) 0 2px,rgba(0,0,0,0) 2px 10px),radial-gradient(ellipse at 50% 55%,#8c5a34,#5d3a20 78%);box-shadow:inset 0 2px 0 rgba(255,220,180,.25),inset 0 -6px 0 rgba(20,8,4,.5),inset 0 0 0 2px #3e2413,0 3px 5px rgba(0,0,0,.5)}
+/* a caller: the name cut in a red seal, the line still ringing */
+.kl-seal{display:flex;align-items:center;justify-content:center;min-width:calc(var(--cell) * .9);height:calc(var(--cell) * .52);padding:0 10px;box-sizing:border-box;border-radius:3px;background:#9c2318;box-shadow:inset 0 0 0 2px #c9473a,inset 0 0 0 4px #7d170e,0 1px 0 rgba(255,235,200,.5)}
+.kl-block.named .kl-name{font:700 22px/1 "NT Song","Songti SC",serif;letter-spacing:.12em;text-indent:.12em;color:#f6e4c6;text-shadow:0 1px 0 rgba(60,8,4,.8);white-space:nowrap}
+.kl-ring{position:relative;width:16px;height:22px;flex:none}
+.kl-ring::before,.kl-ring::after{content:"";position:absolute;left:0;top:50%;border:2px solid #7d170e;border-left-color:transparent;border-top-color:transparent;border-bottom-color:transparent;border-radius:50%;translate:0 -50%;animation:kl-ring 1.6s steps(2,end) infinite}
+.kl-ring::before{width:10px;height:10px}
+.kl-ring::after{width:20px;height:20px;left:-4px;animation-delay:.4s}
+@keyframes kl-ring{50%{opacity:.15}}
+/* the nameless one: an eye carved shut; held, it opens */
+.kl-eye{position:relative;width:58%;height:30%;border-radius:50%;border-bottom:5px solid #1c0d06;box-sizing:border-box}
+.kl-eye::before{content:"";position:absolute;left:8%;right:8%;bottom:-13px;height:8px;background:repeating-linear-gradient(90deg,#1c0d06 0 3px,rgba(0,0,0,0) 3px 12px)}
+.kl-eye b{display:none}
+.kl-block.big.picked .kl-eye{border:0;background:radial-gradient(ellipse at 50% 50%,#f1e2c4 0 64%,#1c0d06 66%);box-shadow:0 0 0 4px #1c0d06,0 0 18px rgba(170,20,20,.7);overflow:hidden}
+.kl-block.big.picked .kl-eye::before{display:none}
+.kl-block.big.picked .kl-eye b{display:block;position:absolute;left:50%;top:50%;width:34%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,#050202 0 30%,#b81d1d 32% 70%,#4a0808 72%)}
+/* the tall ones: someone with no face */
+.kl-fig{width:34%;height:62%;background:radial-gradient(circle at 50% 16%,rgba(60,32,12,.75) 0 15%,rgba(0,0,0,0) 16%),linear-gradient(180deg,rgba(0,0,0,0) 0 30%,rgba(60,32,12,.6) 30% 100%);border-radius:40% 40% 8% 8% / 30% 30% 4% 4%;opacity:.8}
+.kl-pupil{width:22%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#1c0d06 0 42%,rgba(60,32,12,.35) 44% 100%)}
+.kl-block.picked{box-shadow:inset 0 2px 0 rgba(255,245,220,.55),inset 0 -6px 0 rgba(70,38,12,.38),0 0 0 3px #F6B73C,0 0 16px rgba(246,183,60,.55)}
+.kl-block.big.picked{box-shadow:inset 0 -6px 0 rgba(20,8,4,.5),0 0 0 3px #b81d1d,0 0 22px rgba(184,29,29,.6)}
 .kl-block:disabled{cursor:default}
 .kl-block.leaving{animation:kl-leave 900ms ease-in forwards;pointer-events:none}
 @keyframes kl-leave{to{transform:translateY(calc(var(--cell) * 2.2));opacity:0}}
-.kl-door{position:absolute;left:calc(6px + 1 * var(--cell));bottom:-6px;width:calc(2 * var(--cell));height:8px;background:#2a1a0e;border-radius:0 0 4px 4px}
+.kl-door{position:absolute;left:calc(8px + 1 * var(--cell));bottom:-12px;width:calc(2 * var(--cell));height:14px;background:linear-gradient(180deg,#000,#120303);border-radius:0 0 5px 5px;box-shadow:inset 0 3px 6px rgba(0,0,0,.9),0 0 calc(18px * var(--rot,0)) rgba(170,20,20,.8)}
 .kl-board.open .kl-door{background:#050505;box-shadow:0 6px 14px rgba(0,0,0,.6)}
+/* before the door is free, the tip of it waits there: more of it with every push */
+.kl-peek{position:absolute;left:calc(8px + 2 * var(--cell) - var(--cell) * .3);bottom:-12px;width:calc(var(--cell) * .6);height:calc(var(--cell) * .9 * var(--rot,0));background:url(/objects/icons/tentacle-overlay.png) center top / 100% auto no-repeat;transform-origin:50% 100%;animation:kl-peek 2.8s ease-in-out infinite;pointer-events:none;opacity:.92}
+@keyframes kl-peek{50%{transform:rotate(4deg) scaleY(1.06)}}
 .kl-tentacle{position:absolute;left:calc(6px + 1 * var(--cell) + 10px);bottom:-6px;width:calc(var(--cell) * 1.4);height:calc(var(--rows) * var(--cell) * .9);background:url(/objects/icons/tentacle-overlay.png) center bottom / contain no-repeat;transform-origin:50% 100%;animation:kl-tentacle 3200ms ease-out both;pointer-events:none;z-index:3}
 @keyframes kl-tentacle{from{transform:scaleY(0) rotate(-4deg)}70%{transform:scaleY(1) rotate(3deg)}to{transform:scaleY(1) rotate(0)}}
 .kl-nameless{margin:6px 0 0;font-size:12px;opacity:.75}
-@media (prefers-reduced-motion:reduce){.kl-block{transition:none}.kl-block.leaving{animation:none;opacity:0}.kl-tentacle{animation:none}}
+@media (prefers-reduced-motion:reduce){.kl-block{transition:none}.kl-block.leaving{animation:none;opacity:0}.kl-tentacle,.kl-peek,.kl-veins,.kl-ring::before,.kl-ring::after{animation:none}}
 /* echo (game-swaps §2): the meeting's seats; a lit one speaks, the empty one goes dark */
 .ec-main{padding:0 28px}
 .ec-grid{display:grid;grid-template-columns:repeat(var(--cols,3),150px);gap:10px;margin-bottom:14px}

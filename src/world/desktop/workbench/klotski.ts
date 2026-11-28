@@ -145,14 +145,27 @@ export function klotskiPath(game: Game, id: string, limit = 200_000): KlotskiSte
 
 // ——— the screen ———
 
-/** A block's look: a named one carries its caller's name; the small and the big ones are plain. */
+/**
+ * A block's look (author 2026-11-27, #166: 「17 天那个华容道的设计非常简单」; the toy keeps its look, wood
+ * and carved pieces, and day 17 is in it): a caller is a piece with its name in a red seal and a line
+ * still ringing; the nameless big one has an eye carved shut that opens while it is held; the tall
+ * ones are faceless figures; the small ones a single pupil each.
+ */
 function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null, leaving: boolean): SafeHtml {
   const named = game.blocks[b.id];
   const style = `--x:${String(b.x)};--y:${String(b.y)};--w:${String(b.w)};--h:${String(b.h)}`;
-  const kind = b.id === "N" ? "big" : named ? "named" : "small";
-  const label = named ? named.label : "";
-  return html`<button type="button" class="${cls("kl-block", kind, g?.pick === b.id && "picked", leaving && "leaving")}" data-action="klotski-pick" data-block="${b.id}" style="${style}"${g && !g.done ? null : html` disabled`}>${label ? html`<span class="kl-name">${label}</span>` : null}</button>`;
+  const kind = b.id === "N" ? "big" : named ? "named" : b.h > 1 || b.w > 1 ? "tall" : "small";
+  const face = named
+    ? html`<span class="kl-seal"><span class="kl-name">${named.label}</span></span><i class="kl-ring" aria-hidden="true"></i>`
+    : kind === "big" ? html`<i class="kl-eye" aria-hidden="true"><b></b></i>`
+    : kind === "tall" ? html`<i class="kl-fig" aria-hidden="true"></i>`
+    : html`<i class="kl-pupil" aria-hidden="true"></i>`;
+  return html`<button type="button" class="${cls("kl-block", kind, g?.pick === b.id && "picked", leaving && "leaving")}" data-action="klotski-pick" data-block="${b.id}" style="${style}"${g && !g.done ? null : html` disabled`}>${face}</button>`;
 }
+
+/** #166: how far the thing at the door has come, 0..1, by the pushes made (drawn only). */
+export const KLOTSKI_ROT_MOVES = 40;
+export const klotskiRot = (moves: number): number => Math.min(1, Math.max(0, moves / KLOTSKI_ROT_MOVES));
 
 export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number): SafeHtml {
   const game = board.game as Game;
@@ -164,7 +177,9 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   // the block on its way out is drawn at the door, sliding down; after it, the door stays open
   const leaving = sliding && outBlock ? blockHtml(game, { ...outBlock, x: DOOR_X, y: KLOTSKI_ROWS - outBlock.h }, g, true) : null;
   const blocks = lv.blocks.map((b) => blockHtml(game, b, g, false));
-  const field = html`<div class="${cls("kl-board", !g && "blank", g?.out && "open")}" style="--cols:${String(KLOTSKI_COLS)};--rows:${String(KLOTSKI_ROWS)}">${blocks}${leaving}<i class="kl-door" aria-hidden="true"></i>${tentacle ? html`<i class="kl-tentacle" aria-hidden="true"></i>` : null}</div>`;
+  // the more pushes, the more of it shows at the door and the redder the tray's grain (drawn only)
+  const rot = klotskiRot(g?.moves ?? 0).toFixed(2);
+  const field = html`<div class="${cls("kl-board", !g && "blank", g?.out && "open")}" style="--cols:${String(KLOTSKI_COLS)};--rows:${String(KLOTSKI_ROWS)};--rot:${rot}"><i class="kl-veins" aria-hidden="true"></i>${blocks}${leaving}<i class="kl-door" aria-hidden="true"></i>${tentacle ? html`<i class="kl-tentacle" aria-hidden="true"></i>` : html`<i class="kl-peek" aria-hidden="true"></i>`}</div>`;
   const notes = board.slots.map((slot) => html`<li class="mn-note"><b>${slot.label}</b><span>${slot.id in s.slots ? cardText(board, s.slots[slot.id]!) : ""}</span></li>`);
   const pad = (["up", "left", "down", "right"] as const).map((d) => html`<button type="button" class="${cls("sk-arrow", "sn-key", d)}" data-action="klotski-push" data-dir="${d}" aria-label="${d}">${d === "up" ? "▲" : d === "left" ? "◀" : d === "down" ? "▼" : "▶"}</button>`);
   const name = g?.out ? (game.blocks[g.out]?.label ?? "") : "";
