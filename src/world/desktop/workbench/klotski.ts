@@ -268,8 +268,9 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
     const step = KLOTSKI_GROW_MS / Math.max(1, cover.length);
     tentacles = cover.map(([x, y], i) => html`<i class="${cls("kl-tent", i === cover.length - 1 && "last")}" aria-hidden="true" style="--x:${String(x)};--y:${String(y)};--d:${String(Math.round(KLOTSKI_SLIDE_MS + i * step))}ms"></i>`);
   }
-  const field = html`<div class="${cls("kl-board", !g && "blank", out && "open")}" style="--cols:${String(KLOTSKI_COLS)};--rows:${String(KLOTSKI_ROWS)};--rot:${rot}"><i class="kl-veins" aria-hidden="true"></i>${blocks}<i class="kl-door" aria-hidden="true"></i>${tentacles}</div>`;
-  const notes = board.slots.map((slot) => html`<li class="mn-note"><b>${slot.label}</b><span>${slot.id in s.slots ? cardText(board, s.slots[slot.id]!) : ""}</span></li>`);
+  const field = html`<div class="${cls("kl-board", !g && "blank", out && "open")}" style="--cols:${String(KLOTSKI_COLS)};--rows:${String(KLOTSKI_ROWS)};--rot:${rot}"><i class="kl-veins" aria-hidden="true"></i>${blocks}<i class="kl-door" aria-hidden="true"><b class="kl-leaf l"></b><b class="kl-leaf r"></b><em>${S("klotski.stage.door")}</em></i><i class="kl-road" aria-hidden="true"></i>${tentacles}</div>`;
+  // author 2026-11-27 (「左边的东西写的非常非常奇怪」): each note is the form's own question and what was answered
+  const notes = board.slots.map((slot) => html`<li class="mn-note"><b>${board.given.rows[slot.id] ?? slot.label}</b><span>${slot.id in s.slots ? cardText(board, s.slots[slot.id]!) : ""}</span></li>`);
   const pad = (["up", "left", "down", "right"] as const).map((d) => html`<button type="button" class="${cls("sk-arrow", "sn-key", d)}" data-action="klotski-push" data-dir="${d}" aria-label="${d}">${d === "up" ? "▲" : d === "left" ? "◀" : d === "down" ? "▼" : "▶"}</button>`);
   const nameless = g?.nameless ? html`<p class="kl-nameless">${S("klotski.stage.nameless")}</p>` : null;
   // the sub-line: the three door lines one after another; a block that cannot go out; else the room

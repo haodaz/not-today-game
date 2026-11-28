@@ -833,6 +833,7 @@
   "klotski.stage.reset": "重排",
   "klotski.stage.nameless": "最大的那块没有名字。它不出去。",
   "klotski.stage.blocked": "它们出不去。门只给你开。",
+  "klotski.stage.door": "门",
   "klotski.stage.door1": "门开了。",
   "klotski.stage.door2": "我没有出去。",
   "klotski.stage.door3": "是它们进来了。",

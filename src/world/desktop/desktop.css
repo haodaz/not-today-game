@@ -2317,7 +2317,7 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 /* klotski (game-swaps §1): the classic wooden 华容道; the door under the bottom row's middle two; the tentacle comes in through it */
 /* klotski, day 17 (author 2026-11-27, #166): the toy keeps its look (a lacquered tray, carved wooden pieces); the day is in the grain */
 .kl-main{padding:18px 28px;display:flex;flex-direction:column;align-items:center}
-.kl-board{--cell:92px;position:relative;width:calc(var(--cols) * var(--cell));height:calc(var(--rows) * var(--cell));padding:8px;border-radius:6px;margin-bottom:14px;
+.kl-board{--cell:80px;flex:none;box-sizing:content-box;position:relative;width:calc(var(--cols) * var(--cell));height:calc(var(--rows) * var(--cell));padding:8px;border-radius:6px;margin-bottom:104px;
   background:repeating-linear-gradient(93deg,rgba(0,0,0,.16) 0 2px,rgba(0,0,0,0) 2px 11px),repeating-linear-gradient(88deg,rgba(255,220,170,.05) 0 1px,rgba(0,0,0,0) 1px 23px),linear-gradient(180deg,#3a2415,#22140b);
   box-shadow:inset 0 0 0 5px #170d07,inset 0 0 0 7px #6e4a25,inset 0 0 40px rgba(0,0,0,.6),0 0 0 10px #2a1a0f,0 0 0 12px #815a2e,0 22px 46px rgba(0,0,0,.45)}
 .kl-board.blank{filter:saturate(.7) brightness(.82)}
@@ -2355,8 +2355,16 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .kl-block:disabled{cursor:default}
 .kl-block.leaving{animation:kl-leave 900ms ease-in forwards;pointer-events:none}
 @keyframes kl-leave{to{transform:translateY(calc(var(--cell) * 2.2));opacity:0}}
-.kl-door{position:absolute;left:calc(8px + 1 * var(--cell));bottom:-12px;width:calc(2 * var(--cell));height:14px;background:linear-gradient(180deg,#000,#120303);border-radius:0 0 5px 5px;box-shadow:inset 0 3px 6px rgba(0,0,0,.9),0 0 calc(18px * var(--rot,0)) rgba(170,20,20,.8)}
-.kl-board.open .kl-door{background:#050505;box-shadow:0 6px 14px rgba(0,0,0,.6)}
+/* the door (author 2026-11-27: 「没看出门在哪里…哪怕那个位置下面有条路都行」): two leaves under the bottom row's middle cells, the word on them, and a lit path leading away */
+.kl-door{position:absolute;left:calc(8px + 1 * var(--cell));bottom:-38px;width:calc(2 * var(--cell));height:38px;display:flex;background:#070303;border:4px solid #4a2c14;border-top:0;border-radius:0 0 6px 6px;overflow:hidden;box-shadow:0 0 calc(18px * var(--rot,0)) rgba(170,20,20,.8),0 4px 8px rgba(0,0,0,.35);z-index:1}
+.kl-leaf{flex:1;background:repeating-linear-gradient(90deg,rgba(90,55,20,.16) 0 2px,transparent 2px 9px),linear-gradient(180deg,#d9b577,#b78a4c);box-shadow:inset 0 0 0 1px #6d4a26;transition:transform 900ms ease}
+.kl-leaf.l{transform-origin:left center}
+.kl-leaf.r{transform-origin:right center}
+.kl-door em{position:absolute;inset:0;display:grid;place-items:center;font:700 15px/1 "Noto Serif SC","Songti SC",serif;font-style:normal;letter-spacing:.35em;text-indent:.35em;color:#3a2412;transition:opacity 300ms}
+.kl-board.open .kl-leaf{transform:scaleX(.1)}
+.kl-board.open .kl-door em{opacity:0}
+.kl-road{position:absolute;left:calc(8px + .25 * var(--cell));bottom:-100px;width:calc(3.5 * var(--cell));height:62px;clip-path:polygon(21.4% 0,78.6% 0,100% 100%,0 100%);background:repeating-linear-gradient(180deg,rgba(120,100,70,.22) 0 2px,transparent 2px 15px),linear-gradient(180deg,#f4e7c4,#e9dcc0 55%,rgba(233,220,192,0));transition:background 900ms ease}
+.kl-board.open .kl-road{background:repeating-linear-gradient(180deg,rgba(0,0,0,.35) 0 2px,transparent 2px 15px),linear-gradient(180deg,#1a0505,#3a0a0a 55%,rgba(58,10,10,0))}
 /* before the door is free, the tip of it waits there: more of it with every push */
 .kl-peek{position:absolute;left:calc(8px + 2 * var(--cell) - var(--cell) * .3);bottom:-12px;width:calc(var(--cell) * .6);height:calc(var(--cell) * .9 * var(--rot,0));background:url(/objects/icons/tentacle-overlay.png) center top / 100% auto no-repeat;transform-origin:50% 100%;animation:kl-peek 2.8s ease-in-out infinite;pointer-events:none;opacity:.92}
 @keyframes kl-peek{50%{transform:rotate(4deg) scaleY(1.06)}}

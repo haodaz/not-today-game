@@ -833,6 +833,7 @@
   "klotski.stage.reset": "Reset",
   "klotski.stage.nameless": "The biggest block has no name. It is not going out.",
   "klotski.stage.blocked": "They cannot go out. The door only opens for you.",
+  "klotski.stage.door": "DOOR",
   "klotski.stage.door1": "The door opens.",
   "klotski.stage.door2": "I did not get out.",
   "klotski.stage.door3": "They came in.",
