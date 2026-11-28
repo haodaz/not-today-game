@@ -2169,14 +2169,14 @@ scene.add(rain);
 // and the ball tree are kept but switched off; what is modelled out there from now on is only what goes wrong.
 const CITY = [...outside.children];
 for (const o of CITY) o.visible = false;
-const VIEW = [];
+const VIEW = [], PICS = []; // PICS: the two pictures' materials (the big window's, the slit's mirrored one)
 {
   // The block stands across a wide yard, some sixty metres off (author: 这个距离太近了; the first retry put it too far and
   // repeated it mirrored, which showed as twins). One picture, about 60° of the view, its edges faded into a plain
   // ground behind it: overcast grey above the tree line, tree-dark below, so nothing repeats and nothing streaks.
   const D = 60, TW = 86, TH = TW * 928 / 1664, cy = 1.5 + TH * 0.12 - 2, line = cy - TH * 0.12;
   const [bc, bg] = canvas(8, 512), gr = bg.createLinearGradient(0, 0, 0, 512);
-  gr.addColorStop(0, "#7d8389"); gr.addColorStop(0.47, "#a9adb0"); gr.addColorStop(0.495, "#59625a"); gr.addColorStop(0.51, "#1c2619"); gr.addColorStop(1, "#141b12");
+  gr.addColorStop(0, "rgba(58,70,56,0)"); gr.addColorStop(0.4975, "rgba(58,70,56,0)"); gr.addColorStop(0.504, "#3a4638"); gr.addColorStop(0.512, "#1c2619"); gr.addColorStop(1, "#141b12"); // above the tree line it is clear now: the sky and the far town are behind it (FARCITY)
   bg.fillStyle = gr; bg.fillRect(0, 0, 8, 512);
   const back = new THREE.CanvasTexture(bc); back.colorSpace = THREE.SRGBColorSpace;
   const [fc, fg] = canvas(256, 256);
@@ -2186,11 +2186,143 @@ const VIEW = [];
   const flip = pic.clone(); flip.wrapS = THREE.RepeatWrapping; flip.repeat.x = -1; flip.offset.x = 1;
   for (const [sx, zc, ry, map] of [[-1, (WIN.z0 + WIN.z1) / 2 - 10.2, Math.PI / 2, pic], [1, (SLIT.z0 + SLIT.z1) / 2, -Math.PI / 2, flip]]) {
     const x = sx > 0 ? X1 + D : X0 - D;
-    const b = new THREE.Mesh(new THREE.PlaneGeometry(600, 400), new THREE.MeshBasicMaterial({ map: back, fog: false, toneMapped: false }));
+    const b = new THREE.Mesh(new THREE.PlaneGeometry(600, 400), new THREE.MeshBasicMaterial({ map: back, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
     b.position.set(x + sx * 1.5, line, zc); b.rotation.y = ry; b.userData.noEdge = true; outside.add(b); VIEW.push(b);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(TW, TH), new THREE.MeshBasicMaterial({ map, alphaMap: fade, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
-    m.position.set(x, cy, zc); m.rotation.y = ry; m.userData.noEdge = true; m.isLine2 = true; outside.add(m); VIEW.push(m);
+    m.position.set(x, cy, zc); m.rotation.y = ry; m.userData.noEdge = true; m.isLine2 = true; outside.add(m); VIEW.push(m); PICS.push(m.material);
   }
+}
+// ---- the sky and the far town behind the picture (author 2026-11-28: 「我觉得可以用这个构建外部环境」) ----
+// Until now what is outside was one photograph on a card with a painted grey behind it: right by day, flat at night, and
+// nothing in it ever moved. The photograph stays (the block, the trees: 窗外远处的背景用真图). Its sky is cut out of it once it
+// has loaded (see GLASS below), and behind it there is now a sky that is one shader on a dome (overcast that drifts, a
+// dusk, a night with the town's glow along its foot) and a far town of slabs and towers in the haze, whose windows are
+// lit at night. As the room goes wrong the sky does too: the cloud turns the colour of a bruise and winds round one
+// place, and from day 15 that place opens on what is behind the sky (the sky of the far view, FAR.space).
+// Built the way the Caelune lookdev lab builds a backdrop (github.com/bigdrum/caelune2: every box pushed into one
+// accumulated geometry, the facades drawn by the shader, the sky as one dome), rewritten for this room. Two draw calls.
+const FARCITY = { set() {}, time() {} };
+{
+  const P = [], UV = [], COL = [], HZ = [], ID = [], IDX = [];
+  // one face: its four corners, and its width and height in metres for the facade's grid
+  const quad = (a, b, c, d, w, h, col, hz, id, kind, shade) => { const n = P.length / 3;
+    P.push(...a, ...b, ...c, ...d); UV.push(0, 0, w, 0, w, h, 0, h);
+    for (let i = 0; i < 4; i++) { COL.push(col.r * shade, col.g * shade, col.b * shade); HZ.push(hz); ID.push(id, kind); }
+    IDX.push(n, n + 1, n + 2, n, n + 2, n + 3); };
+  const pushBox = (cx, y0, cz, w, h, d, col, hz, id, kind = 0) => { // w along z, d along x. kind 0: a wall with windows, 1: plain, 2: a red lamp
+    const x0 = cx - d / 2, x1 = cx + d / 2, z0 = cz - w / 2, z1 = cz + w / 2, y1 = y0 + h;
+    quad([x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1], w, h, col, hz, id, kind, 1);
+    quad([x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0], w, h, col, hz, id, kind, 0.92);
+    quad([x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1], d, h, col, hz, id, kind, 0.74);
+    quad([x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0], d, h, col, hz, id, kind, 0.8);
+    quad([x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0], d, w, col, hz, id, kind === 2 ? 2 : 1, 0.95); // the roof
+  };
+  const R = rng(2028), walls = [0xa9a294, 0x9a9488, 0xb3ab9c, 0x8e9196, 0xa0988c, 0x97908a].map((h) => new THREE.Color(h)), dark = new THREE.Color(0x4a4c50);
+  const GROUND = -16, EZ = (WIN.z0 + WIN.z1) / 2;
+  let id = 0;
+  // three ranks, each further and taller than the one before it, on both sides of the house (the big window and the slit)
+  for (const side of [-1, 1]) for (const [d0, d1, h0, h1, tallP] of [[150, 185, 16, 34, 0], [200, 255, 22, 46, 0.12], [268, 335, 28, 54, 0.22]]) {
+    let a = -1.2 + R() * 0.05;
+    while (a < 1.2) {
+      const dist = d0 + R() * (d1 - d0), tall = R() < tallP, slab = !tall && R() < 0.5;
+      const w = tall ? 14 + R() * 8 : slab ? 26 + R() * 20 : 16 + R() * 12, dep = 11 + R() * 6;
+      const h = tall ? h1 * (1.05 + R() * 0.25) : h0 + R() * (h1 - h0), hz = 0.26 + 0.38 * ss(150, 335, dist);
+      const x = side * (-X0 + Math.cos(a) * dist), z = EZ + Math.sin(a) * dist, col = walls[Math.floor(R() * walls.length)], my = ++id, top = GROUND + h;
+      pushBox(x, GROUND, z, w, h, dep, col, hz, my, 0);
+      if (R() < 0.7) pushBox(x + (R() - 0.5) * dep * 0.3, top, z + (R() - 0.5) * w * 0.5, 4 + R() * 3, 2.4 + R(), 4, col, hz, my, 1); // a stair head, a lift house
+      if (R() < 0.3) pushBox(x, top, z + (R() - 0.5) * w * 0.6, 2.2, 1.8, 2.2, dark, hz, my, 1); // a water tank
+      if (tall || R() < 0.22) { const m = 5 + R() * 6; pushBox(x, top, z - w * 0.2, 0.28, m, 0.28, dark, hz, my, 1); if (tall) pushBox(x, top + m, z - w * 0.2, 1.3, 1.3, 1.3, dark, hz, my, 2); }
+      a += (w + (R() < 0.14 ? 50 + R() * 60 : 4 + R() * 18)) / dist;
+    }
+  }
+  for (const [a, dist, h] of [[-0.42, 300, 78], [-0.37, 312, 66], [0.78, 290, 72]]) { // chimneys: a works, far off to one side
+    const x = X0 - Math.cos(a) * dist, z = EZ + Math.sin(a) * dist, my = ++id;
+    pushBox(x, GROUND, z, 3, h, 3, walls[3], 0.6, my, 1); pushBox(x, GROUND + h, z, 1.4, 1.4, 1.4, dark, 0.6, my, 2);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(P, 3)); geo.setAttribute("uv", new THREE.Float32BufferAttribute(UV, 2));
+  geo.setAttribute("aCol", new THREE.Float32BufferAttribute(COL, 3)); geo.setAttribute("aHz", new THREE.Float32BufferAttribute(HZ, 1)); geo.setAttribute("aId", new THREE.Float32BufferAttribute(ID, 2));
+  geo.setIndex(IDX);
+  const HASH = /* glsl */ `float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }`;
+  const cityMat = new THREE.ShaderMaterial({
+    side: THREE.DoubleSide, fog: false, toneMapped: false,
+    uniforms: { uTint: { value: new THREE.Color(1, 1, 1) }, uHaze: { value: new THREE.Color(0xbcbfc1) }, uNight: { value: 0 }, uLit: { value: 0.3 }, uTime: { value: 0 }, uBreath: { value: 0 } },
+    vertexShader: /* glsl */ `attribute vec3 aCol; attribute float aHz; attribute vec2 aId; varying vec2 vUv; varying vec3 vCol; varying float vHz; varying vec2 vId;
+      void main() { vUv = uv; vCol = aCol; vHz = aHz; vId = aId; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `uniform vec3 uTint, uHaze; uniform float uNight, uLit, uTime, uBreath; varying vec2 vUv; varying vec3 vCol; varying float vHz; varying vec2 vId;
+      ${HASH}
+      void main() {
+        vec3 col = vCol, glow = vec3(0.0);
+        if (vId.y < 0.5) { // a wall: a bay every 3.3 m, a floor every 2.9 m, a window in each; which of them are lit is the building's own
+          vec2 g = vUv / vec2(3.3, 2.9), f = fract(g), cell = floor(g), fw = fwidth(g) * 0.75;
+          float win = smoothstep(0.2 - fw.x, 0.2 + fw.x, f.x) * (1.0 - smoothstep(0.8 - fw.x, 0.8 + fw.x, f.x)) * smoothstep(0.3 - fw.y, 0.3 + fw.y, f.y) * (1.0 - smoothstep(0.78 - fw.y, 0.78 + fw.y, f.y));
+          float r = h21(cell + vId.x * 17.3);
+          col *= (1.0 - 0.1 * (1.0 - smoothstep(0.0, 0.06 + fw.y, f.y))) * (0.94 + 0.06 * h21(cell * 0.5 + vId.x)); // the joint between two floors of panels; no two panels weathered alike
+          col = mix(col, vec3(0.045, 0.058, 0.072) + 0.03 * r, win * 0.9);
+          float lit = win * step(1.0 - uLit, r) * mix(1.0, 0.5 + 0.5 * sin(uTime * 0.7), uBreath); // gone wrong: they breathe, all of them together
+          glow = mix(mix(vec3(1.0, 0.55, 0.2), vec3(0.6, 0.78, 1.0), step(0.82, fract(r * 7.31))), vec3(1.0, 0.08, 0.04), uBreath) * lit * (0.4 + 0.6 * fract(r * 13.7)); // a curtain here, a bare bulb there
+        } else if (vId.y > 1.5) { // a red lamp on what stands highest
+          glow = vec3(1.0, 0.05, 0.03) * step(0.5, fract(uTime * 0.45 + vId.x * 0.37)) * (0.6 + 0.9 / max(uNight, 0.25)) ; col *= 0.3;
+        }
+        col = mix(col * uTint, uHaze, vHz) + glow * uNight * (1.0 - 0.45 * vHz);
+        gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+  const city = new THREE.Mesh(geo, cityMat); city.frustumCulled = false; city.userData.noEdge = true; city.isLine2 = true; /* the occlusion pass leaves it alone */ outside.add(city);
+
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, fog: false, toneMapped: false,
+    uniforms: { uTime: { value: 0 }, uC: { value: 0 }, uTear: { value: 0 }, uLight: { value: new THREE.Color(0x9ba1a7) }, uDark: { value: new THREE.Color(0x565c64) }, uHor: { value: new THREE.Color(0xbcbfc1) }, uGlow: { value: new THREE.Color(0) },
+      uSwirl: { value: new THREE.Vector3(-60, 13, -16).normalize() } }, // where the sky winds: out of the big window, to the right of the block and above the trees
+    vertexShader: /* glsl */ `varying vec3 vDir; void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `uniform float uTime, uC, uTear; uniform vec3 uLight, uDark, uHor, uGlow, uSwirl; varying vec3 vDir;
+      ${HASH}
+      float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
+      float fbm(vec2 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * vn(p); p = p * 2.03 + vec2(17.1, 9.2); a *= 0.5; } return s; }
+      float h31(vec3 p) { p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.x + p.y) * p.z); }
+      vec3 stars(vec3 d, float cells, float keep, float size, float seed) {
+        vec3 p = d * cells, id = floor(p); float r = h31(id + seed); if (r < keep) return vec3(0.0);
+        vec3 off = vec3(h31(id + seed + 1.7), h31(id + seed + 5.3), h31(id + seed + 9.1)) - 0.5;
+        return mix(vec3(1.0, 0.82, 0.74), vec3(0.74, 0.84, 1.0), h31(id + seed + 4.4)) * smoothstep(size, 0.0, length(fract(p) - 0.5 - off * 0.6)) * (0.35 + 0.65 * h31(id + seed + 3.1));
+      }
+      void main() {
+        vec3 d = normalize(vDir);
+        float el = max(d.y, 0.0), hor = exp(-el * 6.0);
+        // the cloud is a ceiling: flat over the house, crowded toward the horizon
+        vec2 p = d.xz / (el + 0.2) * 1.3, sc = uSwirl.xz / (uSwirl.y + 0.2) * 1.3, q = p - sc; float rr = length(q);
+        float ang = uC * (2.4 * exp(-rr * 0.8) + uTime * 0.03 * exp(-rr * 0.5)); // gone wrong: it winds round one place, and goes on winding
+        float ca = cos(ang), sa = sin(ang); p = sc + vec2(q.x * ca - q.y * sa, q.x * sa + q.y * ca);
+        vec2 wind = vec2(uTime * 0.02, uTime * 0.007);
+        float n1 = fbm(p * 0.75 + wind), n2 = fbm(p * 2.1 + wind * 1.7 + n1 * 1.1), n3 = fbm(p * 6.0 + wind * 2.6 + n2);
+        float dens = smoothstep(0.36, 0.7, n1 * 0.6 + n2 * 0.42 + n3 * 0.12); // heavy bellies, and paler rifts between them
+        vec3 col = mix(uLight, uDark, dens * (1.0 - 0.4 * hor));
+        col = mix(col, uHor, hor * 0.55) + uGlow * hor * hor; // lighter along its foot; at night the town's own light on it
+        if (uTear > 0.001) { // and then it opens there
+          float ta = acos(clamp(dot(d, uSwirl), -1.0, 1.0)), edge = uTear * (0.7 + 0.6 * fbm(q / (rr + 0.0001) * 1.4 + uTime * 0.03));
+          float open = 1.0 - smoothstep(edge * 0.82, edge, ta);
+          vec3 sp = stars(d, 90.0, 0.86, 0.12, 0.0) + stars(d, 200.0, 0.9, 0.14, 20.0) * 0.6 + vec3(0.2, 0.02, 0.05) * smoothstep(0.4, 0.85, fbm(d.xz * 9.0 + d.y * 5.0)) * 0.5;
+          col = mix(col * (1.0 - 0.5 * smoothstep(edge * 2.2, edge, ta)), sp, open) + vec3(0.22, 0.02, 0.03) * exp(-abs(ta - edge) * 110.0) * 0.5; // the cloud is darker round it; a thin red lip
+        }
+        gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(385, 40, 20, 0, Math.PI * 2, 0, Math.PI * 0.62), skyMat);
+  sky.frustumCulled = false; sky.userData.noEdge = true; sky.isLine2 = true; sky.renderOrder = 50; /* last of the solid things: only what shows through the windows is ever shaded */ outside.add(sky);
+  const cA = new THREE.Color(), cB = new THREE.Color(), cH = new THREE.Color(), WHT = new THREE.Color(0xf3f2ee);
+  FARCITY.set = (day, dusk, c, white, t, tint) => {
+    const k = 0.05 + 0.95 * day, w = c * 0.6 * (1 - 0.3 * day), wk = 0.2 + 0.8 * day, U2 = skyMat.uniforms, CU = cityMat.uniforms;
+    cA.set(0xb6babd).multiplyScalar(k).lerp(new THREE.Color(0x8f8790), dusk * 0.4).lerp(new THREE.Color(0x5c2a31).multiplyScalar(wk), w).lerp(WHT, white);
+    cB.set(0x4d535b).multiplyScalar(k).lerp(new THREE.Color(0x4a4350), dusk * 0.5).lerp(new THREE.Color(0x1c0a10).multiplyScalar(wk), w).lerp(WHT, white);
+    cH.set(0xbcbfc1).multiplyScalar(k).lerp(new THREE.Color(0xd9a57e), dusk * 0.75).lerp(new THREE.Color(0x7c4038).multiplyScalar(wk), w).lerp(WHT, white);
+    U2.uLight.value.copy(cA); U2.uDark.value.copy(cB); U2.uHor.value.copy(cH); U2.uGlow.value.set(0x2b211b).multiplyScalar((1 - day) * (1 - white));
+    U2.uC.value = c; U2.uTear.value = ss(0.45, 1, c) * 0.2 * (1 - white);
+    const late = t < 6 ? t + 24 : t; // fewer and fewer of them as the night goes on; gone wrong, every one of them
+    CU.uTint.value.copy(tint); CU.uHaze.value.copy(cH).multiplyScalar(0.86); /* a far wall in haze is a little darker than the sky's foot, never paler */ CU.uNight.value = Math.max(1 - day, ss(0.6, 1, c) * 0.6) * (1 - white);
+    CU.uLit.value = (0.1 + 0.24 * (1 - ss(22.5, 25, late))) * (1 - ss(0.55, 1, c)) + ss(0.55, 1, c); CU.uBreath.value = ss(0.3, 0.75, c);
+  };
+  FARCITY.time = (s) => { skyMat.uniforms.uTime.value = s; cityMat.uniforms.uTime.value = s; };
 }
 // ---- what goes wrong across the yard (author 2026-11-16) ----
 // Painted over the picture on a clear sheet, by day and hour. Her list: one window still lit when the rest are dark;
@@ -2222,6 +2354,22 @@ const GLASS = { ready: false, c: null, box: [] };
   im.onload = () => {
     const [mc, mg] = canvas(1664, 928); mg.drawImage(im, 0, 0, 1664, 928);
     const src = mg.getImageData(0, 0, 1664, 928).data, out = mg.createImageData(1664, 928), o = out.data;
+    { // The picture's own sky is cut out of it, so that the sky behind (FARCITY) is the sky. Sky is what is pale and not warm
+      // (the wall is warm, the trees are green and dark) and can be reached from the picture's top edge without crossing
+      // anything else: a window pane the colour of the sky is not sky. Half size is enough for an edge.
+      const W2 = 832, H2 = 464, sky = new Uint8Array(W2 * H2), stack = [];
+      const isSky = (x, y) => { const k = (y * 2 * 1664 + x * 2) * 4, r = src[k], g2 = src[k + 1], b2 = src[k + 2]; return r + g2 + b2 > 190 && b2 - r > -8 && g2 - b2 < 12; };
+      for (let x = 0; x < W2; x++) if (isSky(x, 0)) { sky[x] = 1; stack.push(x); }
+      while (stack.length) { const i = stack.pop(), x = i % W2, y = (i - x) / W2;
+        for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) { if (nx < 0 || ny < 0 || nx >= W2 || ny >= H2) continue; const j = ny * W2 + nx; if (!sky[j] && isSky(nx, ny)) { sky[j] = 1; stack.push(j); } } }
+      const [ac, ag] = canvas(W2, H2), im2 = ag.createImageData(W2, H2);
+      for (let y = 0; y < H2; y++) for (let x = 0; x < W2; x++) { const u = x / (W2 - 1), v = y / (H2 - 1), i = y * W2 + x, a = sky[i] ? 0 : Math.min(ss(0, 0.04, u), ss(0, 0.04, 1 - u), ss(0, 0.2, 1 - v)) * 255; /* what is not sky is solid almost to the picture's edge: a wide fade let the far town's lit windows show through the block */ im2.data[i * 4] = im2.data[i * 4 + 1] = im2.data[i * 4 + 2] = a; im2.data[i * 4 + 3] = 255; }
+      ag.putImageData(im2, 0, 0);
+      const [sc2, sg2] = canvas(W2, H2); sg2.filter = "blur(0.7px)"; sg2.drawImage(ac, 0, 0); // a soft edge, not a cut one
+      const at = new THREE.CanvasTexture(sc2), af = new THREE.CanvasTexture(sc2); af.wrapS = THREE.RepeatWrapping; af.repeat.x = -1; af.offset.x = 1;
+      if (PICS[0]) { PICS[0].alphaMap = at; PICS[0].needsUpdate = true; } if (PICS[1]) { PICS[1].alphaMap = af; PICS[1].needsUpdate = true; }
+      GLASS.sky = sc2;
+    }
     WINS.forEach(([x, y, w, h, wide], i) => {
       const px = wide ? 4 : 9, py = wide ? 4 : 12, x0 = Math.round(x - w / 2 - px), x1 = Math.round(x + w / 2 + px), y0 = Math.round(y - h / 2 - py), y1 = Math.round(y + h / 2 + py);
       let a0 = 1e9, a1 = -1, b0 = 1e9, b1 = -1, sx = 0, n = 0;
@@ -2355,6 +2503,7 @@ function updateSurge() {
   }
 }
 function updateOutside(s, dt) {
+  FARCITY.time(s);
   const want = state.outer ? 1 : 0;
   OUTER.k += (want - OUTER.k) * (1 - Math.exp(-dt * 0.5));
   if (OUTER.k < 0.002 && !want) OUTER.k = 0;
@@ -2551,6 +2700,7 @@ function apply() {
   scene.background = sky;
   drawView();
   for (const m of VIEW) m.material.color.setScalar(0.06 + 0.9 * day).lerp(C(0x3a0c0a), c * 0.45 * (1 - 0.5 * day)).lerp(WHITE, white);
+  FARCITY.set(day, dusk, c, white, t, VIEW[0].material.color);
   const lightCol = LIGHT.night.clone().lerp(LIGHT.day, day).lerp(LIGHT.dusk, dusk * 0.8).multiply(tint);
   skyLight.color.copy(lightCol);
   slitLight.color.copy(lightCol);
