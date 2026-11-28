@@ -1579,9 +1579,13 @@ function applyDay() {
 }
 // what the room looks like on each day: photos' days stay clean here; the wall starts on 11, the material world is 15–18
 function dayLook(day) {
-  const c = { 10: 0.09, 11: 0.16, 12: 0.24, 13: 0.34, 14: 0.43, 15: 0.52, 16: 0.78, 17: 0.9, 18: 1 }[day] ?? 0;
-  const px = { 16: 0.6, 17: 0.8, 18: 1 }[day] ?? 0; // slider units: full = PX_MAX of space broken (author: 20 % is the most it should ever be)
-  const u = { 17: 0.62, 18: 0.95 }[day] ?? 0; // slider units: full = UN_MAX; lines and lifting only, no day rests in white
+  // author 2026-11-28: 「3D 房间第 16、17 天已经是整面血肉，要不要压低、把最重的留给第 18 天？是的」. Days 16 and 17 were 0.78 and
+  // 0.9 (flesh over half of every wall, by the flesh shader's threshold); they are 0.58 and 0.66 now (about a third, and two
+  // fifths), a step like the days before them. Day 18 keeps the full look: in the game it is the photographs' flesh, and here
+  // it is the last fight's and the look-out's.
+  const c = { 10: 0.09, 11: 0.16, 12: 0.24, 13: 0.34, 14: 0.43, 15: 0.52, 16: 0.58, 17: 0.66, 18: 1 }[day] ?? 0;
+  const px = { 16: 0.35, 17: 0.55, 18: 1 }[day] ?? 0; // slider units: full = PX_MAX of space broken (author: 20 % is the most it should ever be)
+  const u = { 17: 0.35, 18: 0.95 }[day] ?? 0; // slider units: full = UN_MAX; lines and lifting only, no day rests in white
   return { collapse: c, pixel: px, unreal: u };
 }
 

@@ -17,7 +17,7 @@ explains itself.
 
 | Fact (`State`) | Shows as | Where | Status |
 |---|---|---|---|
-| `day` | the photographed room re-edited per stage (wall → otherworld → glitch → white); the code-built room's collapse amount, broken pixels and "unreal" lines (days 10–18, `dayLook` in `room3d/room.js`); the window and the lights across the yard; the weather (`rain`) | every view | shown |
+| `day` | the photographed room re-edited per stage (wall → otherworld → glitch → flesh; flesh is day 18 only); the code-built room's collapse amount, broken pixels and "unreal" lines (days 10–18, `dayLook` in `room3d/room.js`); the window and the lights across the yard; the weather (`rain`) | every view | shown |
 | `day` | the carton: one small box loose each day; the shipping slip on day 18 | 床 wall, 桌子 | shown |
 | `stage` | derived from `day` (`content/stages.json`); read by the photos and the shader | every view | shown |
 | `found` | each old object on the desk from the day after it is found; in the 道具 card | 桌子 (photo and 3D) | shown |
