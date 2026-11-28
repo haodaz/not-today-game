@@ -2439,6 +2439,7 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .kl-tent:nth-child(odd){scale:-1 1}
 @keyframes kl-tent{from{transform:scaleY(0) rotate(-6deg);opacity:0}60%{opacity:1}to{transform:scaleY(1) rotate(0);opacity:1}}
 .kl-doorlines{display:flex;gap:.6em;flex-wrap:wrap}
+.kl-quip{flex-basis:100%;color:var(--ink,#1d2129)}
 .kl-doorline{opacity:0;animation:kl-line 600ms ease var(--d,0ms) both}
 @keyframes kl-line{from{opacity:0}to{opacity:1}}
 .kl-blocked{color:#c9473a}

@@ -16,7 +16,7 @@ import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { gradeGame } from "@world/desktop/workbench/grades";
-import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves, KLOTSKI_ROOM_MS, klotskiRoomSrc, klotskiStage } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves, KLOTSKI_ROOM_MS, klotskiRoomSrc, klotskiStage, KLOTSKI_QUIP_MS } from "@world/desktop/workbench/klotski";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
@@ -249,9 +249,15 @@ describe("klotski: the stage", () => {
     expect(roomJs).toContain('if (q.get("surge") === "wait")');
     expect(roomJs).toContain("if (m.surge) surge(m.at);");
     expect(fs.readFileSync(new URL("../src/world/motion/dom.ts", import.meta.url), "utf8")).toContain('postMessage({ target: "nt-room", surge: true, at: roomCue.at }, "*")');
+    // her aside in the room (author 2026-11-28): after the three lines, while the room is on screen; not in the photo look, which has no room
+    expect(t("klotski.stage.quip")).toBe("程序员的外套太结实了，我是不是该接个广告啊。。。。");
+    expect(r.out()).toContain(`<span class="kl-doorline kl-quip" style="--d:${String(KLOTSKI_QUIP_MS)}ms">${t("klotski.stage.quip")}</span>`);
+    expect(KLOTSKI_QUIP_MS).toBeGreaterThan(KLOTSKI_ROOM_MS + 2000);
+    expect(KLOTSKI_QUIP_MS).toBeLessThan(KLOTSKI_DONE_MS - 2000);
     // the photo look (`?desk=photo`, the walk's software renderer): no 3D page is loaded; the flat tentacles stand in
     const flat = klotskiStage(r.task, r.board, boardState(r.board, 17, r.task.id, r.store.getEvents()), r.session, false, r.clock.now, null, false).value;
     expect(flat).not.toContain("<iframe");
+    expect(flat).not.toContain("kl-quip");
     expect(flat).toContain('class="kl-tent');
     expect(fs.readFileSync(new URL("../src/world/desktop/desktop.css", import.meta.url), "utf8")).toContain(".kl-board.open:has(.kl-flesh) .kl-tent");
     // parted, not covered (「感觉是盖在上面的，不是从通道过去的」): the blocks standing on your way are pushed off it; you are not

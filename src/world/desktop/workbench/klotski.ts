@@ -59,6 +59,8 @@ export const KLOTSKI_DONE_MS = 8800;
 export const KLOTSKI_GROW_MS = 3200;
 /** The three lines' delays from the door opening (door1, door2, door3). */
 export const KLOTSKI_LINE_MS = [0, 2200, 4400] as const;
+/** The aside in the room's cutscene (author 2026-11-28: 「这个地方我好想加一句吐槽」): the jacket on the door wall is the one thing the room has not touched. Said once the room is on screen. */
+export const KLOTSKI_QUIP_MS = 6200;
 /** The door: under the bottom row, these two columns (0-based). */
 export const DOOR_X = 1;
 const HISTORY = 300;
@@ -379,7 +381,7 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   const nameless = g?.nameless ? html`<p class="kl-nameless">${S("klotski.stage.nameless")}</p>` : null;
   // the sub-line: the three door lines one after another; a block that cannot go out; else the room
   const sub = out
-    ? html`<span class="mn-sub kl-doorlines">${(["door1", "door2", "door3"] as const).map((k, i) => html`<span class="${cls("kl-doorline", `l${String(i + 1)}`)}" style="--d:${String(KLOTSKI_LINE_MS[i])}ms">${S(`klotski.stage.${k}`)}</span>`)}</span>`
+    ? html`<span class="mn-sub kl-doorlines">${(["door1", "door2", "door3"] as const).map((k, i) => html`<span class="${cls("kl-doorline", `l${String(i + 1)}`)}" style="--d:${String(KLOTSKI_LINE_MS[i])}ms">${S(`klotski.stage.${k}`)}</span>`)}${flesh ? html`<span class="kl-doorline kl-quip" style="--d:${String(KLOTSKI_QUIP_MS)}ms">${S("klotski.stage.quip")}</span>` : null}</span>`
     : up ? html`<span class="mn-sub kl-blocked">${S("klotski.phone.sub")}</span>`
     : g?.blocked ? html`<span class="mn-sub kl-blocked">${S("klotski.stage.blocked")}</span>`
     : html`<span class="mn-sub">${S("klotski.stage.sub")}</span>`;
