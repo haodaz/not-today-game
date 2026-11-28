@@ -21,7 +21,7 @@ One pure function next to `desk3dOn` (`src/world/room/desk3d.ts` or a sibling): 
 
 ## R2 · The frame is the backdrop
 
-- The shared frame (R1 of `room-3d-desk`; do not make a second iframe) is shown under the HUD for those views, with `face`: 房间 0, 窗 1, 门 2, 床 3, and `spot: null`. The other command fields are the ones `deskCommand` already sends (`day`, `time`, `lamp`, `ceil`, `rain`, `coat` when it is not 0, and so on).
+- The shared frame (R1 of `room-3d-desk`; do not make a second iframe) is shown under the HUD for those views, with `face`: 房间 0, 床 1, 门 2, 窗 3 (corrected 2026-11-28 after Kiro checked `room3d/room.js`: the first version of this line had 窗 and 床 swapped), and `spot: null`. The other command fields are the ones `deskCommand` already sends (`day`, `time`, `lamp`, `ceil`, `rain`, `coat` when it is not 0, and so on).
 - Turning between two of these views (`room-turn`) posts the new `face`; the room turns by itself. The photo turn animation (`m-turn-face`) is not played between two frame views. A turn between a frame view and a photo view (never happens inside one day, but `lying` ↔ `bed` does) cross-fades as 桌子 ↔ 房间 does today.
 - While a frame view is shown, the photo layers of that view are not drawn: the stage's own background photograph, the `.fx` stack and its WebGL layer, `.window-light`, `.evening-look` (the room has its own lamp, ceiling light and daylight). The letterbox behind the stage is plain dark (`applyFit` with no backdrop).
 - The screen's text creatures (`src/world/desktop/textlife`) are untouched: they live on the monitor, not in the room.
@@ -65,7 +65,7 @@ The evening and the night beats (`isEvening`, the hand nights of days 10–17, t
 
 - `room3dOn`: true on days 10–17 for the four views in the day beats; false on days 1–9 and 18, at night, on `lying` / `table` / `desk`, with `deskPhoto`, in a scene, after a failed `ready`. Property: for every day and view it never returns true when the day's ring is before `wall`.
 - Markup: on a frame view the stage has no `.fx`, no `.window-light`, no `.evening-look`, no photo hot areas, and has the room host; on day 18 and on day 9 it has the photographs as today (existing snapshots unchanged).
-- Posts: entering 床 on day 12 posts `face: 3`; turning to 门 posts `face: 2` and nothing else changes; the garment (`coat`) is posted when not 0.
+- Posts: entering 床 on day 12 posts `face: 1`; turning to 门 posts `face: 2` and nothing else changes; the garment (`coat`) is posted when not 0.
 - Picks: each id of R3 runs its action (`coat` leaves the 换一件 ask in the box; `switch` toggles `ceilOn`; `bed` asks to lie down); an unmapped id does nothing.
 - The headless walk (`script/tools/auto-day-shoot.mjs`, `?desk=photo`) needs no change: days 10–17 still clear in it. Do not run it; say that it was not run.
 - `npx tsc --noEmit` and `npm test` green, read, then commit as a separate step. Update a snapshot only where the diff is exactly this spec's markup, and say so.

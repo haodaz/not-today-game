@@ -20,7 +20,7 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `day` | 1–18 | the day's look: collapse amount, broken pixels, unreal lines (`dayLook`), objects, meals, the carton, the hand |
 | `snap` | `false` | with `day`: keep the current look instead of jumping to the day's (a fade the game drives) |
 | `time` | hour, 6–24 | daylight, the window, the lights across the yard |
-| `face` | 0–3 | which wall the camera faces (room, window, door, bed) |
+| `face` | 0–3 | which wall the camera faces: 0 the desk wall (房间), 1 the bed wall (床), 2 the door wall (门), 3 the window wall (窗) |
 | `spot` | `"desk"`, `"meal"`, `"win"`, `"slit"` or `null` | the camera goes up to that spot; `null` stands back |
 | `far` | 0–1 | how far the camera has pulled back (the endings' pull-out) |
 | `pause` | boolean | stop or restart drawing (a frame the game has hidden) |
