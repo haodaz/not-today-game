@@ -20,7 +20,7 @@
             "r1": "City Data Bureau · acceptance report",
             "r2": "NVIBIG Group · invoice",
             "r3": "JianHua University · renewal",
-            "r4": "Qinghe Logistics · final payment",
+            "r4": "Takeaway downstairs · this month's meals",
             "r5": "Future Intelligence · year-end summary"
           }
         },
@@ -42,7 +42,7 @@
           },
           {
             "id": "r4",
-            "label": "Final payment",
+            "label": "Meals",
             "answer": "c4"
           },
           {
@@ -78,11 +78,7 @@
           },
           {
             "id": "c4",
-            "text": "Close it",
-            "from": {
-              "file": "e-receivable"
-            },
-            "hint": "In the receivables: the only one that really paid"
+            "text": "Close it"
           },
           {
             "id": "c5",
@@ -144,7 +140,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "This one was really paid. Close it."
+                "text": "This one you paid yourself. Close it."
               }
             ]
           },
@@ -217,7 +213,7 @@
             "Acceptance report",
             "Invoice",
             "Renewal",
-            "Final payment",
+            "Meals",
             "Year-end summary",
             "Nothing for tomorrow",
             "Colleagues in the corridor",
