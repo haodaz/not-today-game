@@ -197,7 +197,7 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   // texture-pass R1: cutscenes play in a real browser, never in the fast replay or with reduced motion.
   game.session.cutsOn = cutsSupported() && new URLSearchParams(search).get("fast") !== "1";
   // Dev only: the running game at hand in the console (`__nt.session`, `__nt.store`), for looking, never for the story.
-  if (import.meta.env.DEV) (window as unknown as { __nt: unknown }).__nt = game;
+  if (import.meta.env.DEV) (window as unknown as { __nt: unknown }).__nt = { ...game, store };
   // room-3d-desk R6: `?desk=photo` keeps the photo 桌子 (the author's comparison; the replay driver passes it).
   game.session.deskPhoto = new URLSearchParams(search).get("desk") === "photo";
   // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that

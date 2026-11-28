@@ -58,12 +58,12 @@ describe("an option with its own lines", () => {
     expect(store.getState().recognised).toEqual(["chick"]);
   });
 
-  it("a wrong option's own say plays alone when it has no inner; not recognised", () => {
+  it("a wrong option's own say plays alone when it has no inner; it is known all the same (chick-fights R7)", () => {
     const { store, pick } = ask(1, "chick");
     const i = wrongsOf("chick")[0]!;
     expect(pick(i)).toEqual(narr(OWN.wrongSay));
-    expect(store.getState().recognised).toEqual([]);
-    expect(knows("chick", store.getState(), store.getEvents())).toBe(false);
+    expect(store.getState().recognised).toEqual(["chick"]);
+    expect(knows("chick", store.getState(), store.getEvents())).toBe(true);
   });
 });
 
@@ -89,7 +89,7 @@ describe("an object with no right option is no test", () => {
     expect(pick(plain)).toEqual([...narr(right.say), { k: "inner", t: right.inner, me: "carton" }]);
     expect(store.getState().recognised).toEqual(["pager"]);
     expect(knows("pager", store.getState(), store.getEvents())).toBe(true);
-    expect(store.getState().judgement.evidence.at(-1)).toMatchObject({ day: 4, eventId: "recognise:pager" });
+    expect(store.getState().judgement.evidence).toEqual([]); // chick-fights R7: not judged
     // The next day: picking it up does not ask again (it is known; no retry).
     store.appendEvent({ kind: "lieDown" });
     ctx.session.dialogue = EMPTY_DIALOGUE;

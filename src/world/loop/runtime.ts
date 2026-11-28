@@ -6,6 +6,8 @@ import type { BeatName, Item, SayLine, Sequence } from "@state/days/table";
 import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
+import { chickFedOn } from "@state/chick";
+import type { State } from "@state/types.gen";
 import { choiceOf } from "@state/days/effects";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { boardJudgement, deliverableForHand, handNight } from "@state/days/board";
@@ -89,10 +91,26 @@ function wake(ctx: ActionContext, lc: LoopContext): void {
   const { session } = ctx;
   const day = lc.state.day;
   const seq = lc.file.beats.boot;
-  if (!seq || session.bootBeatDay === day || booted(lc.state, ctx.store.getEvents())) return;
+  const events = ctx.store.getEvents();
+  if (session.bootBeatDay === day || booted(lc.state, events)) return;
+  const hungry = chickForgotten(lc.state, events);
+  if (!seq && !hungry) return;
   session.bootBeatDay = day;
-  session.dialogue = push(session.dialogue, beatQueued(day, "boot", seq));
+  if (seq) session.dialogue = push(session.dialogue, beatQueued(day, "boot", seq));
+  // chick-fights R6: one thought on waking when it went unfed yesterday (not a checklist item)
+  if (hungry) session.dialogue = push(session.dialogue, { key: `d${day}:chick-hungry`, lines: [{ k: "inner", t: t("chick.hungry.morning") }], ending: { kind: "none" } });
   settleSession(session);
+}
+
+/**
+ * chick-fights R6: from day 2, the chick was already held yesterday, is still its own (not upgraded),
+ * and got no meal yesterday. Pure, from the state and the log.
+ */
+export function chickForgotten(state: Pick<State, "day" | "found" | "upgraded">, events: readonly GameEvent[]): boolean {
+  const day = state.day;
+  if (day < 2 || !(state.found as string[]).includes("chick") || state.upgraded.chick === true || !hasString("chick.hungry.morning")) return false;
+  if (!events.some((e) => e.kind === "openLayer" && e.objectId === "chick" && e.day < day)) return false;
+  return !chickFedOn(events, day - 1);
 }
 
 /** author 2026-11-11: the object's description (content `q`), read before the question is asked; null without recognise.ask. */

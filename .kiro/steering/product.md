@@ -29,7 +29,7 @@ The AI era's effect on work, and how people respond to it. The unnameable thing 
 
 - Bad: SAN reaches zero, the player is replaced (a "You and You" chat appears). Restart from day 1 with nothing carried over.
 - Survive: reach day 18, ask Kuro to post the box, lie down. The next page says "Day 1".
-- Good: never let Kuro do a task unchecked, recognise all eight objects, keep assimilation low (three-meters), say the key lines, **and talk with Kuro every day until its hidden affinity reaches the threshold**; on night 18 the branch happens at bedtime, before the shipping slip is written: the player does not fill in the slip, shakes the hand, and on day 19 the door handle turns.
+- Good: never let Kuro do a task unchecked, keep assimilation low (three-meters), say the key lines, **and talk with Kuro every day until its hidden affinity reaches the threshold**; on night 18 the branch happens at bedtime, before the shipping slip is written: the player does not fill in the slip, shakes the hand, and on day 19 the door handle turns.
 
 ## The chat beat is the heart (author decision 2026-10-31)
 

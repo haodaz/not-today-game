@@ -10,7 +10,6 @@ import { dayFile } from "@state/days/table";
 import { npcPortrait } from "@world/npc";
 import { endingFlavour, type Ending } from "@state/endings";
 import type { JudgementDelta } from "@state/judgement";
-import { RIGHT_DELTA } from "@state/recognise";
 import type { State } from "@state/types.gen";
 import { upgradeTable } from "@state/upgrades";
 import { t } from "@world/i18n";
@@ -128,7 +127,7 @@ export interface CreditLine {
 export function deltaOf(eventId: string): JudgementDelta {
   if (eventId.startsWith("upgrade:")) return upgradeTable.judgement.accept;
   if (eventId.startsWith("declineUpgrade:")) return upgradeTable.judgement.decline;
-  if (eventId.startsWith("recognise:")) return RIGHT_DELTA;
+  // `recognise:` entries are from runs before 2026-11-27 (recognising is no judgement now): nothing visible
   return {};
 }
 

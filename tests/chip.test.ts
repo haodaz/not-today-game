@@ -204,7 +204,7 @@ describe("the player's chip()", () => {
 // ——— the battle (the work games' chick) ———
 
 const line = (fx: BattleLine["fx"]): BattleLine => ({ t: "x", fx, side: "theirs" });
-const atMenu = (): BattleState => ({ ...startBattle("4:task1", "foe", "/x.png", 4, 0), phase: "menu", queue: [], after: "menu", at: 5 });
+const atMenu = (): BattleState => ({ ...startBattle("4:task1", "foe", "/x.png", 0), phase: "menu", queue: [], after: "menu", at: 5 });
 
 describe("battleChip", () => {
   it("a new line sounds by its fx; the end has its own; nothing changed is null", () => {
@@ -221,7 +221,7 @@ describe("battleChip", () => {
     expect(battleChip(menu, battleCmd(menu, "bogus", 9))).toBeNull();
     expect(battleChip(reading, { ...reading })).toBeNull();
     expect(battleChip(menu, battleCmd(menu, "fight", 9))).toBeNull(); // the menu turned: the press's cursor only
-    expect(battleChip(null, startBattle("k", "foe", "/x.png", 1, 0))).toBe("text");
+    expect(battleChip(null, startBattle("k", "foe", "/x.png", 0))).toBe("text");
     expect(battleChip(menu, battleTurn(menu, "hype", 9))).toBe("shake");
   });
 });

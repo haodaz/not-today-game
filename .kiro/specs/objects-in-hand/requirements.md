@@ -1,5 +1,7 @@
 # objects-in-hand — requirements (author 2026-11-02)
 
+> **Note (2026-11-27):** the arrival days written below are the first plan's. The days in force are in `content/stages.json`: chick 1, camera 2, pager 3, IC card 4, tape 5, dictionary 6, calculator 7, phone 8.
+
 The old things, held and used. Design source: `script/notes/物件手感.md` (Chinese, the author's decisions are marked). Rules already in force stay: each object outputs only what its channel allows (steering `voices.md`), the chick's screen is 32×16 integer pixels, an upgraded object shows the smooth high-res channel and "helps" unasked (object-upgrade FR2), objects are held up at night to block the hand (night-hand).
 
 ## FR1. Two states: holding and using

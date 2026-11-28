@@ -2010,6 +2010,10 @@ body:has(.stage[data-day="10"]) .cs-label{color:#8f7410;border-bottom-color:rgba
    four tones, hard pixels, the box, the menu */
 .wl-battle{padding:6px 14px;border:1.5px solid #1d2129;background:#F2D33A;color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer;box-shadow:3px 3px 0 #1d2129}
 .wl-battle:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 #1d2129}
+/* chick-fights R2/R5: 饿着 beside the words when it was not fed today; a dead chip once Kuro has it */
+.wl-battle .wl-hungry{margin-left:8px;padding:1px 6px;border:1px solid #1d2129;background:#fff;font-size:11px;letter-spacing:.1em}
+.wl-battle.taken{background:#d6d2c8;color:#6b665c;border-color:#8a857a;box-shadow:none;cursor:default}
+.wl-battle.taken:hover{transform:none;box-shadow:none}
 .bt{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;background:#1c1c1c;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:"Courier New",ui-monospace,Menlo,monospace;color:#1a1a1a}
 .bt-screen{position:relative;height:100%;aspect-ratio:10/9;max-width:100%;background:#fff;overflow:hidden}
 .bt img{image-rendering:pixelated}

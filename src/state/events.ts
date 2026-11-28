@@ -131,7 +131,9 @@ export type BoardOp =
   /** stack (author 2026-11-12): the approval chain reached its top rank — the form is approved. */
   | { readonly t: "approve" }
   /** settlement (author 2026-11-13): 让克总帮忙 on a failed board — the wrong slots take Kuro's card (one assist). */
-  | { readonly t: "assistFix" };
+  | { readonly t: "assistFix" }
+  /** chick-fights R4: how the chick's one fight on this task ended. A win lifts the task one step (`lifted`); a loss (or a run) changes nothing. */
+  | { readonly t: "chick"; readonly won: boolean };
 
 export type EventKind = GameEvent["kind"];
 

@@ -6,6 +6,8 @@ import { hungerNumbers } from "@state/hunger";
 import type { State } from "@state/types.gen";
 import { constants, membersOf } from "@state/variables";
 import type { GameEvent } from "@state/events";
+import { chickFights } from "@state/chick";
+import { chickToday } from "@world/desktop/workbench/battle";
 import { beatLabelKey } from "@world/desktop/beat";
 import type { Session } from "@world/desktop/model";
 import { playerPortraitSrc } from "@world/dialogue/box";
@@ -92,6 +94,28 @@ export function statusNumbers(state: State, events: readonly GameEvent[]) {
   };
 }
 
+/** The chick's cells: one per day of the run so far (18 at most), lit for each day it was fed. */
+export const CHICK_CELLS_MAX = 18;
+
+/**
+ * chick-fights R6 (author 2026-11-27: 「小鸡天天喂状态栏怎么看」): the chick's row, from the day it is
+ * found. Fed today or hungry; the days it was fed as cells (the 饱食度 drawing); today's fights.
+ * While Kuro has it: the days left. Once it is Kuro's: only that. Null before the chick is found.
+ */
+export function chickRow(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  if (!(state.found as string[]).includes("chick")) return null;
+  const c = chickToday(state, events);
+  if (c.taken) return html`<div class="st-meter st-chick taken"><span class="st-k">${tr("status.chick")}</span><span class="st-chick-say">${tr("status.chick.taken")}</span><span></span></div>`;
+  const cells = Math.min(CHICK_CELLS_MAX, Math.max(1, state.day));
+  const lit = Math.min(cells, c.fedDays);
+  const f = chickFights(events, state.day);
+  const fights = f.won + f.lost === 0 ? tr("status.chick.fight.none") : tr("status.chick.fight", { n: f.won + f.lost, w: f.won });
+  const today = c.kuro
+    ? html`<span class="st-chick-today kuro">${tr("status.chick.kuro", { n: c.kuroDaysLeft })}</span>`
+    : html`<span class="${cls("st-chick-today", c.fedToday ? "fed" : "hungry")}"><i class="st-dot"></i>${tr(c.fedToday ? "status.chick.fed" : "status.chick.hungry")}</span>`;
+  return html`<div class="st-meter st-chick"><span class="st-k">${tr("status.chick")}</span><span class="st-bar full chick" style="grid-template-columns:repeat(${String(cells)},1fr)">${Array.from({ length: cells }, (_, i) => html`<i class="${i < lit ? "f" : ""}"></i>`)}</span><span class="st-v st-chick-n">${tr("status.chick.days", { n: c.fedDays })}</span></div><p class="st-line st-chick-line">${today}<span class="st-chick-fight">${fights}</span></p>`;
+}
+
 /**
  * 人物 (game-menu #80, 2026-11-25): the portrait in a lens, the name and the day; 理智 as a trace,
  * 饱食度 as ten cells, 克总 as hearts, 同化 as a line with its marker (and, from day 10, what grows
@@ -117,6 +141,6 @@ export function statusPanel(state: State, events: readonly GameEvent[], session:
   });
   const objects = html`<p class="st-line st-cap">${tr("status.objects", { n: n.objects, total: n.total })}${n.upgraded >= 1 ? html` · ${tr("status.upgraded", { n: n.upgraded })}` : null}</p><div class="st-cases">${cases}</div>`;
   const chats = html`<p class="st-line">${tr("status.chats", { n: n.chats })}</p>`;
-  const body = html`${who}<div class="gm-read"><p class="st-cap">${tr("status.state")}</p>${san}${full}${kuro}${assim}${objects}${chats}</div>`;
+  const body = html`${who}<div class="gm-read"><p class="st-cap">${tr("status.state")}</p>${san}${full}${kuro}${assim}${chickRow(state, events)}${objects}${chats}</div>`;
   return menuShell({ active: "status", day: state.day, title: tr("status.title"), rune: "who", tabs: roomTabs(state.found.length), close: "status-close", body, pane: "status", id: "status-title", extra: "status-layer" });
 }

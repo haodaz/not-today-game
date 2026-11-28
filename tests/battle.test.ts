@@ -1,5 +1,6 @@
 // battle mode (author 2026-11-13): the Game Boy battle on a work screen — seeded dice, the turn and
-// the text queue, 让小鸡上 once per task, a win pushing the work one cell.
+// the text queue, 让小鸡上 once per task. What a win does, how strong each side is and where the
+// control shows are chick-fights' (tests/chick-fights.test.ts).
 import "./specimen";
 import { describe, expect, it } from "vitest";
 import { taskByFlag } from "@state/days/tasks";
@@ -8,7 +9,7 @@ import { boardState } from "@state/days/board";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
-import { battleCmd, battleOffered, battleReward, battleScene, battleTurn, dice, startBattle, OUR_MOVES } from "@world/desktop/workbench/battle";
+import { battleCmd, battleOffered, battleScene, battleTurn, dice, startBattle, OUR_MOVES } from "@world/desktop/workbench/battle";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
@@ -19,7 +20,7 @@ describe("battle mode", () => {
     const a = dice("4:task1:0"), b = dice("4:task1:0"), c = dice("4:task1:1");
     expect([a(), a(), a()]).toEqual([b(), b(), b()]);
     expect(a()).not.toBe(c());
-    let s = startBattle("4:task1", "投资人材料", "/battle/mon-brief.gb.png", 4, 0);
+    let s = startBattle("4:task1", "投资人材料", "/battle/mon-brief.gb.png", 0);
     expect(s.phase).toBe("text");
     expect(s.queue[0]!.t).toBe(t("battle.appear", { foe: "投资人材料" }));
     s = battleCmd(s, "next", 1); s = battleCmd(s, "next", 2);
@@ -41,9 +42,10 @@ describe("battle mode", () => {
     expect(ran.after).toBe("ran");
   });
 
-  it("让小鸡上 is offered once per task when the chick is held; a win pushes one cell", () => {
+  it("让小鸡上 is offered once per task when the chick is held; a win goes in the log and lifts the board", () => {
     setLocale("zh");
     const store = createStore({ startDay: 4, patch: { found: ["chick"] } });
+    store.appendEvent({ kind: "pressKey", key: "chick:meal" }); // fed today: the plain button (饿着 is chick-fights')
     completeUntil(store, "task1");
     const task = taskByFlag(4, "task_d4_1")!;
     const board = task.board!;
@@ -53,9 +55,9 @@ describe("battle mode", () => {
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => now };
     const act = (name: string, data: Record<string, string> = {}) => boardActions[name]!(ctx, data as DOMStringMap, null as never);
     const out = () => workLayer({ state: store.getState(), events: store.getEvents(), session, nowMs: now })!.value;
-    const s0 = boardState(board, 4, task.id, store.getEvents());
-    expect(battleOffered(board, s0, ["chick"], store.getEvents(), 4, task.id)).toBe(true);
-    expect(battleOffered(board, s0, [], store.getEvents(), 4, task.id)).toBe(false);
+    expect(battleOffered(["chick"], store.getEvents(), 4, task.id)).toBe(true);
+    expect(battleOffered([], store.getEvents(), 4, task.id)).toBe(false);
+    expect(battleOffered(["chick"], store.getEvents(), 4, task.id, true)).toBe(false); // taken by Kuro
     expect(out()).toContain(`data-action="battle-start">${t("battle.go")}</button>`);
     act("battle-start");
     expect(session.battle?.key).toBe(`4:${task.id}`);
@@ -70,10 +72,13 @@ describe("battle mode", () => {
     while (session.battle!.phase === "text") act("battle-act", { cmd: "next" });
     expect(session.battle!.phase).toBe("won");
     expect(out()).toContain(`data-action="battle-done">${t("battle.done")}</button>`);
-    const reward = battleReward(board, boardState(board, 4, task.id, store.getEvents()))!;
+    const cells = { ...boardState(board, 4, task.id, store.getEvents()).slots };
     act("battle-done");
     expect(session.battle).toBeNull();
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: reward.slot, card: reward.card } });
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", taskId: task.id, op: { t: "chick", won: true } });
+    // no cell fills itself any more; the board is lifted instead
+    expect(boardState(board, 4, task.id, store.getEvents()).slots).toEqual(cells);
+    expect(boardState(board, 4, task.id, store.getEvents()).lifted).toBe(true);
     // once per task: no second offer
     expect(out()).not.toContain('data-action="battle-start"');
     act("battle-start");

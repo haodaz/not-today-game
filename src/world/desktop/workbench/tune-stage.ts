@@ -125,7 +125,8 @@ export function tuneStage(c: { state: State; events: readonly GameEvent[]; sessi
   const offers = !busy && offer ? html`<div class="ts-offer"><button type="button" class="wl-cta" data-action="tune-ask">${S("tune.ask.go")}</button></div>` : null;
   const finish = printable || s.done ? html`<button type="button" class="ts-finish" data-action="board-print"${printable && !busy ? null : html` disabled`}>${finishLabel(task)}</button>` : null;
   // author 2026-11-24 (#33): a deferrable task under today's line can be kept for tomorrow instead (今天先不发)
-  const shortNow = s.done ? tuneShort(board, tuneMods(s)).length > 0 : false;
+  // chick-fights R4: once the chick has lifted it, it is not short any more (no fix, no defer: it can go)
+  const shortNow = s.done && !s.lifted ? tuneShort(board, tuneMods(s)).length > 0 : false;
   // author 2026-11-24 (#60): under the line, Kuro's fix (his taste where it is short), once
   const fix = s.done && !offer && !busy && s.assists === 0 && shortNow && hasString("tune.kuroFix") ? html`<button type="button" class="ts-finish ghost" data-action="tune-kuro-fix">${S("tune.kuroFix")}</button>` : null;
   const defer = s.done && task.defer === true && !busy && !offer && shortNow && s.assists === 0 && hasString("tune.defer") ? html`<button type="button" class="ts-finish ghost" data-action="board-defer">${S("tune.defer")}</button>` : null;

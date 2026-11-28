@@ -19,7 +19,7 @@ import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
 import type { SayLine } from "@state/days/table";
-import { battleChip, battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
+import { battleChip, battleCmd, battleOffered, battleOver, battleTarget, battleTurn, chickToday, foeImage, foeStrength, startBattle } from "./battle";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
 import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
@@ -773,11 +773,12 @@ const actions: Record<string, ActionHandler> = {
     const c = currentBoard(ctx);
     if (!c) return;
     const state = ctx.store.getState();
-    const s = stateOf(ctx, c.task, c.board);
-    if (!battleOffered(c.board, s, state.found as string[], ctx.store.getEvents(), state.day, c.task.id)) return;
+    // chick-fights R2/R3/R5: on every task; the chick as strong as it was fed, the monster as strong as the day
+    const chick = chickToday(state, ctx.store.getEvents());
+    if (!battleOffered(state.found as string[], ctx.store.getEvents(), state.day, c.task.id, chick.taken)) return;
     ctx.store.appendEvent({ kind: "open", target: battleTarget(c.task.id), t: ctx.session.clock.time });
     const fill = (x: string) => fillPlaceholders(x, state.names);
-    ctx.session.battle = startBattle(ideKey(state.day, c.task), fill(c.task.title), foeImage(c.task, state.day), state.day, ctx.now?.() ?? Date.now());
+    ctx.session.battle = startBattle(ideKey(state.day, c.task), fill(c.task.title), foeImage(c.task, state.day), ctx.now?.() ?? Date.now(), chick.strength, foeStrength(state.day));
     ctx.rerender();
   },
   "battle-act"(ctx, data) {
@@ -792,16 +793,13 @@ const actions: Record<string, ActionHandler> = {
     if (sound) ctx.chip?.(sound);
     ctx.rerender();
   },
-  // the way back: a win pushes the work one state (one cell takes its answer); lost or ran: nothing
+  // the way back (chick-fights R4): how it ended goes in the log; a win lifts the task one step, a loss or a run nothing
   "battle-done"(ctx) {
     const b = ctx.session.battle;
     const c = currentBoard(ctx);
     if (!b || !battleOver(b)) return;
     ctx.chip?.("cursor");
-    if (c && b.phase === "won" && b.key === ideKey(ctx.store.getState().day, c.task)) {
-      const reward = battleReward(c.board, stateOf(ctx, c.task, c.board));
-      if (reward) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot: reward.slot, card: reward.card } });
-    }
+    if (c && b.key === ideKey(ctx.store.getState().day, c.task)) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "chick", won: b.phase === "won" } });
     ctx.session.battle = null;
     ctx.rerender();
   },

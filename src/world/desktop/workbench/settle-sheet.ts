@@ -2,7 +2,7 @@
 // 「最后结算的时候先展示出来，再提交」). 整理好了 (`board-settle`) shows it instead of the board: one
 // paper sheet, centred — who it goes to, the board's title, one row per slot with its demand and the
 // card placed in it — and under it the one way out the verdict allows (`settleActions`). Pure view.
-import { canPrint, settleVerdict, type BoardState, type BoardVerdict } from "@state/days/board";
+import { canPrint, liftVerdict, settleVerdict, type BoardState, type BoardVerdict } from "@state/days/board";
 import { FRAMES, frameUrl } from "../kuro/body";
 import type { Task, TaskBoard } from "@state/days/tasks";
 import type { State } from "@state/types.gen";
@@ -78,7 +78,7 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
   }
   // fill (day11-budget-fill): beside the form, the real cost sheet — the 人 rows the play spent struck through
   if (board.game?.kind === "fill") effect = html`${sheet}${fillSheet(board.game, fillRecord(events, state.day, task.id), state.names)}`;
-  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}${qualityLine(quality)}`, effect, actions: actions.buttons });
+  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}${qualityLine(quality && s.lifted ? liftVerdict(quality) : quality)}`, effect, actions: actions.buttons });
 }
 
 /** meters-v2 §1: the play's grade as one short line under the pass / fail line (only for a graded game). */
@@ -95,6 +95,8 @@ export function settleActions(task: Task, board: TaskBoard, s: BoardState): { li
   const verdict = settleVerdict(board, s);
   const kuro = (text: string, cls_: string) => html`<div class="${cls("sl-kuro", cls_)}"><img src="${frameUrl(FRAMES.idle[0])}" alt="">${text}</div>`;
   const print = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
-  if (verdict === "pass") return { line: s.assists > 0 ? kuro(S("settle.kuroDone"), "done") : html`<p class="sl-verdict pass">${S("settle.pass")}</p>`, buttons: print };
+  // chick-fights R4: the chick's win is said where the verdict is (it is why a board with a wrong cell can go)
+  const lifted = s.lifted ? html`<p class="sl-verdict pass chick">${S("battle.win.grade")}</p>` : null;
+  if (verdict === "pass") return { line: s.assists > 0 ? html`${kuro(S("settle.kuroDone"), "done")}${lifted}` : html`${lifted}<p class="sl-verdict pass">${S("settle.pass")}</p>`, buttons: print };
   return { line: html`<p class="sl-verdict fail">${S("settle.fail")}</p>`, buttons: html`<button type="button" class="wl-cta ghost" data-action="settle-kuro">${S("settle.kuro")}</button><p class="cmp-note">${S("settle.kuroNote")}</p>` };
 }

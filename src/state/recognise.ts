@@ -10,7 +10,6 @@ import enRaw from "@content/en/objects.json";
 import { objectsFoundOnDay } from "./stages";
 import { bilingualValues } from "./content-locale";
 import type { GameEvent } from "./events";
-import { hasEvidence, judge, type JudgementDelta } from "./judgement";
 import { HAND_FIELDS } from "./hands";
 import { shuffled } from "./seed";
 import type { State } from "./types.gen";
@@ -40,8 +39,9 @@ export interface RecogniseEntry {
   readonly wrong?: Answer;
 }
 
-/** A right answer is truth +1 evidence; a wrong one is not negative (FR2). */
-export const RIGHT_DELTA: JudgementDelta = { truth: 1 };
+// chick-fights R7 (author 2026-11-27: 「不要和认不认出来挂钩，我觉得这个别当做判定机制，一开始认物件只是 3 个对话
+// 3 种交流」): the question is three ways of answering, each with its own next line. No option is a
+// judgement: any of them makes the thing known, none moves a variable, nothing gates on it.
 /** An object has 2–4 options (author 2026-11-06; it was exactly 3). */
 export const OPTION_MIN = 2;
 export const OPTION_MAX = 4;
@@ -193,10 +193,10 @@ export function answerFor(object: string, option: number): { readonly say: reado
 
 /**
  * Knows what it is: recognised in state, or (for a box thing outside variables.json's `recognised`
- * set, if any) answered in the log with a pick that counts.
+ * set, if any) answered in the log, whichever way (chick-fights R7: every answer is an answer).
  */
 export function knows(object: string, state: State, events: readonly GameEvent[]): boolean {
-  return (state.recognised as string[]).includes(object) || events.some((e) => isRecognise(e) && e.objectId === object && wasRight(e));
+  return (state.recognised as string[]).includes(object) || events.some((e) => isRecognise(e) && e.objectId === object);
 }
 
 /** Already asked about `object` on `day` (once per day, right or wrong). */
@@ -204,10 +204,9 @@ export const askedOn = (events: readonly GameEvent[], day: number, object: strin
   events.some((e) => isRecognise(e) && e.day === day && e.objectId === object);
 
 /**
- * The reducer. With an `option` (the question): the object must be in the table and found; a
- * wrong option changes nothing; one that counts (the right one, or any pick of a question with no
- * right option) adds it to `recognised` (if the set lists it: all eight do) and logs truth +1 once. Without
- * one: world-state's plain form, which recognises it.
+ * The reducer. With an `option` (the question): the object must be in the table and found; any
+ * option adds it to `recognised` (if the set lists it: all eight do) and changes nothing else
+ * (chick-fights R7: the answer is not judged). Without one: world-state's plain form, the same.
  */
 export function applyRecognise(state: State, event: RecogniseEvent, plain: (state: State) => State): State {
   if (event.option === undefined) return plain(state);
@@ -217,9 +216,5 @@ export function applyRecognise(state: State, event: RecogniseEvent, plain: (stat
     throw new Error(`recognise: "${event.objectId}" has no option ${event.option}`);
   }
   if (!(state.found as string[]).includes(event.objectId)) throw new Error(`recognise: "${event.objectId}" has not been found`);
-  if (!optionCounts(entry.options, event.option)) return state;
-  const counts = (membersOf("recognised") ?? []).includes(event.objectId);
-  const next = counts ? plain(state) : state;
-  const id = `recognise:${event.objectId}`;
-  return hasEvidence(next, id) ? next : judge(next, RIGHT_DELTA, event.day, id, entry.options[event.option]!.t);
+  return (membersOf("recognised") ?? []).includes(event.objectId) ? plain(state) : state;
 }

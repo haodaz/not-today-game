@@ -38,3 +38,28 @@ export function chickStats(events: readonly GameEvent[], day: number): ChickRais
   }
   return { ...stats, today: perDay.get(day) ?? 0 };
 }
+
+// ——— chick-fights R1 (author 2026-11-27): feeding is what makes it strong ———
+
+/** The days up to and including `day` on which the chick was given its meal at least once. Cumulative: it never goes down. */
+export function chickFedDays(events: readonly GameEvent[], day: number): number {
+  const days = new Set<number>();
+  const meal = careKey("meal");
+  for (const e of events) if (e.kind === "pressKey" && e.key === meal && e.day <= day) days.add(e.day);
+  return days.size;
+}
+
+/** It was fed on `day`. */
+export const chickFedOn = (events: readonly GameEvent[], day: number): boolean =>
+  events.some((e) => e.kind === "pressKey" && e.day === day && e.key === careKey("meal"));
+
+/** The chick's fights that ended on `day` (chick-fights R4): how many it won and how many it lost (a run counts as lost). */
+export function chickFights(events: readonly GameEvent[], day: number): { readonly won: number; readonly lost: number } {
+  let won = 0;
+  let lost = 0;
+  for (const e of events) {
+    if (e.kind !== "boardStep" || e.day !== day || e.op.t !== "chick") continue;
+    if (e.op.won) won += 1; else lost += 1;
+  }
+  return { won, lost };
+}

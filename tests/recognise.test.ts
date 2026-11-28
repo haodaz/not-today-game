@@ -114,30 +114,28 @@ describe("the recognise event (FR1/FR2)", () => {
     return store;
   };
 
-  it("property: a wrong answer never sets recognised or moves the judgement; a right one is idempotent", () => {
+  // chick-fights R7 (author 2026-11-27): the question is three ways of answering, not a judgement
+  it("property: any answer makes it known, once; no answer moves the judgement or anything else", () => {
     fc.assert(
       fc.property(fc.constantFrom(...objects), fc.integer({ min: 0, max: 2 }), fc.integer({ min: 1, max: 3 }), (o, option, times) => {
         const store = found(boxDay(o), o);
         const before = store.getState();
         for (let i = 0; i < times; i++) store.appendEvent({ kind: "recognise", objectId: o, option });
         const after = store.getState();
-        const right = recogniseTable.get(o)!.options[option]!.right;
-        if (!right) {
-          expect(after).toEqual(before);
-          return;
-        }
-        expect(after.recognised.includes(o as never)).toBe(six.includes(o));
         expect(after.recognised.filter((x) => x === o).length).toBe(six.includes(o) ? 1 : 0);
-        expect(after.judgement.truth).toBe(Math.min(10, before.judgement.truth + 1));
-        expect(after.judgement.evidence.filter((e) => e.eventId === `recognise:${o}`)).toHaveLength(1);
+        expect(knows(o, after, store.getEvents())).toBe(true);
+        expect({ ...after, recognised: before.recognised }).toEqual(before);
       }),
     );
   });
 
-  it("a right answer is truth +1 evidence citing the event, noted with what it was", () => {
-    const store = found(4, "pager");
-    store.appendEvent({ kind: "recognise", objectId: "pager", option: rightIndex("pager") });
-    expect(store.getState().judgement.evidence.at(-1)).toEqual({ day: 4, eventId: "recognise:pager", note: recogniseTable.get("pager")!.options[rightIndex("pager")]!.t });
+  it("no answer writes evidence: the right one and a wrong one leave Kuro's log alone", () => {
+    for (const option of [rightIndex("pager"), wrongIndex("pager")]) {
+      const store = found(4, "pager");
+      store.appendEvent({ kind: "recognise", objectId: "pager", option });
+      expect(store.getState().judgement.evidence).toEqual([]);
+      expect(store.getState().judgement.truth).toBe(found(4, "pager").getState().judgement.truth);
+    }
   });
 
   it("the recognised set is all eight objects: a right answer for the camera (or the phone) puts it in state", () => {
@@ -199,7 +197,7 @@ describe("when it is asked (FR1)", () => {
     expect(out).toMatchSnapshot();
   });
 
-  it("snapshot: day 4 pager, a wrong answer plays its lines; no retry that day; the next day picking it up asks again, once", () => {
+  it("day 4 pager: a wrong answer plays its own lines and it is known all the same; it is never asked again", () => {
     const store = createStore({ startDay: 4 });
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
     const ctx = ctxOf(store);
@@ -209,27 +207,22 @@ describe("when it is asked (FR1)", () => {
     // Content 2026-11-06: the picked wrong option carries its own lines.
     const wrong = recogniseTable.get("pager")!.options[wrongIndex("pager")]!;
     expect(answer.lines).toEqual([...wrong.say!.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner!, me: "carton" }]);
-    expect(store.getState().recognised).toEqual([]);
+    // chick-fights R7: every answer is an answer
+    expect(store.getState().recognised).toEqual(["pager"]);
+    expect(knows("pager", store.getState(), store.getEvents())).toBe(true);
 
     // Same day: picking it up does not ask again.
     ctx.session.dialogue = EMPTY_DIALOGUE;
     loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
-    expect(ctx.session.dialogue.queue).toEqual([]);
+    expect(ctx.session.dialogue.queue.some((q) => q.key.includes("recognise"))).toBe(false);
     loopActions["loop-put-down"]!(ctx, none, null as never);
 
-    // The next day: picking it up asks again.
+    // The next day: not then either.
     store.appendEvent({ kind: "lieDown" });
+    ctx.session.dialogue = EMPTY_DIALOGUE;
     loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d5:recognise:pager:look", "d5:recognise:pager"]);
-    expect(everyScreen(store.getState(), ctx.session)).toMatchSnapshot();
-    // Answered right this time: it is known, and the desk bar shows it in full colour.
-    loopActions["loop-advance"]!(ctx, none, null as never); // the description read first (author 2026-11-11)
-    loopActions["loop-choice"]!(ctx, { index: String(rightIndex("pager")) } as DOMStringMap, null as never);
-    expect(store.getState().recognised).toEqual(["pager"]);
-    expect(askedOn(store.getEvents(), 5, "pager")).toBe(true);
-    loopActions["loop-put-down"]!(ctx, none, null as never);
-    loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
-    expect(ctx.session.dialogue.queue).toEqual([]);
+    expect(ctx.session.dialogue.queue.some((q) => q.key.includes("recognise"))).toBe(false);
+    expect(askedOn(store.getEvents(), 5, "pager")).toBe(false);
   });
 
   it("put down before it is answered, the question goes with the object: never asked under another; asked again on its next pick-up", () => {

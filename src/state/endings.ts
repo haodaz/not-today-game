@@ -7,10 +7,10 @@
 //   collapse  温柔的世界   SAN 0 on any day; the run never reaches day 18
 //   bad       以我之名     assimilation full at the last lie-down (the run reaches day 18 and fights)
 //   survive   回到未来     the last lie-down, not good; two flavours by affinity (warm / cold)
-//   good      导盲犬小克   survive's conditions + the hand, every object recognised, affinity,
-//                          assimilation low, and no object upgraded
+//   good      导盲犬小克   survive's conditions + the hand, affinity, assimilation low, and no
+//                          object upgraded (recognising is no gate: chick-fights R7, 2026-11-27)
 import type { State } from "./types.gen";
-import { constants, membersOf, rangeOf } from "./variables";
+import { constants, rangeOf } from "./variables";
 
 export const ENDINGS = ["bad", "survive", "good", "collapse"] as const;
 export type Ending = (typeof ENDINGS)[number];
@@ -49,7 +49,6 @@ export const noneUpgraded = (state: State): boolean => Object.values(state.upgra
 
 export interface GoodConditions {
   readonly shookHand: boolean;
-  readonly recognisedAll: boolean;
   readonly affinity: boolean;
   /** Assimilation stayed low enough (three-meters: ≤ assimilationGoodMax, in place of `unchecked`). */
   readonly assimilationOk: boolean;
@@ -58,15 +57,12 @@ export interface GoodConditions {
 }
 
 /**
- * The five conditions of the good ending (three-meters: blockedAll dropped, unchecked → assimilation;
- * ending matrix: no object upgraded). `recognisedAll` is over the whole `recognised` set of
- * variables.json: all eight objects (2026-11-06).
+ * The four conditions of the good ending (three-meters: blockedAll dropped, unchecked → assimilation;
+ * ending matrix: no object upgraded; chick-fights R7: recognising the objects is no condition).
  */
 export function goodConditions(state: State): GoodConditions {
-  const all = membersOf("recognised") ?? [];
   return {
     shookHand: state.flags.includes("shook_hand"),
-    recognisedAll: all.every((o) => (state.recognised as string[]).includes(o)),
     affinity: affinityHigh(state),
     assimilationOk: state.assimilation <= (constants.assimilationGoodMax as number),
     noneUpgraded: noneUpgraded(state),

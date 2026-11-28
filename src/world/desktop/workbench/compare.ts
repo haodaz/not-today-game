@@ -19,7 +19,8 @@ import { hasString, t, tr } from "@world/i18n";
 import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
 import { browserFrame, settleLayer } from "./settle-layer";
-import { battleOffered, battleScene } from "./battle";
+import { battleScene, fightControl } from "./battle";
+import { tallyField } from "./grades";
 import { minesApproving, minesStage } from "./mines";
 import { pipesApproving, pipesStage } from "./pipes";
 import { match3Approving, match3Stage } from "./match3";
@@ -174,8 +175,8 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const phase = session.workPhase?.key === key ? session.workPhase : null;
   const pending = comparePending(board, s);
-  // battle (author 2026-11-13): 让小鸡上 while a page is still to pick and the chick is held, once per task
-  const fight = pending && !session.battle && battleOffered(board, s, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
+  // battle (author 2026-11-13; chick-fights R2): 让小鸡上 while a page is still to pick and at the settlement, once per task
+  const fight = phase?.phase === "result" ? null : fightControl(state, events, task.id, !!session.battle);
   const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}</header>`;
   const srcFor = (slot: string, card: string) => ideSrc(board, { ...s, slots: { ...s.slots, [slot]: card } }, ops, slot, tuneCarried(board, events));
   let body: SafeHtml;
@@ -216,12 +217,13 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     // settle
     screen = "settle";
     const sc = compareScore(board, s);
-    const pass = sc.pct >= cmp.threshold;
+    // chick-fights R4: the chick's win lets a draft under the bar go as it is
+    const pass = sc.pct >= cmp.threshold || s.lifted === true;
     const finish = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
     // the settlement's two ways out (author 2026-11-13): passed → 发给老板; failed → 让克总帮忙 only (his fill, then it can go)
     const redo = !pass && hasString("settle.kuro") ? html`<button type="button" class="wl-cta ghost" data-action="compare-redo"${holding ? html` disabled` : null}>${tr("settle.kuro")}</button><p class="cmp-note">${tr("settle.kuroNote")}</p>` : null;
     // the settlement (author 2026-11-12): left the game's ending, right the page as it really is now
-    const record = html`<div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p>`;
+    const record = html`<div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}${s.lifted && sc.pct < cmp.threshold ? html`<p class="cmp-verdict pass chick">${tr("battle.win.grade")}</p>` : html`<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p>`}`;
     const effect = browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle");
     body = settleLayer({ kind: "page", portrait: counterpartPortrait(task), kick: hasString("sheet.settle.kick") ? t("sheet.settle.kick", { who: counterpartName(task) }) : "", title: fill(task.title), record, effect, actions: html`${pass ? finish : redo}` });
   }
@@ -234,10 +236,12 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   const app: AppContext = { state, events, startDay: c.startDay, session, night: isNight(session.clock), nowMs };
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const key = `${state.day}:${task.id}`;
-  // battle (author 2026-11-13): 让小鸡上 on the board (not at its settlement), once per task
-  const bs = boardState(board, state.day, task.id, events);
+  // battle (author 2026-11-13; chick-fights R2): 让小鸡上 on every board and at its settlement, once per
+  // task. Not while the board's own game is under way: the game keeps its clock, the fight would talk over it.
   const settling = session.workPhase?.key === key && session.workPhase.phase === "settle";
-  const fight = !settling && !session.battle && battleOffered(board, bs, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
+  const gameField = board.stack ? "chain" : board.game ? tallyField(`${board.game.kind}-x`) : null;
+  const playing = !settling && gameField !== null && (session[gameField] as { key?: string } | null | undefined)?.key === task.id;
+  const fight = playing ? null : fightControl(state, events, task.id, !!session.battle);
   const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}</header>`;
   let body: SafeHtml;
   if (session.battle?.key === key) {

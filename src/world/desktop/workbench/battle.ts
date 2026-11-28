@@ -2,9 +2,12 @@
 // sent in once per task: a Game Boy battle screen — the chick seen from behind on our side, the task
 // itself as a pixel monster on theirs (「对面就是工作这个东西的像素」), HP bars, the text box, FIGHT /
 // CHICK / ITEM / RUN. Our moves: 冲撞 (the screen shakes), 啄, 喷火 (flames), 叫; the work's: 加需求,
-// 催, 开会, 改口. A win never passes the task: it 「move on 一个状态」 — one empty cell of the board fills
-// itself (the actions do that; this file is the pure engine and the view). Seeded dice: the same
-// battle plays the same way for the same run, task and turn.
+// 催, 开会, 改口. Seeded dice: the same battle plays the same way for the same run, task and turn.
+//
+// chick-fights (author 2026-11-27): 「我想小鸡每次都能战斗，战斗如何胜利完成度上升一格，每个任务 boss 能力会
+// 提升，所以要记得喂鸡」. The fight is on every task, once; a win lifts the task one step (the board's
+// `lifted`: a failed settlement passes, the night's judgement is one grade better); a loss changes
+// nothing. The work's monster grows with the day; the chick grows with the days it was fed.
 import type { Task } from "@state/days/tasks";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
@@ -29,7 +32,12 @@ export interface BattleState {
   readonly key: string;
   readonly foe: string;
   readonly img: string;
+  /** The chick's level (the days it was fed, + Kuro's loan) and the monster's (the day). */
   readonly level: number;
+  readonly foeLevel: number;
+  /** What each side's damage is multiplied by (chick-fights R3). */
+  readonly oursMul: number;
+  readonly foeMul: number;
   readonly ours: Fighter;
   readonly theirs: Fighter;
   readonly phase: BattlePhase;
@@ -71,10 +79,38 @@ export function dice(seed: string): () => number {
   };
 }
 
-export function startBattle(key: string, foe: string, img: string, level: number, at: number): BattleState {
+// ——— chick-fights R3: how strong each side is ———
+
+/** A level of the chick is worth this much HP and this much damage; so is a day of the monster. */
+export const HP_PER_LEVEL = 8;
+export const DMG_PER_LEVEL = 0.04;
+/** Fed today: this much more HP; not fed today: this much less (never under OURS_HP_MIN). */
+export const FED_HP = 16;
+export const OURS_HP_MIN = 40;
+/** The three days Kuro has it (chick-fights R5): it fights this many levels up. */
+export const KURO_LEVELS = 6;
+
+export interface Strength { readonly level: number; readonly hp: number; readonly mul: number }
+
+/** The chick: its level is the days it was fed (+ Kuro's loan while it lasts); fed today or not moves its HP. */
+export function chickStrength(fedDays: number, fedToday: boolean, kuro = false): Strength {
+  const level = Math.max(0, fedDays) + (kuro ? KURO_LEVELS : 0);
+  return { level, hp: Math.max(OURS_HP_MIN, OURS_HP + HP_PER_LEVEL * level + (fedToday ? FED_HP : -FED_HP)), mul: 1 + DMG_PER_LEVEL * level };
+}
+
+/** The work's monster: a little stronger every day. */
+export function foeStrength(day: number): Strength {
+  const level = Math.max(0, day - 1);
+  return { level: Math.max(1, day), hp: FOE_HP + HP_PER_LEVEL * level, mul: 1 + DMG_PER_LEVEL * level };
+}
+
+const PLAIN: Strength = { level: 1, hp: OURS_HP, mul: 1 };
+const PLAIN_FOE: Strength = { level: 1, hp: FOE_HP, mul: 1 };
+
+export function startBattle(key: string, foe: string, img: string, at: number, ours: Strength = PLAIN, theirs: Strength = PLAIN_FOE): BattleState {
   return {
-    key, foe, img, level,
-    ours: { hp: OURS_HP, max: OURS_HP, atk: 0 }, theirs: { hp: FOE_HP, max: FOE_HP, atk: 0 },
+    key, foe, img, level: ours.level, foeLevel: theirs.level, oursMul: ours.mul, foeMul: theirs.mul,
+    ours: { hp: ours.hp, max: ours.hp, atk: 0 }, theirs: { hp: theirs.hp, max: theirs.hp, atk: 0 },
     phase: "text", queue: [{ t: S("battle.appear", { foe }), fx: "none", side: "none" }, { t: S("battle.goChick"), fx: "none", side: "none" }], after: "menu", turn: 0, at,
   };
 }
@@ -82,7 +118,7 @@ export function startBattle(key: string, foe: string, img: string, level: number
 const stageMul = (stage: number): number => Math.pow(1.5, Math.max(-2, Math.min(2, stage)));
 
 /** One move from `from` on `to`: the lines it writes and the fighters after it. */
-function useMove(move: Move, who: "ours" | "theirs", s: { ours: Fighter; theirs: Fighter }, roll: () => number, foe: string): { lines: BattleLine[]; ours: Fighter; theirs: Fighter } {
+function useMove(move: Move, who: "ours" | "theirs", s: { ours: Fighter; theirs: Fighter }, roll: () => number, foe: string, mul = 1): { lines: BattleLine[]; ours: Fighter; theirs: Fighter } {
   const name = S(who === "ours" ? `battle.move.${move.id}` : `battle.foe.${move.id}`);
   const lines: BattleLine[] = [{ t: S(who === "ours" ? "battle.used" : "battle.foeUsed", { foe, move: name }), fx: move.effect ? "none" : move.fx, side: who === "ours" ? "theirs" : "ours" }];
   let { ours, theirs } = s;
@@ -105,7 +141,7 @@ function useMove(move: Move, who: "ours" | "theirs", s: { ours: Fighter; theirs:
       lines.push({ t: S("battle.miss"), fx: "none", side: "none" });
     } else {
       const crit = roll() < move.crit;
-      const dmg = Math.max(1, Math.round(move.power * stageMul(me.atk) * (0.85 + roll() * 0.15) * (crit ? 1.5 : 1)));
+      const dmg = Math.max(1, Math.round(move.power * mul * stageMul(me.atk) * (0.85 + roll() * 0.15) * (crit ? 1.5 : 1)));
       const hit = { ...other, hp: Math.max(0, other.hp - dmg) };
       if (crit) lines.push({ t: S("battle.crit"), fx: "none", side: "none" });
       if (who === "ours") theirs = hit; else ours = hit;
@@ -120,16 +156,16 @@ export function battleTurn(s: BattleState, moveId: string, at: number): BattleSt
   const move = OUR_MOVES.find((m) => m.id === moveId);
   if (!move) return s;
   const roll = dice(`${s.key}:${s.turn}`);
-  const a = useMove(move, "ours", s, roll, s.foe);
+  const a = useMove(move, "ours", s, roll, s.foe, s.oursMul);
   const lines = [...a.lines];
   let { ours, theirs } = a;
   let after: BattlePhase = "menu";
   if (theirs.hp <= 0) {
-    lines.push({ t: S("battle.won", { foe: s.foe }), fx: "down", side: "theirs" }, { t: S("battle.wonEffect"), fx: "none", side: "none" });
+    lines.push({ t: S("battle.won", { foe: s.foe }), fx: "down", side: "theirs" }, { t: S("battle.win.grade"), fx: "none", side: "none" });
     after = "won";
   } else {
     const foeMove = FOE_MOVES[Math.floor(roll() * FOE_MOVES.length)]!;
-    const b = useMove(foeMove, "theirs", { ours, theirs }, roll, s.foe);
+    const b = useMove(foeMove, "theirs", { ours, theirs }, roll, s.foe, s.foeMul);
     lines.push(...b.lines); ours = b.ours; theirs = b.theirs;
     if (ours.hp <= 0) { lines.push({ t: S("battle.lost"), fx: "down", side: "ours" }); after = "lost"; }
   }
@@ -173,9 +209,10 @@ export function battleChip(prev: BattleState | null, next: BattleState): ChipId 
 
 // ——— when it is offered, and what a win does ———
 
-import type { TaskBoard } from "@state/days/tasks";
-import type { BoardState } from "@state/days/board";
 import type { GameEvent } from "@state/events";
+import { chickFedDays, chickFedOn } from "@state/chick";
+import type { State } from "@state/types.gen";
+import { TAKEN_AFTER_DAYS, takenByKuro, upgradedOn } from "@world/objects/taken";
 
 /** The log's mark that this task's battle was fought (win or lose), once per task. */
 export const battleTarget = (taskId: string): string => `battle:${taskId}`;
@@ -183,22 +220,40 @@ export const battleUsed = (events: readonly GameEvent[], day: number, taskId: st
   events.some((e) => e.kind === "open" && e.target === battleTarget(taskId) && e.day === day);
 
 /**
- * 让小鸡上 is on the work screen when the chick is held, the board is one a cell can be pushed on (not
- * a tuning board, not the chain), a cell is still wrong or empty, and this task's battle is unfought.
+ * 让小鸡上 is on every task's work screen (chick-fights R2) when the chick is held, it can still
+ * fight (not taken by Kuro, R5) and this task's fight is unfought. Once per task, win or lose.
  */
-export function battleOffered(board: TaskBoard, s: BoardState, found: readonly string[], events: readonly GameEvent[], day: number, taskId: string): boolean {
-  // a game board (mines, link …) still has the form before its game: the chick may push a cell there
-  if (!found.includes("chick") || board.tune || board.stack) return false;
-  if (!board.slots.some((slot) => s.slots[slot.id] !== slot.answer)) return false;
-  return !battleUsed(events, day, taskId);
+export function battleOffered(found: readonly string[], events: readonly GameEvent[], day: number, taskId: string, taken = false): boolean {
+  return found.includes("chick") && !taken && !battleUsed(events, day, taskId);
 }
 
-/** A win moves the work on one state: the first empty cell takes its answer, else the first wrong one. */
-export function battleReward(board: TaskBoard, s: BoardState): { readonly slot: string; readonly card: string } | null {
-  const empty = board.slots.find((slot) => !(slot.id in s.slots));
-  const wrong = board.slots.find((slot) => s.slots[slot.id] !== slot.answer);
-  const target = empty ?? wrong;
-  return target ? { slot: target.id, card: target.answer } : null;
+/**
+ * The chick as it stands today (chick-fights R1, R3, R5), from the state and the log: taken by Kuro
+ * (no more fights), in Kuro's three days (stronger), fed today or not, and its strength in a fight.
+ */
+export function chickToday(state: Pick<State, "day" | "upgraded">, events: readonly GameEvent[]): { readonly taken: boolean; readonly kuro: boolean; readonly kuroDaysLeft: number; readonly fedDays: number; readonly fedToday: boolean; readonly strength: Strength } {
+  const on = upgradedOn("chick", events);
+  const upgraded = state.upgraded.chick === true && on !== null;
+  const taken = upgraded && takenByKuro("chick", state, events);
+  const kuro = upgraded && !taken;
+  const fedDays = chickFedDays(events, state.day);
+  // while Kuro has it, Kuro feeds it (its offer: 「按时喂，你以后一个键都不用按」): never hungry in those three days
+  const fedToday = kuro || chickFedOn(events, state.day);
+  return { taken, kuro, kuroDaysLeft: kuro ? Math.max(0, on! + TAKEN_AFTER_DAYS - state.day) : 0, fedDays, fedToday, strength: chickStrength(fedDays, fedToday, kuro) };
+}
+
+/**
+ * The control in the work screen's head (chick-fights R2, R5): 让小鸡上, with a small 饿着 when it was
+ * not fed today; a dead chip once Kuro has taken it; nothing when the chick is not held, a fight is
+ * on, or this task's fight is fought.
+ */
+export function fightControl(state: Pick<State, "day" | "upgraded" | "found">, events: readonly GameEvent[], taskId: string, fighting: boolean): SafeHtml | null {
+  const found = state.found as readonly string[];
+  if (fighting || !found.includes("chick")) return null;
+  const chick = chickToday(state, events);
+  if (chick.taken) return html`<span class="wl-battle taken" aria-disabled="true">${S("battle.taken")}</span>`;
+  if (!battleOffered(found, events, state.day, taskId)) return null;
+  return html`<button type="button" class="${cls("wl-battle", !chick.fedToday && "hungry")}" data-action="battle-start">${S("battle.go")}${chick.fedToday ? null : html`<small class="wl-hungry">${S("battle.hungry")}</small>`}</button>`;
 }
 
 // ——— the screen ———
@@ -222,16 +277,16 @@ export function battleScene(s: BattleState, nowMs: number): SafeHtml {
   } else if (s.phase === "moves") {
     box = html`<div class="bt-box bt-moves"><div class="bt-cmds">${OUR_MOVES.map((m) => html`<button type="button" class="bt-cmd" data-action="battle-act" data-cmd="move" data-move="${m.id}">${S(`battle.move.${m.id}`)}</button>`)}</div><button type="button" class="bt-back" data-action="battle-act" data-cmd="back">${S("battle.back")}</button></div>`;
   } else if (over) {
-    box = html`<div class="bt-box"><p class="bt-line">${S(s.phase === "won" ? "battle.wonEffect" : s.phase === "lost" ? "battle.lost" : "battle.ran")}</p><button type="button" class="bt-done" data-action="battle-done">${S("battle.done")}</button></div>`;
+    box = html`<div class="bt-box"><p class="bt-line">${S(s.phase === "won" ? "battle.win.grade" : s.phase === "lost" ? "battle.lost" : "battle.ran")}</p><button type="button" class="bt-done" data-action="battle-done">${S("battle.done")}</button></div>`;
   } else {
     box = html`<button type="button" class="bt-box bt-textbtn" data-action="battle-act" data-cmd="next"><p class="bt-line">${line?.t ?? ""}</p><span class="bt-more">▼</span></button>`;
   }
   // the screen keeps the Game Boy's 10:9 (author 2026-11-13: 「只有在固定的比例尺才能感觉熟悉」), centred on the dark stage
   return html`<div class="${cls("bt", fresh === "shake" && "shake")}" data-phase="${s.phase}"><div class="bt-screen">
-    <div class="bt-foe-box"><b class="bt-name">${s.foe}</b><span class="bt-lv">:L${String(s.level)}</span>${hpBar(s.theirs)}</div>
+    <div class="bt-foe-box"><b class="bt-name">${s.foe}</b><span class="bt-lv">:L${String(s.foeLevel)}</span>${hpBar(s.theirs)}</div>
     <div class="${cls("bt-foe", fresh === "hit" && line?.side === "theirs" && "hit", foeDown && "down", fresh === "heal" && line?.side === "theirs" && "heal")}"><img src="${s.img}" alt="">${flame ? html`<span class="bt-flame"><i></i><i></i><i></i><i></i></span>` : null}</div>
     <div class="${cls("bt-ours", fresh === "hit" && line?.side === "ours" && "hit", oursDown && "down")}"><img src="${CHICK_BACK}" alt=""></div>
-    <div class="bt-ours-box"><b class="bt-name">${S("battle.ours")}</b><span class="bt-lv">:L${String(s.level)}</span>${hpBar(s.ours)}<small class="bt-num">${String(s.ours.hp)}/ ${String(s.ours.max)}</small></div>
+    <div class="bt-ours-box"><b class="bt-name">${S("battle.ours")}</b><span class="bt-lv">:L${String(s.level + 1)}</span>${hpBar(s.ours)}<small class="bt-num">${String(s.ours.hp)}/ ${String(s.ours.max)}</small></div>
     ${box}
   </div></div>`;
 }

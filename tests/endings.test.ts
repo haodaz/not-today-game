@@ -183,12 +183,13 @@ describe("the three exits (FR2)", () => {
     expect(dueAtLieDown(good)).toBe("good");
     const drops: [string, State][] = [
       ["shook_hand", { ...good, flags: good.flags.filter((x) => x !== "shook_hand") }],
-      ["all six recognised", { ...good, recognised: good.recognised.slice(1) }],
       ["affinity", { ...good, affinity: (constants.affinityThreshold as number) - 1 }],
       ["assimilation", { ...good, assimilation: (constants.assimilationGoodMax as number) + 1 }],
       ["an upgraded object (ending matrix 2026-11-13)", { ...good, upgraded: { ...good.upgraded, chick: true } }],
     ];
     for (const [what, s] of drops) expect(dueAtLieDown(s), what).toBe("survive");
+    // chick-fights R7 (author 2026-11-27): recognising the objects is no condition
+    expect(dueAtLieDown({ ...good, recognised: [] })).toBe("good");
     // Exactly at the max is still good; one over is survive (three-meters).
     expect(dueAtLieDown({ ...good, assimilation: constants.assimilationGoodMax as number })).toBe("good");
     expect(dueAtLieDown({ ...good, assimilation: (constants.assimilationGoodMax as number) + 1 })).toBe("survive");
@@ -240,7 +241,7 @@ describe("credits are Kuro's log (FR3)", () => {
       [6, "upgrade:chick"],
       [6, "chat:7"],
     ]);
-    expect(lines[0]!.moved).toEqual([{ dim: "truth", dir: 1 }]);
+    expect(lines[0]!.moved).toEqual([]); // an entry from a run before 2026-11-27: recognising moves nothing now
     expect(lines[3]!.moved).toEqual([]);
     expect(deltaOf("nothing:here")).toEqual({});
   });

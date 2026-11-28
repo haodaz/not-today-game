@@ -6,7 +6,6 @@ import { validateJudgement } from "@kuro/judgement.ts";
 import type { Judgement, LogEvent } from "@kuro/types.ts";
 import { NEVER_KINDS } from "@kuro/prompt.ts";
 import type { GameEvent } from "@state/events";
-import { wasRight } from "@state/recognise";
 import { kuroDay } from "./days";
 import { repeatEntries } from "./repeat";
 import { REPEAT_AT, repeatEntry, timesAsked } from "@kuro/repeat.ts";
@@ -32,7 +31,6 @@ const first = (today: readonly { e: GameEvent; i: number }[], p: (e: GameEvent) 
 const RULES: readonly Rule[] = [
   { dim: "truth", points: 1, note: "judge.offline.looked", find: (t) => first(t, (e) => e.kind === "looked") },
   { dim: "truth", points: 1, note: "judge.offline.checked", find: (t) => first(t, (e) => e.kind === "task" && (e.mode === "look" || e.mode === "self")) },
-  { dim: "truth", points: 1, note: "judge.offline.recognised", find: (t) => first(t, (e) => e.kind === "recognise" && wasRight(e)) },
   {
     dim: "truth",
     points: 1,

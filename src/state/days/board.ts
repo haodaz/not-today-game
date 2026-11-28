@@ -53,6 +53,11 @@ export interface BoardState {
   readonly decided: boolean;
   /** stack (2026-11-12): the approval chain reached its top (the hand-in needs it on a board with a `stack`). */
   readonly approved: boolean;
+  /**
+   * chick-fights R4 (author 2026-11-27): the chick won its fight on this task. The work goes up one
+   * step: a settlement that failed passes, and the night's judgement is one grade better.
+   */
+  readonly lifted?: boolean;
 }
 
 /**
@@ -148,6 +153,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       delete next[op.slot];
       return { ...s, slots: next };
     }
+    case "chick":
+      return op.won && !s.lifted ? { ...s, lifted: true } : s;
     case "assistFix": {
       // settlement (author 2026-11-13): the board failed its judgement; Kuro fixes it his way — every
       // slot that does not hold its answer takes his card (his fill, else the answer); one assist.
@@ -204,9 +211,10 @@ export function boardState(board: TaskBoard, day: number, taskId: string, events
  */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
   // author 2026-11-24 (#52): the line is a gate — under it the work waits for Kuro's fix (an assist) or 今天先不发
-  if (board.tune) return s.done && !tuneOfferPending(board, s) && (tuneShort(board, tuneMods(s)).length === 0 || s.assists > 0);
+  // chick-fights R4: the chick's win lifts it over the line too
+  if (board.tune) return s.done && !tuneOfferPending(board, s) && (tuneShort(board, tuneMods(s)).length === 0 || s.assists > 0 || s.lifted === true);
   // compare (author 2026-11-11): every page picked and the boss satisfied enough (the threshold).
-  if (board.compare) return s.unlocked && comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold;
+  if (board.compare) return s.unlocked && comparePending(board, s) === null && (compareScore(board, s).pct >= board.compare.threshold || s.lifted === true);
   // stack (2026-11-12): the filled form must also have come back approved from the top of the chain
   return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched) && (!(board.stack || board.game) || s.approved);
 }
@@ -493,6 +501,9 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       return;
     case "assistFill":
       return;
+    case "chick":
+      if (typeof op.won !== "boolean") throw new Error("boardStep: chick needs won: true or false");
+      return;
     case "assistFix":
       return; // a tuning board too (author 2026-11-24 #60): Kuro's fix where it is short
     default:
@@ -516,6 +527,9 @@ export function handNight(day: number): boolean {
 }
 
 export type BoardVerdict = "perfect" | "flawed" | "wrong";
+
+/** chick-fights R4: one step up (wrong → flawed → perfect; perfect stays). */
+export const liftVerdict = (v: BoardVerdict): BoardVerdict => (v === "wrong" ? "flawed" : "perfect");
 
 /** The task event that printed a board on a day (its slots + assists), or null (not printed). */
 export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>>; assists: number; quality: BoardVerdict | null } | null {
@@ -611,8 +625,9 @@ export function lockJammed(board: TaskBoard, s: BoardState): boolean {
 export function settleVerdict(board: TaskBoard, s: BoardState): "pass" | "fail" {
   // a game decides its own board (mines, link …) — but a compare board's game (spot, day 10) only changes how the pick is made
   if (board.tune || board.stack || (board.game && !board.compare)) return "pass";
-  if (board.compare) return comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold ? "pass" : "fail";
-  return s.assists > 0 || wrongCount(board, s.slots) === 0 ? "pass" : "fail";
+  // chick-fights R4: the chick won its fight here, so a board that would fail goes as it is, without Kuro
+  if (board.compare) return comparePending(board, s) === null && (compareScore(board, s).pct >= board.compare.threshold || s.lifted === true) ? "pass" : "fail";
+  return s.assists > 0 || s.lifted === true || wrongCount(board, s.slots) === 0 ? "pass" : "fail";
 }
 
 /** How many slots hold a card that is not the right answer (a Kuro card counts as wrong too). */
@@ -652,6 +667,9 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   else if (wrong === 0) verdict = "perfect";
   else if (wrong < judge.wrongAt) verdict = "flawed";
   else verdict = "wrong";
+  // chick-fights R4: the chick's win raises a given work one step, after every cap above (Kuro's help
+  // included). Work that was never given stays wrong: there is nothing to lift.
+  if (given && boardState(board, day, tree.id, events).lifted) verdict = liftVerdict(verdict);
   const own = verdict === "perfect" ? judge.perfect : verdict === "flawed" ? judge.flawed : judge.wrong;
   // meters-v2: on a hand night the hand takes its own cut as well, by the verdict (or for nothing given).
   const san = own + handCost(day, given ? verdict : "refused");

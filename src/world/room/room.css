@@ -1414,6 +1414,20 @@
 .game-menu .st-mark{position:absolute;top:4px;width:11px;height:11px;margin-left:-6px;border:1.5px solid var(--gm-bone);background:rgba(22,24,22,.9);transform:rotate(45deg)}
 .game-menu .st-line{margin:14px 0 0;font-size:14px;color:var(--gm-bone2);letter-spacing:.15em}
 .game-menu .st-line.st-cap{margin:6px 0 10px}
+/* chick-fights R6: the chick's row: the days it was fed as cells, then today (fed or hungry) and today's fights */
+.game-menu .st-meter.st-chick{grid-template-columns:90px 1fr auto;margin-bottom:8px}
+.game-menu .st-bar.full.chick{height:14px}
+.game-menu .st-v.st-chick-n{font:13px var(--gm-serif);letter-spacing:.12em;color:var(--gm-bone2);white-space:nowrap}
+.game-menu .st-line.st-chick-line{display:flex;gap:18px;margin:0 0 22px 108px;font-size:13px}
+.game-menu .st-chick-today{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.game-menu .st-chick-today .st-dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--gm-bone2);box-sizing:border-box}
+.game-menu .st-chick-today.fed .st-dot{background:var(--gm-bone2)}
+.game-menu .st-chick-today.hungry{color:#e0574c}
+.game-menu .st-chick-today.hungry .st-dot{border-color:#e0574c}
+.game-menu .st-chick-today.kuro{color:var(--gm-bone)}
+.game-menu .st-chick-fight{color:var(--gm-bone2);white-space:nowrap}
+.game-menu .st-meter.st-chick.taken{margin-bottom:22px}
+.game-menu .st-chick-say{font-size:14px;letter-spacing:.2em;color:var(--gm-bone2)}
 .game-menu .st-cases{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
 .game-menu .st-case{position:relative;aspect-ratio:3/4;border:1px solid var(--gm-hair2);background:rgba(10,12,10,.28);display:grid;place-items:center}
 .game-menu .st-case img{width:78%;height:70%;object-fit:contain}
