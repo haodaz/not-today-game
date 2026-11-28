@@ -256,6 +256,30 @@
               "role": "you",
               "card": "c1"
             }
+          },
+          "phone": {
+            "calls": [
+              {
+                "card": "d1",
+                "name": "Lao Wang",
+                "say": "Answer me. You should know who I am."
+              },
+              {
+                "card": "d2",
+                "name": "Vivi",
+                "say": "Answer me. You should know who I am."
+              },
+              {
+                "card": "k1",
+                "name": "Kuro",
+                "say": "You can answer me too. I am always here."
+              },
+              {
+                "card": "c1",
+                "name": "My number 6603 2047",
+                "say": "Are you still here?"
+              }
+            ]
           }
         }
       },

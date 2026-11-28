@@ -19,10 +19,12 @@ const netDir = fileURLToPath(new URL("./src/net", import.meta.url));
 // room3d (2026-11-16): the code-built room is its own page, put in an <iframe> by the game only when a 3D
 // view is shown, so three.js is a second bundle that loads on first use and never on the title page.
 const room3dPage = fileURLToPath(new URL("./room3d/index.html", import.meta.url));
+// flesh (2026-11-27): the room's flesh tentacles alone, over day 17's tray at the door moment
+const fleshPage = fileURLToPath(new URL("./room3d/flesh.html", import.meta.url));
 const mainPage = fileURLToPath(new URL("./index.html", import.meta.url));
 
 export default defineConfig({
-  build: { rollupOptions: { input: { main: mainPage, room3d: room3dPage } } },
+  build: { rollupOptions: { input: { main: mainPage, room3d: room3dPage, flesh: fleshPage } } },
   resolve: {
     alias: {
       "@content": contentDir,

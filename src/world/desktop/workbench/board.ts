@@ -35,7 +35,7 @@ import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePa
 import { FILL_DONE_MS, FILL_GROW_MS, fillDrop, fillKuro, fillLift, fillNext, fillPick, fillPlace, fillRecord, fillRotate, fillSolveRound, fillStart, fillStuck, fillTarget, type FillBoard, type FillGame, type FillPick } from "./fill";
 import type { FillPerson } from "@state/days/tasks";
 import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
-import { KLOTSKI_DONE_MS, KLOTSKI_SLIDE_MS, klotskiCard, klotskiPick, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiDir, type KlotskiGame } from "./klotski";
+import { KLOTSKI_DONE_MS, KLOTSKI_SLIDE_MS, klotskiCall, klotskiCard, klotskiPick, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiDir, type KlotskiGame } from "./klotski";
 import { ECHO_DONE_MS, ECHO_LIT_MS, echoAgain, echoSolve, echoStart, echoTap, echoVoiceTimes, listenMs, type EchoGame } from "./echo";
 import { grade as nonogramGrade, NONO_FLASH_MS, NONO_REVEAL_MS, nonogramRevealed, nonogramSolve, nonogramStart, nonogramTap } from "./nonogram";
 import type { ChipId } from "@world/sound/chip";
@@ -1257,6 +1257,16 @@ const actions: Record<string, ActionHandler> = {
     const next = klotskiPush(g, dir, ctx.now?.() ?? Date.now(), typeof data.block === "string" ? data.block : g.pick);
     if (next === g) return;
     ctx.session.klotski = next.done ? klotskiOut(ctx, c, next) : next;
+    ctx.rerender();
+  },
+  // the call: with the phone in hand at the door, the one entry called back; then the door moment
+  "klotski-call"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
+    if (c?.board.game?.kind !== "klotski" || !g || typeof data.card !== "string") return;
+    const next = klotskiCall(g, c.board.game, data.card, ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    ctx.session.klotski = klotskiOut(ctx, c, next);
     ctx.rerender();
   },
   "klotski-undo"(ctx) {

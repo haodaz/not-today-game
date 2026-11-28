@@ -212,7 +212,9 @@ export type BoardGame =
    * block with a role; `exit` (the player, 1 × 1, role `you`) is the only one the door takes, and its
    * card is what `slot` takes. `level` rows: a letter per block (every one in `blocks`), `.` empty.
    */
-  | { readonly kind: "klotski"; readonly slot: string; readonly level: readonly string[]; readonly exit: string; readonly blocks: Readonly<Record<string, KlotskiBlock>> }
+  | { readonly kind: "klotski"; readonly slot: string; readonly level: readonly string[]; readonly exit: string; readonly blocks: Readonly<Record<string, KlotskiBlock>>;
+      /** the call (author 2026-11-27): at the door the phone has signal; the one entry called back is what `slot` takes (one of them is the exit block's card) */
+      readonly phone?: { readonly calls: readonly { readonly card: string; readonly name: string; readonly say: string }[] } }
   /** echo (game-swaps, 跟读): the roll call repeated round by round; each voice a `meeting.people` id and its line (may be empty) */
   | { readonly kind: "echo"; readonly voices: readonly { readonly who: string; readonly line: string }[] }
   /** balance: the prices dropped from a swinging crane onto two pans; `fixed` is the welded weight on each (oil, wine) */
@@ -840,7 +842,7 @@ function board(v: unknown, w: string): TaskBoard {
       // klotski; until then it is read and dropped (the board works as a plain form, no game).
       keys(v.game, ["kind", "slot", "eggs"], gw);
     } else if (v.game.kind === "klotski") {
-      keys(v.game, ["kind", "slot", "exit", "level", "blocks"], gw);
+      keys(v.game, ["kind", "slot", "exit", "level", "blocks", "phone"], gw);
       const slot = str(v.game.slot, `${gw}.slot`);
       if (!slotIds.has(slot)) fail(`${gw}.slot`, `"${slot}" is not a slot`);
       const level = v.game.level;
@@ -892,7 +894,24 @@ function board(v: unknown, w: string): TaskBoard {
       if (eb.card === undefined) fail(`${gw}.exit`, `"${exit}" must have a card`);
       if (!cardIds.has(eb.card)) fail(`${gw}.exit`, `"${eb.card}" is not one of the board's cards`);
       if (slots.find((x) => x.id === slot)?.answer !== eb.card) fail(`${gw}.exit`, `"${exit}"'s card must be the answer of "${slot}"`);
-      game = { kind: "klotski", slot, level: rowsOf, exit, blocks };
+      let phone: { calls: { card: string; name: string; say: string }[] } | undefined;
+      if (v.game.phone !== undefined) {
+        const pw = `${gw}.phone`;
+        if (!isRecord(v.game.phone) || !Array.isArray(v.game.phone.calls) || v.game.phone.calls.length < 2 || v.game.phone.calls.length > 6) fail(pw, "must have 2 to 6 calls");
+        keys(v.game.phone, ["calls"], pw);
+        const calls = (v.game.phone.calls as unknown[]).map((c, i) => {
+          const cw = `${pw}.calls[${i}]`;
+          if (!isRecord(c)) fail(cw, "must be an object");
+          keys(c, ["card", "name", "say"], cw);
+          const card = str(c.card, `${cw}.card`);
+          if (!cardIds.has(card) && !kuroCardIds.has(card)) fail(`${cw}.card`, `"${card}" is not a card or a Kuro card`);
+          return { card, name: str(c.name, `${cw}.name`), say: str(c.say, `${cw}.say`) };
+        });
+        if (new Set(calls.map((c) => c.card)).size !== calls.length) fail(pw, "each call must have its own card");
+        if (!calls.some((c) => c.card === eb.card)) fail(pw, "one call must carry the exit block's card (the answer)");
+        phone = { calls };
+      }
+      game = { kind: "klotski", slot, level: rowsOf, exit, blocks, ...(phone ? { phone } : {}) };
     } else if (v.game.kind === "echo") {
       keys(v.game, ["kind", "voices"], gw);
       if (!meeting) fail(gw, "an echo game needs a meeting board (its voices are the meeting's people)");
@@ -1532,7 +1551,7 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     const klotskiShape = (b: TaskBoard) => {
       const g = b.game;
       if (g?.kind !== "klotski") return null;
-      return { slot: g.slot, level: g.level, exit: g.exit, blocks: Object.keys(g.blocks).sort().map((k) => [k, g.blocks[k]!.role, g.blocks[k]!.card ?? null, g.blocks[k]!.face ?? null]) };
+      return { slot: g.slot, level: g.level, exit: g.exit, blocks: Object.keys(g.blocks).sort().map((k) => [k, g.blocks[k]!.role, g.blocks[k]!.card ?? null, g.blocks[k]!.face ?? null]), phone: g.phone?.calls.map((c) => c.card) ?? null };
     };
     if (!sameJson(klotskiShape(zh.board), klotskiShape(en.board))) fail(`${w}.board.game`, "klotski shape differs from the Chinese");
     // launch: the counterpart is shared; the lines are the twin's.

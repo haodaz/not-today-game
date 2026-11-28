@@ -16,7 +16,7 @@ import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { gradeGame } from "@world/desktop/workbench/grades";
-import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS } from "@world/desktop/workbench/klotski";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
@@ -112,6 +112,14 @@ describe("klotski: the engine", () => {
   it("only the exit block leaves: it stays on its cell over the door; its trail is every cell it stood on, in order", () => {
     let g = klotskiStart("t", game());
     for (const s of klotskiPath(game(), "U")!) g = klotskiPush(g, s.dir, 5, s.id);
+    // the call (author 2026-11-27): at the door the phone comes up; nothing moves until one entry is called back
+    expect(g.phone).toBe(true);
+    expect(g.done).toBe(false);
+    expect(klotskiPush(g, "up", 5, "U")).toBe(g);
+    expect(klotskiUndo(g)).toBe(g);
+    expect(klotskiCall(g, game(), "zz", 5)).toBe(g);
+    g = klotskiCall(g, game(), "c1", 5);
+    expect(g.call).toBe("c1");
     expect(g.done).toBe(true);
     expect(g.out).toBe("U");
     expect(g.moves).toBe(28);
@@ -158,6 +166,13 @@ describe("klotski: the stage", () => {
     r.act("klotski-start");
     expect(r.out()).toContain(">老王<");
     playPushes(r, klotskiPath(r.board.game as Game, "U")!);
+    // at the door: the phone, one bar, the four entries; 本机号码 is one of them
+    expect(r.session.klotski!.phone).toBe(true);
+    expect(r.out()).toContain(t("klotski.phone.bar"));
+    expect(r.out()).toContain("本机号码 6603 2047");
+    expect((r.out().match(/data-action="klotski-call"/g) ?? []).length).toBe(4);
+    r.act("klotski-call", { card: "c1" });
+    expect(r.out()).toContain("你还在吗？");
     expect(r.session.klotski!.done).toBe(true);
     const steps = r.store.getEvents().filter((e) => e.kind === "boardStep").slice(-2);
     expect(steps[0]).toMatchObject({ op: { t: "fill", slot: "r1", card: "c1" } });
@@ -195,7 +210,52 @@ describe("klotski: the stage", () => {
     expect(r.session.gameTally!.fails).toBe(1);
     expect(r.session.klotski!.moves).toBe(0);
     playPushes(r, klotskiPath(r.board.game as Game, "U")!);
+    r.act("klotski-call", { card: "c1" });
     expect(boardState(r.board, 17, r.task.id, r.store.getEvents()).slots.r1).toBe("c1");
+  });
+  it("the surge (author 2026-11-27: 血肉触手): the flesh page over the tray, its strands from under the door through your way and off the tray", () => {
+    const r = rig();
+    r.fillOthers();
+    r.act("klotski-start");
+    playPushes(r, klotskiPath(r.board.game as Game, "U")!);
+    expect(r.out()).not.toContain("kl-flesh");
+    r.act("klotski-call", { card: "c1" });
+    const g = r.session.klotski!;
+    const m = /<iframe class="kl-flesh" data-keep="kl-flesh" src="\/room3d\/flesh\.html#([^"]+)"/.exec(r.out());
+    expect(m).not.toBeNull();
+    const job = JSON.parse(decodeURIComponent(m![1]!)) as { at: number; cols: number; rows: number; s: { p: [number, number][]; r: number; d: number }[] };
+    expect(job.at).toBe(g.outAt);
+    expect([job.cols, job.rows]).toEqual([4, 5]);
+    const strands = klotskiSurge(g);
+    expect(job.s).toEqual(strands);
+    expect(strands).toHaveLength(12);
+    // the thick ones: from below the door (row 5 is the sill), along the trail backwards, past the start and off the tray
+    const main = strands[0]!;
+    expect(main.p[0]![1]).toBeGreaterThan(6);
+    expect(main.r).toBeGreaterThan(strands[5]!.r);
+    const last = main.p[main.p.length - 1]!;
+    expect(last[0] < 0 || last[0] > 4 || last[1] < 0 || last[1] > 5).toBe(true);
+    for (const st of strands) expect(st.d).toBeGreaterThanOrEqual(KLOTSKI_SLIDE_MS);
+    // the page and its script are on disk and in the build's inputs
+    expect(fs.readFileSync(new URL("../room3d/flesh.js", import.meta.url), "utf8")).toContain("CatmullRomCurve3");
+    expect(fs.readFileSync(new URL("../vite.config.ts", import.meta.url), "utf8")).toContain("flesh: fleshPage");
+  });
+  it("the call (author 2026-11-27): only one; calling 老王 back fills his card, the door opens all the same, the night's grade is wrong", () => {
+    const r = rig();
+    r.fillOthers();
+    r.act("klotski-start");
+    // before the door: the phone has no service and its entries cannot be pressed
+    expect(r.out()).toContain(t("klotski.phone.none"));
+    expect(r.out()).toMatch(/data-action="klotski-call" data-card="d1" disabled/);
+    r.act("klotski-call", { card: "d1" });
+    expect(r.session.klotski!.done).toBe(false);
+    playPushes(r, klotskiPath(r.board.game as Game, "U")!);
+    r.act("klotski-call", { card: "d1" });
+    r.act("klotski-call", { card: "c1" });
+    expect(boardState(r.board, 17, r.task.id, r.store.getEvents()).slots.r1).toBe("d1");
+    expect(r.out()).toContain("kl-board open");
+    expect(r.out()).toContain("回一下我，我是谁你应该知道。");
+    expect(gradeGame(r.board, r.task.id, 17, r.session, r.store.getEvents())).toBe("wrong");
   });
   it("reduced motion: no growth, the final frame (every tentacle and the three lines shown)", () => {
     const css = fs.readFileSync("src/world/desktop/desktop.css", "utf8");
