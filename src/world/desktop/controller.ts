@@ -326,6 +326,8 @@ export interface DesktopDeps {
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** The boss fight's effects layer (2026-11-14): a Pixi canvas over the boss page, loaded when the page is up. */
   readonly bossFx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** The fight's party as solid pixel figures (endings/party3d): its own small canvas over the field; absent, the page's pictures show. */
+  readonly party3d?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** The code-built room's frames (room-3d-wake, -window, -desk): their messages, the commands, the desk's picks through `actions`. */
   readonly room3d?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** tingtalk R1b: where the windows' placement is remembered for the run (absent = the page only). */
@@ -482,6 +484,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     textLife?.after();
     pull?.after();
     bossFx?.after();
+    party3d?.after();
     hand?.after();
     room3d?.after();
     // While Kuro crawls between windows, render again when it should stop.
@@ -532,6 +535,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;
   const pull = deps.pull ? deps.pull(root, ctx) : null;
   const bossFx = deps.bossFx ? deps.bossFx(root, ctx) : null;
+  const party3d = deps.party3d ? deps.party3d(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
   const textLife = deps.textLife ? deps.textLife(root, ctx) : null;
   const hand = deps.hand ? deps.hand(root, ctx, actions) : null;
@@ -788,6 +792,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       splat?.destroy();
       pull?.destroy();
       bossFx?.destroy();
+      party3d?.destroy();
       fx?.destroy();
       textLife?.destroy();
       hand?.destroy();

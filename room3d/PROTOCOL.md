@@ -57,8 +57,6 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `leave` | `true` | the world pulls away (answers `left`) |
 | `strike` | `true` | a hit lands |
 | `hurt` | `true` | the boss is hurt |
-| `party` | `[{ id, look?, pose? }]` or `null` | the party stands in the fight's world as pixel actors: `id` is `player` or an old thing's id, `look` is `she` / `he` / `none` (the player's pictures), `pose` is `stance` (default) / `strike` / `hurt`. Needs `boss` on. Not posted by the game yet (2026-11-28: shown by `?party=she`) |
-| `partyAct` | `{ id, kind }` | one of them acts: `strike` (steps in and back), `hurt` (thrown back, white), `stance` |
 | `condense` | boolean | the world condenses to one eye on a far greater Kuro (answers `eye`) |
 | `rush` | `true` | the rush out, once the eye has been seen (answers `out`) |
 | `home` | `true`, `"cut"`, `false` | the good ending's room; `"cut"` arrives by a story cut (answers `home`) |

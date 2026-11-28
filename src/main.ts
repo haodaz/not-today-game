@@ -37,6 +37,7 @@ import { stareTick } from "@world/room/stare";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { bossStart } from "@world/endings/boss";
 import { createBossFx } from "@world/endings/boss-fx";
+import { createParty3d } from "@world/endings/party3d";
 import { clearAll, createProfileWriter, createRunSlot, restartRun } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
@@ -183,6 +184,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     pull: createPullDriver(),
     // The boss fight's hits, slashes, sparks and jolts: one Pixi canvas over the page, loaded on demand.
     bossFx: createBossFx(),
+    // the fight as a small 3D stage (2026-11-28, an experiment the author is looking at): only with ?party=3d
+    ...(new URLSearchParams(search).get("party") === "3d" ? { party3d: createParty3d() } : {}),
     hand: createHandLayer(),
     // room-3d-wake: the code-built room's messages (day 4's wake flash).
     room3d: createRoom3dLayer(onRoomMessage, { boss: onBossRoom }),

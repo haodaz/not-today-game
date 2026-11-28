@@ -1534,3 +1534,38 @@ body:has(.game-menu) :is(.dlg-layer,.room .hud-left,.room .hud-tiles,.hud-host .
 .game-menu .settings .row.reset button.gm-btn.danger,.game-menu .settings .actions button.gm-btn.danger{background:rgba(192,55,46,.75);color:#f0aaa2;border:0}
 .game-menu .settings .row.reset button.gm-btn.danger:hover,.game-menu .settings .row.reset button.gm-btn.danger:focus-visible{background:rgba(192,55,46,.9);color:#fff}
 .game-menu .settings .email-in button{border:0;border-radius:0;background:var(--gm-bone);color:#121411;font:14px var(--gm-serif);letter-spacing:.2em;padding:7px 14px;text-shadow:none;cursor:pointer}
+
+/* ——— the fight's party, staged and solid (author 2026-11-28: 「优化这个的人物质感、空间设计（你不一定需要站成一串」) ———
+   Not a row any more: three depths on the ground, the old things fanned out behind, the chick and the player in front
+   nearest him. Each member is placed by its feet (left = the middle of its feet, bottom = its foot line); a place further
+   up the frame is further away. endings/party3d.ts draws each one as a solid pixel figure where its picture is; with
+   that layer on (.p3d) the pictures stay in the page, unseen, so the fight's own lunges, rings and numbers still work.
+   Everything here is under .p3d: without the layer (it is opt-in, ?party=3d) the fight's page is as it was. */
+.boss-page.p3d .bs-party,.boss-page.p3d.many .bs-party{left:0;bottom:0;width:1600px;height:900px;display:block;gap:0;z-index:3;pointer-events:none}
+.boss-page.p3d .bs-party::before{display:none}
+.boss-page.p3d .bs-member{position:absolute;transform:translateX(-50%)}
+.boss-page.p3d .bs-member.object .bs-sprite,.boss-page.p3d.many .bs-member.object .bs-sprite{height:160px}
+.boss-page.p3d .bs-member.player .bs-sprite,.boss-page.p3d.many .bs-member.player .bs-sprite{height:240px}
+.boss-page.p3d .bs-member.qkuro .bs-sprite{height:130px}
+.boss-page.p3d .bs-member[data-id="phone"]{left:150px;bottom:262px;z-index:1}
+.boss-page.p3d .bs-member[data-id="iccard"]{left:318px;bottom:250px;z-index:1}
+.boss-page.p3d .bs-member[data-id="dictionary"]{left:506px;bottom:266px;z-index:1}
+.boss-page.p3d .bs-member[data-id="calculator"]{left:690px;bottom:252px;z-index:1}
+.boss-page.p3d .bs-member[data-id="tape"]{left:236px;bottom:196px;z-index:2}
+.boss-page.p3d .bs-member[data-id="camera"]{left:428px;bottom:204px;z-index:2}
+.boss-page.p3d .bs-member[data-id="pager"]{left:614px;bottom:192px;z-index:2}
+.boss-page.p3d .bs-member[data-id="qkuro"]{left:560px;bottom:140px;z-index:3}
+.boss-page.p3d .bs-member[data-id="chick"]{left:786px;bottom:146px;z-index:3}
+.boss-page.p3d .bs-member[data-id="player"]{left:948px;bottom:138px;z-index:3}
+.boss-page.p3d .bs-field > canvas.party3d{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.boss-page.p3d :is(.bs-tentacle,.bs-prop,.bs-flash){z-index:4}
+.boss-page.p3d .bs-member .bs-sprite{opacity:0}
+.boss-page.p3d .bs-member{filter:none}
+/* him too: his picture stays behind his solid as the red in the air round him */
+.boss-page.p3d .bs-boss-img{opacity:0}
+.boss-page.p3d .bs-field{cursor:grab}
+.boss-page.p3d .bs-field:active{cursor:grabbing}
+/* the second phase: the same places, in the world (they were a row at 0.6 on a dark strip, lost in the red) */
+.boss-page.p3d.world.final .bs-party{left:0;bottom:0;transform:none}
+.boss-page.p3d.world .bs-strip{display:none}
+

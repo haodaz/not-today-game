@@ -3238,155 +3238,6 @@ function updateBoss(s, dt) {
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
 }
-// ---- the party, standing in the fight's world (author 2026-11-28: 「cto给的代码里有精细的pixel art人物生成，你看看能不能用在最后的
-// 3d总决战的battle里面」) ----
-// Until now the player's figure and the old things were pictures laid over the page while the red world ran behind them:
-// in front of the fight, not in it. This stands them in the world, the way the Caelune lookdev lab stands its pixel
-// actors (github.com/bigdrum/caelune2: Hd2dSpriteActor and the chibi-pixel-character notes; rewritten here): each
-// is one quad on its feet, turned to the eye, its pixels kept hard (nearest, no mip-maps); the world's light is on it
-// (the ground's red up the legs, the head's pale light along every top edge); a shade under its feet; it breathes the
-// way a sprite does (the upper body sinks one pixel on the out-breath, 1.1 s in and 1.2 s out, no two together); it
-// steps in to strike and is thrown back, white, when struck.
-// { party: [{ id, look?, pose? }] | null } stands them; { partyAct: { id, kind: "strike" | "hurt" | "stance" } } moves one.
-// The pictures are the ones the fight already has (public/battle/party, party2). Not used by the game yet: ?party=she|he|none shows it.
-const PARTY = { g: null, list: new Map(), shade: null, bits: null, bit: [] }, _pv = new THREE.Vector3(), _pd = new THREE.Object3D(), _pc = new THREE.Color();
-const PARTY_SRC = (id, look, pose) => id === "player" ? `/battle/party/${look}-${pose === "hurt" ? "flip" : pose}.png` : `/battle/party2/obj_${id}_${pose}.png`;
-const PARTY_DEPTH = 5; // how thick a figure is, in its own pixels
-// A picture as a solid thing (author 2026-11-28, on the lab's figures: 「人物3d但是接近pixel」): its face is the picture, and
-// along every edge of its outline a wall one pixel wide runs back PARTY_DEPTH pixels, in that pixel's own colour. One
-// unit is the picture's height. The walls are found from the picture's own pixels (px: { w, h, d } read off a canvas).
-function partySolid(px) {
-  const { w, h, d } = px, P = [], N = [], U = [], I = [], asp = w / h, T = PARTY_DEPTH / h, z0 = T / 2, z1 = -T / 2;
-  const solid = (x, y) => x >= 0 && y >= 0 && x < w && y < h && d[(y * w + x) * 4 + 3] >= 128;
-  const quad = (a, b2, c, e, n, u, v) => { const k = P.length / 3; P.push(...a, ...b2, ...c, ...e); for (let i = 0; i < 4; i++) { N.push(...n); if (u !== null) U.push(u, v); } I.push(k, k + 1, k + 2, k, k + 2, k + 3); };
-  // the two faces
-  quad([-asp / 2, 0, z0], [asp / 2, 0, z0], [asp / 2, 1, z0], [-asp / 2, 1, z0], [0, 0, 1], null); U.push(0, 0, 1, 0, 1, 1, 0, 1);
-  quad([asp / 2, 0, z1], [-asp / 2, 0, z1], [-asp / 2, 1, z1], [asp / 2, 1, z1], [0, 0, -1], null); U.push(1, 0, 0, 0, 0, 1, 1, 1);
-  // the walls: for each solid pixel, each side that has nothing beyond it
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    if (!solid(x, y)) continue;
-    const X0 = (x / w - 0.5) * asp, X1 = ((x + 1) / w - 0.5) * asp, Y1 = 1 - y / h, Y0 = 1 - (y + 1) / h, u = (x + 0.5) / w, v = 1 - (y + 0.5) / h;
-    if (!solid(x - 1, y)) quad([X0, Y0, z1], [X0, Y0, z0], [X0, Y1, z0], [X0, Y1, z1], [-1, 0, 0], u, v);
-    if (!solid(x + 1, y)) quad([X1, Y0, z0], [X1, Y0, z1], [X1, Y1, z1], [X1, Y1, z0], [1, 0, 0], u, v);
-    if (!solid(x, y - 1)) quad([X0, Y1, z0], [X1, Y1, z0], [X1, Y1, z1], [X0, Y1, z1], [0, 1, 0], u, v);
-    if (!solid(x, y + 1)) quad([X0, Y0, z1], [X1, Y0, z1], [X1, Y0, z0], [X0, Y0, z0], [0, -1, 0], u, v);
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(P, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(N, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(U, 2)); g.setIndex(I);
-  return g;
-}
-function partyActor(id, look, i) {
-  const mat = new THREE.ShaderMaterial({
-    side: THREE.DoubleSide, fog: false, toneMapped: false,
-    uniforms: { map: { value: null }, uTexel: { value: new THREE.Vector2(1 / 128, 1 / 192) }, uBreath: { value: 0 }, uFlash: { value: 0 }, uWaist: { value: id === "player" ? 0.46 : 0.3 },
-      uLow: { value: new THREE.Color(1.25, 0.42, 0.34) }, uHigh: { value: new THREE.Color(0.62, 0.56, 0.6) }, uRim: { value: new THREE.Color(0.5, 0.46, 0.5) } },
-    vertexShader: /* glsl */ `varying vec2 vUv; varying vec3 vN; varying float vH; void main() { vUv = uv; vN = normal; vH = position.y; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-    fragmentShader: /* glsl */ `uniform sampler2D map; uniform vec2 uTexel; uniform float uBreath, uFlash, uWaist; uniform vec3 uLow, uHigh, uRim; varying vec2 vUv; varying vec3 vN; varying float vH;
-      void main() {
-        vec2 uv = vUv;
-        bool face = abs(vN.z) > 0.5;
-        if (face && uv.y > uWaist) uv.y += uTexel.y * uBreath; // the out-breath: everything above the waist, one pixel down
-        if (uv.y > 1.0) discard;
-        vec4 t = texture2D(map, uv);
-        if (face && t.a < 0.5) discard;
-        vec3 light = mix(uLow, uHigh, smoothstep(0.0, 0.7, vH)); // the ground's red up the legs, his pale light above
-        vec3 col;
-        if (face) { float top = 1.0 - step(0.5, texture2D(map, uv + vec2(0.0, uTexel.y)).a); col = t.rgb * light * (vN.z > 0.0 ? 1.0 : 0.5) + uRim * top * (0.35 + 0.65 * t.rgb) * step(0.0, vN.z); }
-        else col = t.rgb * light * (vN.y > 0.5 ? 1.25 : vN.y < -0.5 ? 0.45 : 0.68) + uRim * 0.5 * step(0.5, vN.y); // its thickness: lit on top, dark below, half-lit on its sides
-        gl_FragColor = vec4(mix(col, vec3(1.0, 0.96, 0.92), uFlash), 1.0);
-        #include <colorspace_fragment>
-      }`,
-  });
-  const flat = new THREE.PlaneGeometry(0.6, 1); flat.translate(0, 0.5, 0); // until its picture has loaded
-  const mesh = new THREE.Mesh(flat, mat); mesh.userData.noEdge = true; mesh.isLine2 = true; /* the occlusion pass leaves it alone */ mesh.frustumCulled = false; mesh.visible = false;
-  const shade = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: PARTY.shade, transparent: true, depthWrite: false, fog: false, toneMapped: false })); shade.rotation.x = -Math.PI / 2; shade.userData.noEdge = true; shade.isLine2 = true; shade.renderOrder = 1;
-  // Where they stand is given as a place in the frame (the fight's eye is high and far: a figure of a person's own
-  // size at the ring would be fifteen pixels tall). The player a little left of the middle, the old things in two rows
-  // fanned out to the left; each is put on the ground where that place in the frame meets it, and sized so that it
-  // takes `frac` of the frame's height there: about one pixel of the picture to one of the screen, which keeps them hard.
-  const j = i - 1, slot = id === "player" ? [-0.1, -0.5] : [-0.3 - (j >> 1) * 0.19 - (j % 2) * 0.09, j % 2 ? -0.72 : -0.4];
-  const a = { id, look, mesh, shade, mat, pose: "", slot, frac: id === "player" ? 0.27 : 0.15, h: 1, home: new THREE.Vector3(), ph: i * 0.83, act: null, poses: new Map(), px: null };
-  PARTY.g.add(shade, mesh); PARTY.list.set(id, a); partyPose(a, "stance");
-  return a;
-}
-function partyPose(a, pose) {
-  if (a.pose === pose) return; a.pose = pose;
-  let p = a.poses.get(pose);
-  if (!p) { p = { tex: null, geo: null, px: null }; a.poses.set(pose, p);
-    p.tex = new THREE.TextureLoader().load(PARTY_SRC(a.id, a.look, pose), (tx) => {
-      const im = tx.image, [c, g] = canvas(im.width, im.height); g.drawImage(im, 0, 0);
-      p.px = { w: im.width, h: im.height, d: g.getImageData(0, 0, im.width, im.height).data }; p.geo = partySolid(p.px);
-      if (a.pose === pose) partyShow(a, p); });
-    p.tex.colorSpace = THREE.SRGBColorSpace; p.tex.magFilter = p.tex.minFilter = THREE.NearestFilter; p.tex.generateMipmaps = false; }
-  if (p.geo) partyShow(a, p);
-}
-function partyShow(a, p) { a.mat.uniforms.map.value = p.tex; a.mat.uniforms.uTexel.value.set(1 / p.px.w, 1 / p.px.h); a.mesh.geometry = p.geo; a.px = p.px; a.mesh.visible = true; }
-function party(list) {
-  if (!FAR.built) return;
-  if (!PARTY.g) { PARTY.g = new THREE.Group(); FAR.g.add(PARTY.g);
-    const [sc, sg] = canvas(64, 64), gr = sg.createRadialGradient(32, 32, 2, 32, 32, 31); gr.addColorStop(0, "rgba(6,0,2,.7)"); gr.addColorStop(0.6, "rgba(6,0,2,.35)"); gr.addColorStop(1, "rgba(6,0,2,0)"); sg.fillStyle = gr; sg.fillRect(0, 0, 64, 64); PARTY.shade = new THREE.CanvasTexture(sc);
-    // the blocks a blow knocks out (「还有打击崩出pixel块的」): one pool of cubes, one draw call, each its own colour
-    PARTY.bits = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ fog: false, toneMapped: false }), 220);
-    PARTY.bits.frustumCulled = false; PARTY.bits.userData.noEdge = true; PARTY.bits.isLine2 = true; PARTY.bits.count = 0; PARTY.g.add(PARTY.bits); }
-  for (const a of PARTY.list.values()) { PARTY.g.remove(a.mesh, a.shade); a.mat.dispose(); for (const p of a.poses.values()) { p.tex.dispose(); p.geo?.dispose(); } }
-  PARTY.list.clear(); PARTY.bit.length = 0;
-  (list ?? []).forEach((p, i) => { const a = partyActor(String(p.id), p.look ?? "none", i); if (p.pose) partyPose(a, p.pose); });
-}
-function partyAct(m) { const a = PARTY.list.get(String(m.id)); if (!a) return; if (m.kind === "stance") { a.act = null; partyPose(a, "stance"); return; } a.act = { kind: m.kind, at: performance.now() / 1000, hit: false }; if (m.kind === "hurt") { partyBurstFrom(a); partyPose(a, "hurt"); } else partyPose(a, "strike"); }
-// A blow on one of them: blocks of its own picture's pixels fly off it, away from him and up, and fall.
-function partyBurstFrom(a) {
-  if (!a.px) return;
-  const { w, h, d } = a.px, size = (a.h / h) * 2.6, len = Math.hypot(a.home.x, a.home.z) || 1, bx = a.home.x / len, bz = a.home.z / len, R = Math.random;
-  for (let n = 0, tries = 0; n < 34 && tries < 400; tries++) {
-    const x = Math.floor(R() * w), y = Math.floor(R() * h * 0.8), k = (y * w + x) * 4;
-    if (d[k + 3] < 128) continue; n++;
-    const lx = (x / w - 0.5) * (w / h) * a.h, ly = (1 - y / h) * a.h, c = Math.cos(a.mesh.rotation.y), s2 = Math.sin(a.mesh.rotation.y);
-    PARTY.bit.push({ x: a.mesh.position.x + lx * c, y: a.mesh.position.y + ly, z: a.mesh.position.z - lx * s2, vx: bx * (1.5 + R() * 3.5) + (R() - 0.5) * 3, vy: 2.5 + R() * 5, vz: bz * (1.5 + R() * 3.5) + (R() - 0.5) * 3, rx: R() * 6, ry: R() * 6, sp: 4 + R() * 9, s: size * (0.7 + R() * 0.8), t: 0, life: 0.8 + R() * 0.5, g: a.home.y, col: new THREE.Color().setRGB(d[k] / 255, d[k + 1] / 255, d[k + 2] / 255, THREE.SRGBColorSpace) });
-  }
-}
-// One of them lands a blow: blocks of his hide and of what burns under it are knocked out toward the eye.
-const PARTY_HIDE = [0x16090d, 0x2a0c14, 0x4a1018, 0xff5a26, 0xffb060, 0x0c0608].map((x) => new THREE.Color(x));
-function partyBurstAt(a) {
-  const len = Math.hypot(a.home.x, a.home.z) || 1, fx = -a.home.x / len, fz = -a.home.z / len, k = a.h / 1.7, R = Math.random;
-  const ox = a.mesh.position.x + fx * 0.9 * k, oz = a.mesh.position.z + fz * 0.9 * k, oy = a.mesh.position.y + a.h * 0.55;
-  for (let n = 0; n < 26; n++) PARTY.bit.push({ x: ox + (R() - 0.5) * 0.3 * k, y: oy + (R() - 0.5) * 0.4 * k, z: oz + (R() - 0.5) * 0.3 * k, vx: (-fx * (0.5 + R() * 3) + (R() - 0.5) * 4) * k, vy: (2 + R() * 5.5) * k, vz: (-fz * (0.5 + R() * 3) + (R() - 0.5) * 4) * k, rx: R() * 6, ry: R() * 6, sp: 5 + R() * 10, s: a.h * (0.022 + R() * 0.03), t: 0, life: 0.7 + R() * 0.5, g: a.home.y, col: PARTY_HIDE[Math.floor(R() * PARTY_HIDE.length)] });
-}
-function updateParty(s, dt) {
-  if (!PARTY.g) return;
-  PARTY.g.visible = BOSS.on && !BOSS.leave && PARTY.list.size > 0;
-  if (!PARTY.g.visible) return;
-  for (const a of PARTY.list.values()) {
-    const c = (s + a.ph * 2.65) % 2.65; a.mat.uniforms.uBreath.value = c > 1.1 && c < 2.3 ? 1 : 0;
-    let dx = 0, dy = 0, dz = 0, flash = 0, yaw = 0.42 + 0.05 * Math.sin(s * 0.9 + a.ph), tilt = 0; // turned a little toward him, so its thickness shows; never quite still
-    if (a.act) { const T = s - a.act.at;
-      if (a.act.kind === "strike") { const q = Math.min(1, T / 0.55), go = Math.sin(q * Math.PI); dz = 1.1 * go; dy = 0.22 * Math.sin(Math.min(1, q * 2) * Math.PI); yaw -= 1.0 * go; // a step in toward the middle, a small hop, the body swung through, and back
-        if (q > 0.45 && !a.act.hit) { a.act.hit = true; partyBurstAt(a); }
-        if (T > 0.75) { a.act = null; partyPose(a, "stance"); } }
-      else { const q = Math.min(1, T / 0.5); flash = Math.max(0, 1 - T / 0.22); dz = -0.45 * (1 - q) * (1 - q); dx = 0.05 * Math.sin(T * 70) * (1 - q); tilt = -0.35 * (1 - q) * (1 - q); if (T > 0.8) { a.act = null; partyPose(a, "stance"); } } // thrown back, white for a moment, shaking
-    }
-    a.mat.uniforms.uFlash.value = flash;
-    // its place in the frame, carried down the eye's line to the ground
-    _pv.set(a.slot[0], a.slot[1], 0.5).unproject(camera).sub(camera.position).normalize();
-    const reach = _pv.y < -0.02 ? (-0.15 - camera.position.y) / _pv.y : 30;
-    a.home.copy(camera.position).addScaledVector(_pv, reach);
-    a.h = a.frac * 2 * reach * Math.tan((camera.fov * Math.PI) / 360);
-    a.mesh.scale.setScalar(a.h); a.shade.scale.set(a.h * 0.7, a.h * 0.3, 1);
-    // dz: toward the middle of the world (where he is); dx: across it. In the figure's own measure.
-    const k = a.h / 1.7, len = Math.hypot(a.home.x, a.home.z) || 1, fx = -a.home.x / len, fz = -a.home.z / len;
-    const x = a.home.x + (fx * dz - fz * dx) * k, z = a.home.z + (fz * dz + fx * dx) * k, y = a.home.y; dy *= k;
-    a.mesh.position.set(x, y + dy, z); a.shade.position.set(x, y + 0.02, z);
-    a.mesh.rotation.set(tilt, Math.atan2(camera.position.x - x, camera.position.z - z) + yaw, 0, "YXZ"); // upright, turned to the eye and then a little past it
-  }
-  // the blocks: thrown, falling, one bounce, gone
-  let n = 0; const B = PARTY.bit;
-  for (let i = B.length - 1; i >= 0; i--) { const b = B[i]; b.t += dt; if (b.t > b.life) { B.splice(i, 1); continue; }
-    b.vy -= 16 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
-    if (b.y < b.g + b.s / 2 && b.vy < 0) { b.y = b.g + b.s / 2; b.vy *= -0.38; b.vx *= 0.6; b.vz *= 0.6; b.sp *= 0.5; }
-    if (n >= 220) continue;
-    _pd.position.set(b.x, b.y, b.z); _pd.rotation.set(b.rx + b.t * b.sp, b.ry + b.t * b.sp * 0.7, 0); _pd.scale.setScalar(b.s * Math.min(1, (b.life - b.t) / 0.25)); _pd.updateMatrix();
-    PARTY.bits.setMatrixAt(n, _pd.matrix); PARTY.bits.setColorAt(n, _pc.copy(b.col).lerp(WHITE, Math.max(0, 0.7 - b.t * 6))); n++; }
-  PARTY.bits.count = n; PARTY.bits.instanceMatrix.needsUpdate = true; if (PARTY.bits.instanceColor) PARTY.bits.instanceColor.needsUpdate = true;
-}
 // The win in the good ending (author 2026-11-17 「可以的」 to this; the line 「No one like you.」 is NOT said here — it belongs to
 // the ending pages, with the song). They have a small Kuro of their own with them, so nothing is left behind and
 // nothing is drawn away: the crowd of eyes shuts until only the pair is left, the head goes down, the ones that stood
@@ -3608,7 +3459,6 @@ function frame(now) {
   updateHome(now / 1000);
   updateFar(now / 1000, dt);
   updateBoss(now / 1000, dt);
-  updateParty(now / 1000, dt);
   updateCondense(now / 1000);
   if (PEEK) { camera.position.set(PEEK[0], PEEK[1], PEEK[2]); camera.lookAt(PEEK[3], PEEK[4], PEEK[5]); if (PEEK[6] && camera.fov !== PEEK[6]) { camera.fov = PEEK[6]; camera.updateProjectionMatrix(); } } // { peek: [ex, ey, ez, tx, ty, tz, fov] }: a close look at one thing while it is being built; never sent by the game
   // the shadow maps: every few frames, and at once after a change (QUALITY)
@@ -3924,8 +3774,6 @@ function command(m) {
   if (m.greatLook != null) CON.look = m.greatLook;
   if (m.greatZoom != null) CON.zoom = m.greatZoom; // below 1 = further off
   if (m.condense != null) condense(!!m.condense);
-  if ("party" in m) party(m.party);
-  if (m.partyAct) partyAct(m.partyAct);
   if (m.strike) bossEvent("strike");
   if (m.hurt) bossEvent("hurt");
   if (m.layout !== undefined) layout(m.layout);
@@ -3946,12 +3794,6 @@ if (q.get("surge") === "1") surge(q.get("at"));
 if (q.get("coat")) setCoat(q.get("coat"));
 window.proto = { QUALITY, renderer, scene, CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
 
-// ?party=she|he|none: the fight's second phase with the party standing in it, each acting in turn, for looking at. Not used by the game.
-if (q.get("party")) {
-  const ids = ["player", "chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"];
-  const go = setInterval(() => { if (!FAR.built) { command({ boss: true, risen: true }); return; } clearInterval(go); command({ party: ids.map((id) => ({ id, look: q.get("party") })) });
-    let n = 0; setInterval(() => { const id = ids[n % ids.length], hit = n % 3 === 2; if (hit) { command({ strike: true }); setTimeout(() => command({ partyAct: { id, kind: "hurt" } }), 450); } else { command({ partyAct: { id, kind: "strike" } }); setTimeout(() => command({ hurt: true }), 300); } n++; }, 1700); }, 300);
-}
 // ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws
 // the eye away and back, a drag carries it along him. Not used by the game.
 if (q.get("great")) {
