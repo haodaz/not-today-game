@@ -2375,8 +2375,12 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .kl-mark svg{width:100%;height:auto;display:block}
 .kl-block.person .kl-face{width:58%;aspect-ratio:1;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(.9) brightness(.9);box-shadow:0 0 0 2px #a97a43}
 .kl-block.person .kl-label{font-size:13px}
-.kl-block.you{z-index:2;filter:none;background:linear-gradient(180deg,#fbf4e6,#efe2c8);box-shadow:inset 0 2px 0 #fff,inset 0 -4px 0 rgba(120,90,50,.18),0 3px 5px rgba(0,0,0,.45)}
-.kl-block.you .kl-label{color:#3a2a18;font-size:18px}
+/* the only living one on the tray (author 2026-11-27): warm skin tones, the chosen look in full colour, a slow breath */
+.kl-block.you{z-index:2;filter:none;background:linear-gradient(180deg,#ffe9dc,#f7c3aa 78%,#eea98d);box-shadow:inset 0 2px 0 #fff6ef,inset 0 -4px 0 rgba(170,80,50,.22),0 3px 5px rgba(0,0,0,.45),0 0 14px rgba(255,170,130,.35);animation:kl-breath 3.6s ease-in-out infinite}
+.kl-block.you .kl-face.kl-me{width:60%;aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 12%;filter:none;background:#fff3ea;box-shadow:0 0 0 2px #fff6ef,0 1px 4px rgba(120,50,30,.35)}
+.kl-block.you .kl-label{color:#7a2f1c;font-size:14px;font-weight:600}
+@keyframes kl-breath{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@media (prefers-reduced-motion:reduce){.kl-block.you{animation:none}}
 .kl-you-ring{position:absolute;inset:5px;border-radius:4px;box-shadow:0 0 0 1.5px #F6B73C;pointer-events:none}
 .kl-block.you.picked{box-shadow:inset 0 2px 0 #fff,0 0 0 3px #F6B73C,0 0 16px rgba(246,183,60,.55)}
 /* klotski-door R3: the door opens under you; tentacles come in cell by cell, you last */

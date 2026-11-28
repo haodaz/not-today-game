@@ -24,6 +24,15 @@ describe("day 17's klotski, as it is drawn", () => {
     expect(out).not.toMatch(/kl-block (named|small)/);
   });
 
+  it("you wear the look the player chose, in full colour (author 2026-11-27: the only living one)", () => {
+    const out = klotskiStage(task(), task().board!, { slots: {} } as never, { klotski: klotskiStart(task().id, game()) }, false, 0, "/player/glare.png").value;
+    expect(out).toMatch(/class="kl-block you[^>]*><img class="kl-face kl-me" src="\/player\/glare\.png" alt=""><span class="kl-label">你<\/span><i class="kl-you-ring"/);
+    const css = fs.readFileSync(new URL("../src/world/desktop/desktop.css", import.meta.url), "utf8");
+    expect(css).toMatch(/\.kl-block\.you \.kl-face\.kl-me\{[^}]*filter:none/);
+    expect(css).toMatch(/\.kl-block\.person \.kl-face\{[^}]*grayscale\(1\)/);
+    expect(css).toMatch(/prefers-reduced-motion:reduce\)\{\.kl-block\.you\{animation:none\}/);
+  });
+
   it("the marks are drawn, single colour, no image files; you never wear the rot", () => {
     const css = fs.readFileSync("src/world/desktop/desktop.css", "utf8");
     expect(css).toMatch(/\.kl-mark\{[^}]*color:#9c2318/);

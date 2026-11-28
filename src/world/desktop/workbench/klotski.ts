@@ -195,7 +195,7 @@ const GOD_MARK: Readonly<Record<string, string>> = {
  * keyhole under an arch with its name; a god the faceless tall figure with its own mark; a person
  * their face, round and grey, with the name; you a light tile with a thin amber ring.
  */
-function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null): SafeHtml {
+function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null, look: string | null = null): SafeHtml {
   const info = game.blocks[b.id];
   const role = info?.role ?? "nameless";
   const label = info?.label ?? "";
@@ -207,7 +207,8 @@ function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null): SafeHtml {
     : role === "gate" ? html`<i class="kl-arch" aria-hidden="true"></i><i class="kl-key" aria-hidden="true"></i>${name}`
     : role === "god" ? html`<i class="kl-fig" aria-hidden="true"></i><i class="${cls("kl-mark", `m-${b.id}`)}">${raw(GOD_MARK[b.id] ?? "")}</i>`
     : role === "person" ? html`${info?.face ? html`<img class="kl-face" src="${info.face}" alt="">` : null}${name}`
-    : html`${name}<i class="kl-you-ring" aria-hidden="true"></i>`;
+    // author 2026-11-27: 「你，可以用上玩家选的 look，积木看起来颜色要像个活人，唯一的活人」
+    : html`${look ? html`<img class="kl-face kl-me" src="${look}" alt="">` : null}${name}<i class="kl-you-ring" aria-hidden="true"></i>`;
   const aria = label ? html` aria-label="${label}"` : null;
   return html`<button type="button" class="${cls("kl-block", kind, g?.pick === b.id && "picked")}" data-action="klotski-pick" data-block="${b.id}" data-role="${role}" style="${style}"${aria}${g && !g.done ? null : html` disabled`}>${face}</button>`;
 }
@@ -252,12 +253,12 @@ export function klotskiCover(g: Pick<KlotskiGame, "blocks" | "exit" | "trail">):
   return order;
 }
 
-export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number): SafeHtml {
+export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null): SafeHtml {
   const game = board.game as Game;
   const g: KlotskiGame | null = session.klotski?.key === task.id ? session.klotski : null;
   const lv = g ?? klotskiStart(task.id, game);
   const out = !!g?.out;
-  const blocks = lv.blocks.map((b) => blockHtml(game, b, g));
+  const blocks = lv.blocks.map((b) => blockHtml(game, b, g, look));
   // the more pushes, the more of it shows at the door and the redder the tray's grain (drawn only); at the door, all of it
   const rot = (out ? 1 : klotskiRot(g?.moves ?? 0)).toFixed(2);
   // klotski-door R3: the door opens under the exit block; several tentacles come in, cell by cell

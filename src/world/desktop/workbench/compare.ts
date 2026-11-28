@@ -4,6 +4,7 @@
 // and coloured), the two versions of the page side by side as buttons, 克总你定, the row of his faces
 // (one per page: pleased / not pleased / not yet), and at the end the settlement: the satisfaction
 // and either 发给老王 or 让克总重新改一稿. Pure views; the actions are the board's (board.ts).
+import { playerPortraitSrc } from "@world/dialogue/box";
 import { boardState, canPrint, comparePending, compareRight, compareScore, taskForId, tuneCarried, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, selectedSlot } from "@state/days/ide";
 import type { GameEvent } from "@state/events";
@@ -251,7 +252,7 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
     body = tuneStage({ state, events, session, nowMs }, task, board);
   } else if (board.game?.kind === "klotski" && (() => { const st = boardState(board, state.day, task.id, events); const slot = board.game.slot; return board.slots.every((x) => x.id === slot || x.id in st.slots) && (!st.approved || (session.klotski?.key === task.id && klotskiApproving(session.klotski, nowMs))); })()) {
     // klotski (game-swaps §1): every slot but the caller filled — the callers as blocks, one out through the door
-    body = klotskiStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
+    body = klotskiStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs, playerPortraitSrc(state.names.portrait, false));
   } else if (board.game?.kind === "echo" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.echo?.key === task.id && echoApproving(session.echo, nowMs))); })()) {
     // echo (game-swaps §2): the filled minutes' roll call, repeated round by round
     body = echoStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
