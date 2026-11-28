@@ -393,12 +393,17 @@
       "incoming": [
         {
           "t": "09:05",
-          "text": "Xiao Wu：Yesterday's notice: I added \"sharp\" after \"14:30\"",
+          "text": "Xiao Wu：Yesterday's sheet: I made the header row bold",
           "kind": "work"
         },
         {
           "t": "09:40",
-          "text": "Director Liu：Good. Thorough",
+          "text": "Director Liu：Good. Thorough. This sheet can be the model for the others",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "Ms Sun：Forwarded to the whole bureau to learn from [thumbs up]",
           "kind": "work"
         },
         {
@@ -414,6 +419,16 @@
         {
           "t": "11:21",
           "text": "Director Liu：3. Liu",
+          "kind": "work"
+        },
+        {
+          "t": "14:20",
+          "text": "Director Liu：@Future Intelligence The red on the system's home page: the leadership looked and says it is not the right red. Adjust it. Needed tomorrow",
+          "kind": "work"
+        },
+        {
+          "t": "14:21",
+          "text": "Ms Sun：The leadership has such an eye [thumbs up]",
           "kind": "work"
         },
         {
@@ -435,7 +450,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. 32 days overdue."
+        "inner": "Read. The red is mine to fix by tomorrow. 32 days overdue."
       }
     },
     "g_uni": {
@@ -453,6 +468,11 @@
         {
           "t": "10:00",
           "text": "Ms Zhao：A new counter on the second floor of the staff canteen: free soup with your staff card",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Xiao Lin：@Future Intelligence Professor Chen wants me to use your system for my thesis proposal. Please open me an account, and explain how it works tonight",
           "kind": "work"
         },
         {
@@ -499,8 +519,13 @@
           "kind": "work"
         },
         {
-          "t": "10:00",
-          "text": "Lisa：This month's gym allowance has been paid. Please check",
+          "t": "10:20",
+          "text": "Lisa：@all System testing is settled: we take on a batch of interns to test it. Unpaid. An internship certificate at the end",
+          "kind": "work"
+        },
+        {
+          "t": "10:21",
+          "text": "Tony：Good. Costs down, efficiency up",
           "kind": "work"
         },
         {

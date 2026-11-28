@@ -21,13 +21,15 @@ export interface NpcEntry {
 export interface NpcData {
   readonly npcs: Readonly<Record<string, NpcEntry>>;
   readonly silhouettes: readonly string[];
+  /** The picture a written name chose for itself in Hi信 (author 2026-11-28: 「起码有个微信头像吧，否则很难区分人」): written name (either language) -> path. */
+  readonly faces: Readonly<Record<string, string>>;
   /** texture-pass R2: from this day an NPC with an `assim` pose stands as it unless a line names a pose. */
   readonly assimFrom: number;
 }
 
 const isStr = (v: unknown): v is string => typeof v === "string";
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
-const TOP_KEYS = ["_note", "npcs", "silhouettes", "assimFrom"] as const;
+const TOP_KEYS = ["_note", "npcs", "silhouettes", "faces", "assimFrom"] as const;
 const NPC_KEYS = ["name", "portrait", "avatar"] as const;
 const NPC_OPTIONAL = ["stand", "poses", "idle"] as const;
 
@@ -54,7 +56,20 @@ export function parseNpc(raw: unknown): NpcData {
   if (!Array.isArray(raw.silhouettes) || !raw.silhouettes.every(isStr)) fail("silhouettes", "must be a string array");
   const assimFrom = raw.assimFrom === undefined ? 19 : raw.assimFrom;
   if (!(Number.isInteger(assimFrom) && (assimFrom as number) >= 1)) fail("assimFrom", "must be a day number");
-  return { npcs: Object.freeze(npcs), silhouettes: raw.silhouettes as string[], assimFrom: assimFrom as number };
+  // faces: one picture, the names that person is written with (zh, en); a name has one picture only
+  const faces: Record<string, string> = Object.create(null);
+  if (raw.faces !== undefined) {
+    if (!isObj(raw.faces)) fail("faces", "must be an object");
+    for (const [path, names] of Object.entries(raw.faces)) {
+      if (!(Array.isArray(names) && names.length > 0 && names.every(isStr))) fail(`faces.${path}`, "must be a list of written names");
+      for (const name of names as string[]) {
+        if (name in faces) fail(`faces.${path}`, `"${name}" already has a picture`);
+        if (Object.hasOwn(npcs, name)) fail(`faces.${path}`, `"${name}" is an NPC id: its picture is its avatar`);
+        faces[name] = path;
+      }
+    }
+  }
+  return { npcs: Object.freeze(npcs), silhouettes: raw.silhouettes as string[], faces: Object.freeze(faces), assimFrom: assimFrom as number };
 }
 
 export const npcData: NpcData = Object.freeze(parseNpc(npcFile));
@@ -112,6 +127,11 @@ export function silhouetteFor(name: string): string {
   let h = 0;
   for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) % n;
   return npcData.silhouettes[h]!;
+}
+
+/** The face of someone written by name in a group (大姨, Big Aunt, 刘处): the picture they chose, else a stable silhouette. */
+export function aliasAvatar(name: string): string {
+  return npcData.faces[name.trim()] ?? silhouetteFor(name);
 }
 
 /** The NPC's display-name strings key (`name` in npc.json), or null. */

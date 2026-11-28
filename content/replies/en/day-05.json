@@ -565,7 +565,7 @@
         },
         {
           "t": "10:00",
-          "text": "Xiao Wu：The notice has been corrected. Nothing needs correcting any more.",
+          "text": "Xiao Wu：The sheet has been proofread. All 14 rows are correct. Nothing needs correcting any more.",
           "kind": "work"
         },
         {
@@ -721,6 +721,11 @@
         {
           "t": "10:00",
           "text": "Kevin：The font size is correct. All the font sizes are correct.",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Lisa：The interns raised no issues today. All 312 of them say there are no issues.",
           "kind": "work"
         },
         {

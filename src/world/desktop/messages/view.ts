@@ -8,7 +8,7 @@ import { isDeregistered, menu } from "@state/replies/resolve";
 import type { State } from "@state/types.gen";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
-import { npcAvatar, silhouetteFor } from "@world/npc";
+import { aliasAvatar, npcAvatar } from "@world/npc";
 import { faceAttr, markFaces, withoutFaces } from "./face-mark";
 import { HOME_CONVERSATIONS, msgFaceNow, wrongAvatar } from "../workbench/collapse";
 import { labelKey } from "@world/replies/labels";
@@ -38,12 +38,12 @@ function avImg(id: string, css: string, faceOk = false): SafeHtml {
 
 /**
  * The face on a bubble: the player's own is the neutral square; an NPC's is its avatar; a relative
- * or colleague with a written `alias` (大姨, Big Aunt) gets a silhouette by name hash, the same
- * every day. No letters.
+ * or colleague with a written `alias` (大姨, Big Aunt) gets the picture that person chose (npc.json
+ * `faces`), else a silhouette by name hash, the same every day. No letters.
  */
 function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtml {
   if (side === "me") return html`<div class="av me-av"></div>`;
-  if (alias !== undefined) return html`<img class="av av-img" src="${silhouetteFor(alias)}" alt="" aria-hidden="true" draggable="false">`;
+  if (alias !== undefined) return html`<img class="av av-img" src="${aliasAvatar(alias)}" alt="" aria-hidden="true" draggable="false">`;
   return avImg(who, "av av-img", true);
 }
 
@@ -212,7 +212,7 @@ function speakers(bubbles: readonly Bubble[]): { key: string; src: string }[] {
   for (const b of bubbles) {
     if (b.kind !== "msg" || b.side !== "them") continue;
     const key = b.alias ?? b.who;
-    if (!out.has(key)) out.set(key, b.alias !== undefined ? silhouetteFor(b.alias) : npcAvatar(b.who));
+    if (!out.has(key)) out.set(key, b.alias !== undefined ? aliasAvatar(b.alias) : npcAvatar(b.who));
   }
   return [...out].map(([key, src]) => ({ key, src }));
 }

@@ -15,7 +15,7 @@ import { initialSession, type AppContext } from "@world/desktop/model";
 import { labelKey } from "@world/replies/labels";
 import { setLocale, stringIn, t } from "@world/i18n";
 import { menu } from "@state/replies/resolve";
-import { npcAvatar, npcData, npcIdOf, silhouetteFor, speakerLabel } from "@world/npc";
+import { aliasAvatar, npcAvatar, npcData, npcIdOf, silhouetteFor, speakerLabel } from "@world/npc";
 
 afterEach(() => setLocale("zh"));
 
@@ -253,12 +253,12 @@ describe("相亲相爱一家人 (clan): relatives with silhouettes, in 家里 un
     const byName = new Map<string, Set<string>>();
     for (const b of msgs) {
       if (!b.alias) continue;
-      byName.set(b.alias, (byName.get(b.alias) ?? new Set()).add(silhouetteFor(b.alias)));
+      byName.set(b.alias, (byName.get(b.alias) ?? new Set()).add(aliasAvatar(b.alias)));
     }
     expect(byName.size).toBeGreaterThan(1);
     for (const [name, faces] of byName) expect(faces.size, name).toBe(1);
     const out = render(store, CLAN);
-    for (const [name] of byName) expect(avatarsIn(out), name).toContain(silhouetteFor(name));
+    for (const [name] of byName) expect(avatarsIn(out), name).toContain(aliasAvatar(name)); // the picture that relative chose (author 2026-11-28)
   });
 
   it("in English the written names are the English ones, and the same silhouettes by hash of what is written", () => {
@@ -280,9 +280,9 @@ describe("相亲相爱一家人 (clan): relatives with silhouettes, in 家里 un
     expect(out).toContain(`<b>${t("msgs.family")}</b>`);
     expect(out).toContain(`<b>${t("msgs.clan")}</b>`);
     const row = out.slice(clan, out.indexOf("</button>", clan));
-    // A group's face is a 3×3 mosaic of its members' faces (WeChat addition): the relatives' silhouettes.
+    // A group's face is a 3×3 mosaic of its members' faces (WeChat addition): the relatives' own pictures.
     expect(row).toContain('class="av mosaic"');
-    for (const b of bubblesOf(store, CLAN).slice(0, 9)) expect(row).toContain(`src="${silhouetteFor(b.alias!)}"`);
+    for (const b of bubblesOf(store, CLAN).slice(0, 9)) expect(row).toContain(`src="${aliasAvatar(b.alias!)}"`);
     // The preview carries the last speaker's prefix as written (the preview is of day 1 at 23:59).
     expect(row).toMatch(/<small>(大姨|二舅|堂姐|小姑|表弟|姥姥)：/);
   });

@@ -354,7 +354,7 @@
         },
         {
           "t": "10:00",
-          "text": "Director Liu：Xiao Wu, send the notice out",
+          "text": "Director Liu：Xiao Wu, send that sheet out",
           "kind": "work"
         },
         {
@@ -382,6 +382,11 @@
           "kind": "work"
         },
         {
+          "t": "14:30",
+          "text": "Ms Sun：@Future Intelligence Please come and give the system training once more. Last time it clashed with the union's rice and oil, and nobody was in the room",
+          "kind": "work"
+        },
+        {
           "t": "16:20",
           "text": "Lao Zhou：Director Liu, the payment",
           "kind": "work"
@@ -395,7 +400,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. 33 days overdue."
+        "inner": "Read. The training is to be given again. 33 days overdue."
       }
     },
     "g_uni": {
@@ -418,6 +423,21 @@
         {
           "t": "10:31",
           "text": "Prof. Chen：Then that's it for this week. Well done",
+          "kind": "work"
+        },
+        {
+          "t": "11:00",
+          "text": "Prof. Chen：Xiao Lin's thesis proposal passed. Graded excellent",
+          "kind": "work"
+        },
+        {
+          "t": "11:01",
+          "text": "Ms Zhao：A fine teacher, a fine student [thumbs up]",
+          "kind": "work"
+        },
+        {
+          "t": "11:02",
+          "text": "Xiao Lin：Thank you, Professor! You are the first name in the acknowledgements",
           "kind": "work"
         },
         {
@@ -446,12 +466,17 @@
       "incoming": [
         {
           "t": "09:40",
-          "text": "Lisa：@all Family Day on Friday. Two family members each. There's a whole roast lamb",
+          "text": "Lisa：312 interns signed up, more than half with a master's. They don't fit in the lobby",
           "kind": "work"
         },
         {
           "t": "09:41",
-          "text": "Kevin：Signing up, three of us",
+          "text": "Kevin：That many [thumbs up] Then today's afternoon tea orders are for regular staff only",
+          "kind": "work"
+        },
+        {
+          "t": "09:50",
+          "text": "Lisa：@Future Intelligence Please open 312 test accounts, before the end of today",
           "kind": "work"
         },
         {
@@ -467,6 +492,11 @@
         {
           "t": "10:32",
           "text": "Tony：Good. Loop closed",
+          "kind": "work"
+        },
+        {
+          "t": "15:20",
+          "text": "Lisa：The interns raised 1,400 issues this morning. All forwarded to @Future Intelligence. Please close the loop this week",
           "kind": "work"
         },
         {
@@ -488,7 +518,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. They are counting heads for Family Day."
+        "inner": "Read. 312 accounts and 1,400 issues, all for me. Nobody mentions money."
       }
     }
   }

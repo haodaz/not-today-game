@@ -483,28 +483,23 @@
           "kind": "work"
         },
         {
-          "t": "09:03",
-          "text": "Xiao Wu：Received [rose]",
+          "t": "09:30",
+          "text": "Director Liu：Xiao Wu, proofread that ledger spreadsheet today. Just the one sheet. No hurry",
           "kind": "work"
         },
         {
-          "t": "09:03",
-          "text": "Director Liu：Received [rose]",
+          "t": "11:40",
+          "text": "Xiao Wu：I'm at row 6. Found a full-width bracket",
           "kind": "work"
         },
         {
-          "t": "10:30",
-          "text": "Xiao Wu：Director Liu, I changed \"afternoon\" in the notice to \"14:30\"",
+          "t": "11:41",
+          "text": "Ms Sun：Sharp eyes, Xiao Wu [thumbs up]",
           "kind": "work"
         },
         {
-          "t": "10:52",
-          "text": "Director Liu：Fine. That will do for today",
-          "kind": "work"
-        },
-        {
-          "t": "10:53",
-          "text": "Xiao Wu：Yes, Director",
+          "t": "11:41",
+          "text": "Director Liu：Sharp eyes, Xiao Wu [thumbs up]",
           "kind": "work"
         },
         {
@@ -520,6 +515,26 @@
         {
           "t": "15:59",
           "text": "Xiao Wu：It's paid [rose]",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Xiao Wu：The sheet is done. 14 rows in all. Fixed one bracket and two spaces",
+          "kind": "work"
+        },
+        {
+          "t": "16:22",
+          "text": "Ms Sun：[clap][clap][clap]",
+          "kind": "work"
+        },
+        {
+          "t": "16:22",
+          "text": "Director Liu：[clap][clap][clap]",
+          "kind": "work"
+        },
+        {
+          "t": "16:22",
+          "text": "Xiao Wu：[clap][clap][clap]",
           "kind": "work"
         }
       ],

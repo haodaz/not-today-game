@@ -400,23 +400,18 @@
           "kind": "work"
         },
         {
-          "t": "09:03",
-          "text": "Xiao Wu：Received [rose]",
+          "t": "09:30",
+          "text": "Director Liu：Xiao Wu, proofread that ledger spreadsheet today. Just the one sheet. No hurry",
           "kind": "work"
         },
         {
-          "t": "10:30",
-          "text": "Xiao Wu：Director Liu, I changed \"afternoon\" in the notice to \"14:30\"",
+          "t": "11:40",
+          "text": "Xiao Wu：I'm at row 6. Found a full-width bracket",
           "kind": "work"
         },
         {
-          "t": "10:52",
-          "text": "Director Liu：Fine. That will do for today",
-          "kind": "work"
-        },
-        {
-          "t": "10:53",
-          "text": "Xiao Wu：Yes, Director",
+          "t": "11:41",
+          "text": "Ms Sun：Sharp eyes, Xiao Wu [thumbs up]",
           "kind": "work"
         },
         {
@@ -435,6 +430,21 @@
           "kind": "work"
         },
         {
+          "t": "16:20",
+          "text": "Xiao Wu：The sheet is done. 14 rows in all. Fixed one bracket and two spaces",
+          "kind": "work"
+        },
+        {
+          "t": "16:21",
+          "text": "Director Liu：Very good. Everyone learn from Xiao Wu. That will do for today",
+          "kind": "work"
+        },
+        {
+          "t": "16:22",
+          "text": "Ms Sun：[clap][clap][clap]",
+          "kind": "work"
+        },
+        {
           "t": "16:30",
           "text": "Ms Sun：The union is handing out rice and oil. Room 302, before you leave",
           "kind": "work"
@@ -443,7 +453,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. Nobody answers. The payment is 31 days overdue."
+        "inner": "Read. Nobody answers. Today they proofread one sheet of 14 rows. The payment is 31 days overdue."
       }
     },
     "g_uni": {
@@ -466,6 +476,16 @@
         {
           "t": "10:16",
           "text": "Xiao Lin：Yes, Professor. I'll finish it today",
+          "kind": "work"
+        },
+        {
+          "t": "11:00",
+          "text": "Prof. Chen：@Future Intelligence You write the first draft of the final project report. About thirty thousand words. I will arrange the names",
+          "kind": "work"
+        },
+        {
+          "t": "11:01",
+          "text": "Ms Zhao：Another project closed, Professor [thumbs up]",
           "kind": "work"
         },
         {
@@ -492,7 +512,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. Nobody answers."
+        "inner": "Read. Nobody answers. The thirty thousand words are mine to write."
       }
     },
     "g_corp": {
@@ -523,6 +543,11 @@
           "kind": "work"
         },
         {
+          "t": "11:30",
+          "text": "Kevin：@Future Intelligence Move the button on the home page from the left to the right. Tony says it is better aligned that way. This does not count as a change request",
+          "kind": "work"
+        },
+        {
           "t": "15:00",
           "text": "Lisa：Afternoon tea is here. Pick it up at the front desk",
           "kind": "work"
@@ -541,7 +566,7 @@
       "received": {
         "status": "read",
         "lines": [],
-        "inner": "Read. Nobody answers."
+        "inner": "Read. Nobody answers. The button is mine to move, and it is not a change."
       }
     }
   }
