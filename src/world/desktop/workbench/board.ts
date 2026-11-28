@@ -523,7 +523,8 @@ function currentSide(ctx: ActionContext): { task: Task; game: NonNullable<Task["
 /**
  * klotski: the block is out. Its card takes the form's slot (a `fill`, which overwrites whatever was
  * there, Kuro's fill included, and fires the content's `fill:<slot>:<card>` beat), then the form is
- * approved. The re-renders bring the tentacle after the slide and the form after the hold.
+ * approved. The re-renders bring the tentacles after the door opens and the form after the hold
+ * (klotski-door R3: the door moment, KLOTSKI_DONE_MS).
  */
 function klotskiOut(ctx: ActionContext, c: { task: Task; board: TaskBoard }, g: KlotskiGame): KlotskiGame {
   const game = c.board.game as Extract<NonNullable<TaskBoard["game"]>, { kind: "klotski" }>;
@@ -1375,17 +1376,13 @@ const actions: Record<string, ActionHandler> = {
     ctx.later(SOKOBAN_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
-  // dev only: the block the form wants out at once
+  // dev only: the exit block (you) through the door at once (klotski-door R2)
   "klotski-cheat"(ctx) {
     if (!import.meta.env.DEV) return;
     const c = currentBoard(ctx);
     const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
     if (c?.board.game?.kind !== "klotski" || !g || stateOf(ctx, c.task, c.board).approved) return;
-    const game = c.board.game;
-    const answer = c.board.slots.find((x) => x.id === game.slot)?.answer;
-    const id = Object.keys(game.blocks).find((k) => game.blocks[k]!.card === answer);
-    if (!id) return;
-    ctx.session.klotski = klotskiOut(ctx, c, klotskiSolve(g, id, ctx.now?.() ?? Date.now()));
+    ctx.session.klotski = klotskiOut(ctx, c, klotskiSolve(g, c.board.game.exit, ctx.now?.() ?? Date.now()));
     ctx.rerender();
   },
   // dev only: every round repeated at once

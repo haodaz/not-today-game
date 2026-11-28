@@ -203,29 +203,58 @@
         "game": {
           "kind": "klotski",
           "slot": "r1",
+          "exit": "U",
           "level": [
-            "xNNy",
-            "xNNy",
-            "AABB",
-            "CCDD",
-            "s..t"
+            "U.ZW",
+            "SNNH",
+            "SNNH",
+            "FYYP",
+            "FV.P"
           ],
           "blocks": {
-            "A": {
-              "card": "c1",
-              "label": "青禾"
+            "N": {
+              "label": "",
+              "role": "nameless"
             },
-            "B": {
-              "card": "k1",
-              "label": "克总"
+            "Y": {
+              "label": "看门的",
+              "role": "gate"
             },
-            "C": {
-              "card": "d1",
-              "label": "老王"
+            "H": {
+              "label": "黄衣",
+              "role": "god"
             },
-            "D": {
-              "card": "d2",
-              "label": "Vivi"
+            "F": {
+              "label": "天平",
+              "role": "god"
+            },
+            "P": {
+              "label": "不睡的",
+              "role": "god"
+            },
+            "S": {
+              "label": "黑山羊",
+              "role": "god"
+            },
+            "W": {
+              "label": "老王",
+              "role": "person",
+              "face": "/npc/boss_av.png"
+            },
+            "Z": {
+              "label": "老周",
+              "role": "person",
+              "face": "/npc/laozhou_av.png"
+            },
+            "V": {
+              "label": "Vivi",
+              "role": "person",
+              "face": "/npc/partner_av.png"
+            },
+            "U": {
+              "label": "你",
+              "role": "you",
+              "card": "c1"
             }
           }
         }

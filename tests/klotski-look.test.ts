@@ -1,9 +1,11 @@
-// #166 (author 2026-11-27: 「17 天那个华容道的设计非常简单」): the toy keeps its look, wood and carved
-// pieces, with day 17 in it. Drawn only: the layout, the pushes and the grade are as they were.
+// #166 (author 2026-11-27): the toy keeps its look, wood and carved pieces (ce1eda2's tray), and
+// klotski-door R4 draws each block by its role: the nameless eye, the gate's keyhole, a god's figure
+// with its own mark, a person's face, and you, the only light one.
 import "./specimen";
 import { describe, expect, it } from "vitest";
+import fs from "node:fs";
 import { taskByFlag } from "@state/days/tasks";
-import { KLOTSKI_ROT_MOVES, klotskiPath, klotskiRot, klotskiStage, klotskiStart } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_ROT_MOVES, klotskiRot, klotskiStage, klotskiStart } from "@world/desktop/workbench/klotski";
 import { setLocale } from "@world/i18n";
 
 setLocale("zh");
@@ -12,28 +14,31 @@ const game = () => task().board!.game as Extract<NonNullable<ReturnType<typeof t
 const stage = (g: ReturnType<typeof klotskiStart> | null) => klotskiStage(task(), task().board!, { slots: {} } as never, { klotski: g }, false, 0).value;
 
 describe("day 17's klotski, as it is drawn", () => {
-  it("every caller is a seal with its name and a ringing line; the big one an eye; the tall ones figures; the small ones a pupil", () => {
+  it("each block by its role: the eye, the keyhole, four gods with four marks, three faces, you", () => {
     const out = stage(klotskiStart(task().id, game()));
-    for (const b of Object.values(game().blocks)) expect(out).toContain(`<span class="kl-seal"><span class="kl-name">${b.label}</span></span><i class="kl-ring" aria-hidden="true"></i>`);
-    expect((out.match(/class="kl-block named/g) ?? []).length).toBe(4);
     expect((out.match(/class="kl-block big[^>]*>[^<]*<i class="kl-eye"/g) ?? []).length).toBe(1);
-    expect((out.match(/class="kl-block tall[^>]*><i class="kl-fig"/g) ?? []).length).toBe(2);
-    expect((out.match(/class="kl-block small[^>]*><i class="kl-pupil"/g) ?? []).length).toBe(2);
+    expect(out).toMatch(/class="kl-block gate[^>]*><i class="kl-arch" aria-hidden="true"><\/i><i class="kl-key" aria-hidden="true"><\/i><span class="kl-label">看门的<\/span>/);
+    for (const m of ["H", "F", "P", "S"]) expect(out).toMatch(new RegExp(`data-block="${m}"[^>]*><i class="kl-fig" aria-hidden="true"></i><i class="kl-mark m-${m}"><svg`));
+    for (const [id, b] of Object.entries(game().blocks).filter(([, b]) => b.role === "person")) expect(out).toMatch(new RegExp(`data-block="${id}"[^>]*><img class="kl-face" src="${b.face}" alt=""><span class="kl-label">${b.label}</span>`));
+    expect(out).toMatch(/class="kl-block you[^>]*><span class="kl-label">你<\/span><i class="kl-you-ring"/);
+    expect(out).not.toMatch(/kl-block (named|small)/);
   });
 
-  it("the thing at the door comes on with the pushes, and is drawn only", () => {
+  it("the marks are drawn, single colour, no image files; you never wear the rot", () => {
+    const css = fs.readFileSync("src/world/desktop/desktop.css", "utf8");
+    expect(css).toMatch(/\.kl-mark\{[^}]*color:#9c2318/);
+    expect(css).toMatch(/\.kl-block\.you\{[^}]*filter:none/);
+    const out = stage(klotskiStart(task().id, game()));
+    expect(out).not.toMatch(/kl-mark[^>]*><img/);
+  });
+
+  it("the thing at the door comes on with the pushes, and is drawn only (ce1eda2)", () => {
     expect([0, 10, KLOTSKI_ROT_MOVES, 400].map(klotskiRot)).toEqual([0, 0.25, 1, 1]);
     const g = klotskiStart(task().id, game());
     expect(stage(g)).toContain("--rot:0.00");
     expect(stage({ ...g, moves: 20 })).toContain("--rot:0.50");
     expect(stage({ ...g, moves: 20 })).toContain('<i class="kl-peek" aria-hidden="true"></i>');
     expect(stage(null)).toContain("--rot:0.00");
-  });
-
-  it("the puzzle is as it was: the one who paid is 19 pushes from the door, the two nearest 8, the nameless one never", () => {
-    const idOf = (label: string) => Object.entries(game().blocks).find(([, b]) => b.label === label)![0];
-    expect(klotskiPath(game(), idOf("青禾"))!.length).toBe(19);
-    expect(klotskiPath(game(), idOf("老王"))!.length).toBe(8);
-    expect(klotskiPath(game(), idOf("Vivi"))!.length).toBe(8);
+    expect(stage(null)).toContain('<i class="kl-veins" aria-hidden="true"></i>');
   });
 });

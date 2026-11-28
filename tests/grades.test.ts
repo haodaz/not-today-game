@@ -105,13 +105,13 @@ describe("each engine's grade", () => {
     expect(rhythm({ done: true, notes: notes(6) })).toBe("flawed");
     expect(rhythm({ done: true, notes: notes(7) })).toBe("wrong");
   });
-  it("klotski: the answer's block out in ≤ 30 / ≤ 60 / more; another block out or none wrong; help at best flawed", () => {
-    const game = { kind: "klotski" as const, slot: "r1", level: ["xNNy", "xNNy", "AABB", "CCDD", "s..t"], blocks: { A: { card: "c1", label: "a" }, C: { card: "d1", label: "c" } } };
-    expect(klotski({ out: "A", moves: 30 }, game, "c1", tally())).toBe("perfect");
-    expect(klotski({ out: "A", moves: 60 }, game, "c1", tally())).toBe("flawed");
-    expect(klotski({ out: "A", moves: 61 }, game, "c1", tally())).toBe("wrong");
-    expect(klotski({ out: "A", moves: 19 }, game, "c1", tally({ assisted: true }))).toBe("flawed");
-    expect(klotski({ out: "C", moves: 8 }, game, "c1", tally())).toBe("wrong");
+  it("klotski (klotski-door R6): the exit block out in ≤ 45 / ≤ 90 / more; none out wrong; help at best flawed", () => {
+    const game = { kind: "klotski" as const, slot: "r1", exit: "U", level: ["U.ZW", "SNNH", "SNNH", "FYYP", "FV.P"], blocks: { N: { label: "", role: "nameless" as const }, U: { label: "u", role: "you" as const, card: "c1" }, W: { label: "w", role: "person" as const } } };
+    expect(klotski({ out: "U", moves: 45 }, game, "c1", tally())).toBe("perfect");
+    expect(klotski({ out: "U", moves: 90 }, game, "c1", tally())).toBe("flawed");
+    expect(klotski({ out: "U", moves: 91 }, game, "c1", tally())).toBe("wrong");
+    expect(klotski({ out: "U", moves: 28 }, game, "c1", tally({ assisted: true }))).toBe("flawed");
+    expect(klotski({ out: "W", moves: 8 }, game, "c1", tally())).toBe("wrong");
     expect(klotski({ out: null, moves: 3 }, game, "c1", tally())).toBe("wrong");
   });
   it("echo: rounds failed 0 / ≤ 2 / more; unfinished wrong", () => {

@@ -3045,3 +3045,33 @@ and wrote this entry (Kiro wrote none for it).
   coach marks one at a time → 老王: card at the foot, prompt over the choices → sent: 未读, his answer,
   已读, then 听他说完话 → 点个餐吧 → the phone glows on the 3D desk and the glow follows a drag.
 - tsc clean; validate clean; vitest 191 files, 2631 passed.
+
+## 2026-11-27 · klotski-door (day 17's room, the small block is you)
+
+- Spec `.kiro/specs/klotski-door/` (requirements by the author; design.md and tasks.md written here).
+- R1 Content shape: `BoardGame` klotski gets `exit` and `blocks[ch] = { label, role, card?, face? }`.
+  The loader requires every letter to have a block, `N` nameless, `exit` a 1 × 1 `you` block whose
+  card is the answer of `slot`, an empty label only on `nameless`, and `face` only on `person`. The
+  zh / en twin check compares the level, the exit and each block's role / card / face. Day 17's
+  `game` block (zh + en) was written verbatim from the spec by `script/tools/klotski-door-content.mjs`.
+  Nothing else in day 17 was touched. Note for Claude: this is an edit in `content/tasks/day-17.json`
+  and its en twin, limited to the `game` block, as the spec asks.
+- R2 Engine: only the exit block goes through the door. Another block over the door pushed down
+  does not move and sets `blocked`. The exit block's `trail` is recorded (退一步 trims it).
+  `klotskiPath` treats the gods and the persons as interchangeable, and `klotskiSolve` takes only the
+  exit block. The shortest way is 28 pushes (asserted).
+- R5 Strings, verbatim (`script/tools/klotski-door-strings.mjs`): title / sub / nameless / blocked /
+  door1–3 replaced or added; out / won / left removed. The en `kick` becomes "Call back" as given
+  (the spec marks it "unchanged", but the file had "Calling back"). The fonts test is green.
+- R6 The grade is `byCount(moves, 45, 90)`, and nothing out is wrong. The dev cheat and the walk
+  driver's dev finish take the exit block out. The driver waits 14 s for the 6 s door moment and
+  saves a `klotski-door` frame.
+- R4 Look by role, on ce1eda2's tray: the gate's keyhole and arch, the gods' figures with inline SVG
+  marks in seal red (H crown, F scales, P closed eye, S horn), the persons' grey round faces, and you
+  as a light tile with an amber ring and no filter.
+- R3 Door moment: the block stays, the door opens, and 20 tentacle cells grow in order
+  (`klotskiCover`): from the door through the empty cells and the trail, then the rest of the board,
+  you last. door1–3 fade in at 0 / 2.2 / 4.4 s. `KLOTSKI_DONE_MS` = 6000. With reduced motion,
+  everything shows at once.
+- tsc clean; vitest 225 files, 2807 passed (one earlier full run had a flaky `replies-table` failure
+  that passes alone and on the rerun). A headless walk of day 17 was not run.

@@ -203,29 +203,58 @@
         "game": {
           "kind": "klotski",
           "slot": "r1",
+          "exit": "U",
           "level": [
-            "xNNy",
-            "xNNy",
-            "AABB",
-            "CCDD",
-            "s..t"
+            "U.ZW",
+            "SNNH",
+            "SNNH",
+            "FYYP",
+            "FV.P"
           ],
           "blocks": {
-            "A": {
-              "card": "c1",
-              "label": "Qinghe"
+            "N": {
+              "label": "",
+              "role": "nameless"
             },
-            "B": {
-              "card": "k1",
-              "label": "Kuro"
+            "Y": {
+              "label": "The gatekeeper",
+              "role": "gate"
             },
-            "C": {
-              "card": "d1",
-              "label": "Lao Wang"
+            "H": {
+              "label": "In yellow",
+              "role": "god"
             },
-            "D": {
-              "card": "d2",
-              "label": "Vivi"
+            "F": {
+              "label": "The scales",
+              "role": "god"
+            },
+            "P": {
+              "label": "The sleepless",
+              "role": "god"
+            },
+            "S": {
+              "label": "Black goat",
+              "role": "god"
+            },
+            "W": {
+              "label": "Lao Wang",
+              "role": "person",
+              "face": "/npc/boss_av.png"
+            },
+            "Z": {
+              "label": "Lao Zhou",
+              "role": "person",
+              "face": "/npc/laozhou_av.png"
+            },
+            "V": {
+              "label": "Vivi",
+              "role": "person",
+              "face": "/npc/partner_av.png"
+            },
+            "U": {
+              "label": "You",
+              "role": "you",
+              "card": "c1"
             }
           }
         }

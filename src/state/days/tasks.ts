@@ -186,6 +186,9 @@ export interface ComparePage {
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
+/** klotski-door R1: a block's role (its size and its look follow from it). */
+export type KlotskiRole = "nameless" | "gate" | "god" | "person" | "you";
+export interface KlotskiBlock { readonly label: string; readonly role: KlotskiRole; readonly card?: string; readonly face?: string }
 /** klotski (game-swaps): the board is 4 columns by 5 rows; the door is under the bottom row's middle two cells. */
 export const KLOTSKI_COLS = 4;
 export const KLOTSKI_ROWS = 5;
@@ -205,11 +208,11 @@ export type BoardGame =
   /** rhythm: the report as a drum lane — `bars` bars of eight beats at `bpm`, the last bar twice as fast */
   | { readonly kind: "rhythm"; readonly bars: number; readonly bpm: number }
   /**
-   * klotski (game-swaps 2026-11-16, 华容道): the callers as blocks on a 4 × 5 board; the one pushed out
-   * through the door is the card `slot` takes. `level` rows: an upper-case letter a named block
-   * (`blocks`), a lower-case one a nameless block, `N` the nameless big block, `.` empty.
+   * klotski (klotski-door, author 2026-11-27): the room as a 4 × 5 board, everyone who moved in as a
+   * block with a role; `exit` (the player, 1 × 1, role `you`) is the only one the door takes, and its
+   * card is what `slot` takes. `level` rows: a letter per block (every one in `blocks`), `.` empty.
    */
-  | { readonly kind: "klotski"; readonly slot: string; readonly level: readonly string[]; readonly blocks: Readonly<Record<string, { readonly card: string; readonly label: string }>> }
+  | { readonly kind: "klotski"; readonly slot: string; readonly level: readonly string[]; readonly exit: string; readonly blocks: Readonly<Record<string, KlotskiBlock>> }
   /** echo (game-swaps, 跟读): the roll call repeated round by round; each voice a `meeting.people` id and its line (may be empty) */
   | { readonly kind: "echo"; readonly voices: readonly { readonly who: string; readonly line: string }[] }
   /** balance: the prices dropped from a swinging crane onto two pans; `fixed` is the welded weight on each (oil, wine) */
@@ -837,7 +840,7 @@ function board(v: unknown, w: string): TaskBoard {
       // klotski; until then it is read and dropped (the board works as a plain form, no game).
       keys(v.game, ["kind", "slot", "eggs"], gw);
     } else if (v.game.kind === "klotski") {
-      keys(v.game, ["kind", "slot", "level", "blocks"], gw);
+      keys(v.game, ["kind", "slot", "exit", "level", "blocks"], gw);
       const slot = str(v.game.slot, `${gw}.slot`);
       if (!slotIds.has(slot)) fail(`${gw}.slot`, `"${slot}" is not a slot`);
       const level = v.game.level;
@@ -854,18 +857,42 @@ function board(v: unknown, w: string): TaskBoard {
       const big = seen.get("N");
       if (!big || rowsOf.join("").split("").filter((c) => c === "N").length !== 4 || big.x1 - big.x0 !== 1 || big.y1 - big.y0 !== 1) fail(`${gw}.level`, "must have exactly one N, the 2 × 2 big block");
       if (!isRecord(v.game.blocks)) fail(`${gw}.blocks`, "must be an object");
-      const blocks: Record<string, { card: string; label: string }> = {};
-      for (const ch of seen.keys()) if (ch !== "N" && ch === ch.toUpperCase() && !(ch in v.game.blocks)) fail(`${gw}.blocks`, `"${ch}" is in the level but has no entry`);
+      // klotski-door R1: every letter is a block with a role; one `you` block is the exit
+      const blocks: Record<string, KlotskiBlock> = {};
+      for (const ch of seen.keys()) if (!(ch in v.game.blocks)) fail(`${gw}.blocks`, `"${ch}" is in the level but has no entry`);
+      const ROLES: readonly KlotskiRole[] = ["nameless", "gate", "god", "person", "you"];
       for (const [ch, e] of Object.entries(v.game.blocks)) {
         const ew = `${gw}.blocks.${ch}`;
-        if (!/^[A-Z]$/.test(ch) || ch === "N" || !seen.has(ch)) fail(ew, `"${ch}" is not a named block of the level`);
+        if (!seen.has(ch)) fail(ew, `"${ch}" is not a block of the level`);
         if (!isRecord(e)) fail(ew, "must be an object");
-        keys(e, ["card", "label"], ew);
-        const card = str(e.card, `${ew}.card`);
-        if (!cardIds.has(card) && !kuroCardIds.has(card)) fail(`${ew}.card`, `"${card}" is not a card or a Kuro card`);
-        blocks[ch] = { card, label: str(e.label, `${ew}.label`) };
+        keys(e, ["label", "role", "card", "face"], ew);
+        const role = e.role as KlotskiRole;
+        if (!ROLES.includes(role)) fail(`${ew}.role`, `must be one of ${ROLES.join(", ")}`);
+        const label = typeof e.label === "string" ? e.label : fail(`${ew}.label`, "must be a string");
+        if (label === "" && role !== "nameless") fail(`${ew}.label`, "may be empty only for a nameless block");
+        let card: string | undefined;
+        if (e.card !== undefined) {
+          card = str(e.card, `${ew}.card`);
+          if (!cardIds.has(card) && !kuroCardIds.has(card)) fail(`${ew}.card`, `"${card}" is not a card or a Kuro card`);
+        }
+        let face: string | undefined;
+        if (e.face !== undefined) {
+          face = str(e.face, `${ew}.face`);
+          if (role !== "person") fail(`${ew}.face`, "only a person block has a face");
+        }
+        blocks[ch] = { label, role, ...(card !== undefined ? { card } : {}), ...(face !== undefined ? { face } : {}) };
       }
-      game = { kind: "klotski", slot, level: rowsOf, blocks };
+      if (blocks.N?.role !== "nameless") fail(`${gw}.blocks.N`, "the 2 × 2 big block must be nameless");
+      const exit = str(v.game.exit, `${gw}.exit`);
+      const eb = blocks[exit];
+      const ex = seen.get(exit);
+      if (!eb || !ex) fail(`${gw}.exit`, `"${exit}" is not a block`);
+      if (eb.role !== "you") fail(`${gw}.exit`, `"${exit}" must have role "you"`);
+      if (ex.n !== 1) fail(`${gw}.exit`, `"${exit}" must be 1 × 1`);
+      if (eb.card === undefined) fail(`${gw}.exit`, `"${exit}" must have a card`);
+      if (!cardIds.has(eb.card)) fail(`${gw}.exit`, `"${eb.card}" is not one of the board's cards`);
+      if (slots.find((x) => x.id === slot)?.answer !== eb.card) fail(`${gw}.exit`, `"${exit}"'s card must be the answer of "${slot}"`);
+      game = { kind: "klotski", slot, level: rowsOf, exit, blocks };
     } else if (v.game.kind === "echo") {
       keys(v.game, ["kind", "voices"], gw);
       if (!meeting) fail(gw, "an echo game needs a meeting board (its voices are the meeting's people)");
@@ -1501,6 +1528,13 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     // compare (author 2026-11-11): the pages, their cards, the threshold and the bubble counts are shared; only the text differs.
     const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.cards, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
     if (!sameJson(compareShape(zh.board), compareShape(en.board))) fail(`${w}.board.compare`, "compare shape differs from the Chinese");
+    // klotski-door R1: the level, the exit and each block's role / card / face are shared; the labels differ.
+    const klotskiShape = (b: TaskBoard) => {
+      const g = b.game;
+      if (g?.kind !== "klotski") return null;
+      return { slot: g.slot, level: g.level, exit: g.exit, blocks: Object.keys(g.blocks).sort().map((k) => [k, g.blocks[k]!.role, g.blocks[k]!.card ?? null, g.blocks[k]!.face ?? null]) };
+    };
+    if (!sameJson(klotskiShape(zh.board), klotskiShape(en.board))) fail(`${w}.board.game`, "klotski shape differs from the Chinese");
     // launch: the counterpart is shared; the lines are the twin's.
     if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length || zh.launch.motif?.kind !== en.launch.motif?.kind || (zh.launch.motif?.items.length ?? 0) !== (en.launch.motif?.items.length ?? 0) || zh.launch.art !== en.launch.art || zh.launch.tone !== en.launch.tone))) fail(`${w}.launch`, "launch shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}), ...(zh.launch && en.launch ? { launch: en.launch } : {}) });
