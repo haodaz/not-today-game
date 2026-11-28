@@ -1,0 +1,466 @@
+{
+  "_note": "朋友圈 / Moments: written in script/tools/gen-feed.mjs (both languages there); do not edit here. who = an NPC id or a name with a picture in npc.json faces.",
+  "days": {
+    "1": [
+      {
+        "t": "07:50",
+        "who": "Little Aunt",
+        "text": "Good morning. A new day starts with a glass of warm water.",
+        "photo": "A glass of water, the sunrise behind it",
+        "likes": [
+          "Big Aunt",
+          "Uncle Two"
+        ]
+      },
+      {
+        "t": "12:10",
+        "who": "Ms Sun",
+        "text": "Braised pork in the canteen today. Work is good.",
+        "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "likes": [
+          "Xiao Wu",
+          "Director Liu"
+        ]
+      },
+      {
+        "t": "19:40",
+        "who": "Kevin",
+        "text": "Another day of efficient alignment.",
+        "photo": "An iced americano at a floor-to-ceiling window",
+        "place": "NVIBIG Group · 28F",
+        "likes": [
+          "Lisa",
+          "Tony"
+        ]
+      }
+    ],
+    "2": [
+      {
+        "t": "08:05",
+        "who": "Uncle Two",
+        "text": "The boy has done well. A father can hold his head up.",
+        "photo": "A list of the people hired, one name circled in red",
+        "comments": [
+          {
+            "who": "Big Aunt",
+            "text": "Congratulations"
+          },
+          {
+            "who": "Little Aunt",
+            "text": "Congratulations"
+          }
+        ]
+      },
+      {
+        "t": "13:00",
+        "who": "Prof. Chen",
+        "text": "Afternoon. Discussing the Way with my students.",
+        "photo": "A ring of people sitting on a lawn, a bag of tangerines in the middle",
+        "likes": [
+          "Ms Zhao",
+          "Xiao Lin"
+        ]
+      },
+      {
+        "t": "20:30",
+        "who": "partner",
+        "text": "Still revising.",
+        "photo": "A page of the proposal on a screen; the clock in the corner says 02:14",
+        "likes": [
+          "boss"
+        ]
+      }
+    ],
+    "3": [
+      {
+        "t": "11:40",
+        "who": "Xiao Wu",
+        "text": "Wednesday. Crayfish. On time.",
+        "photo": "A basin of crayfish",
+        "likes": [
+          "Ms Sun",
+          "Director Liu"
+        ]
+      },
+      {
+        "t": "15:30",
+        "who": "Lisa",
+        "text": "Welcome, new colleagues. 312 interns reported today. The future is bright.",
+        "photo": "The lobby full of people, a visitor badge on every chest",
+        "likes": [
+          "Kevin",
+          "Tony"
+        ]
+      },
+      {
+        "t": "21:10",
+        "who": "boss",
+        "text": "A startup is jumping off a cliff and building the plane on the way down.",
+        "photo": "An airport at night, one plane",
+        "likes": [
+          "partner",
+          "laozhou"
+        ],
+        "comments": [
+          {
+            "who": "xiaozhang",
+            "text": "The boss is right"
+          }
+        ]
+      }
+    ],
+    "4": [
+      {
+        "t": "12:10",
+        "who": "Ms Sun",
+        "text": "Braised pork in the canteen today. Work is good.",
+        "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "likes": [
+          "Xiao Wu",
+          "Director Liu",
+          "Ms Sun"
+        ]
+      },
+      {
+        "t": "12:10",
+        "who": "Xiao Wu",
+        "text": "Braised pork in the canteen today. Work is good.",
+        "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "likes": [
+          "Ms Sun",
+          "Director Liu",
+          "Xiao Wu"
+        ]
+      },
+      {
+        "t": "18:20",
+        "who": "Cousin Jie",
+        "text": "Dot practised for two hours today, without being told.",
+        "photo": "A little girl from behind, at a piano",
+        "likes": [
+          "Big Aunt",
+          "Little Aunt"
+        ]
+      }
+    ],
+    "5": [
+      {
+        "t": "08:00",
+        "who": "Cousin Bo",
+        "text": "The company is in the news. Proud to be part of it.",
+        "photo": "A screenshot of a news story",
+        "likes": [
+          "Uncle Two"
+        ],
+        "comments": [
+          {
+            "who": "Big Aunt",
+            "text": "Doing well for yourself"
+          }
+        ]
+      },
+      {
+        "t": "12:00",
+        "who": "Kevin",
+        "text": "The afternoon tea was very good.",
+        "photo": "Three coconut lattes, exactly alike",
+        "likes": [
+          "Lisa",
+          "Tony"
+        ]
+      },
+      {
+        "t": "14:00",
+        "who": "Prof. Chen",
+        "text": "Sitting together is good.",
+        "photo": "Three people in a meeting room; nobody looks at the camera",
+        "likes": [
+          "Ms Zhao",
+          "Xiao Lin"
+        ]
+      }
+    ],
+    "6": [
+      {
+        "t": "09:00",
+        "who": "Ms Sun",
+        "text": "So glad to be working with all of you again today.",
+        "photo": "An office, every chair pushed in, nobody there"
+      },
+      {
+        "t": "09:00",
+        "who": "Ms Zhao",
+        "text": "So glad to be working with all of you again today.",
+        "photo": "An office, every chair pushed in, nobody there"
+      },
+      {
+        "t": "09:00",
+        "who": "Lisa",
+        "text": "So glad to be working with all of you again today.",
+        "photo": "An office, every chair pushed in, nobody there"
+      },
+      {
+        "t": "19:00",
+        "who": "Big Aunt",
+        "text": "Square-dance contest. Second prize.",
+        "photo": "A row of people in red dresses, all smiling",
+        "likes": [
+          "Little Aunt",
+          "Uncle Two",
+          "Cousin Jie"
+        ]
+      }
+    ],
+    "7": [
+      {
+        "t": "09:10",
+        "who": "boss",
+        "text": "A new start. Thank you, Evenlight.",
+        "photo": "A screenshot of the morning meeting: nine tiles, one background",
+        "likes": [
+          "partner",
+          "laozhou",
+          "xiaozhang"
+        ]
+      },
+      {
+        "t": "09:10",
+        "who": "partner",
+        "text": "A new start. Thank you, Evenlight.",
+        "photo": "A screenshot of the morning meeting: nine tiles, one background",
+        "likes": [
+          "boss",
+          "laozhou",
+          "xiaozhang"
+        ]
+      },
+      {
+        "t": "18:30",
+        "who": "Uncle Two",
+        "text": "Fished all afternoon. One.",
+        "photo": "A small fish, a shoe beside it for scale",
+        "likes": [
+          "Big Aunt"
+        ]
+      }
+    ],
+    "8": [
+      {
+        "t": "12:40",
+        "who": "xiaozhang",
+        "text": "Thirteen takeaways. I counted three times.",
+        "photo": "A row of takeaway bags, one with no name on it"
+      },
+      {
+        "t": "23:10",
+        "who": "Cousin Bo",
+        "text": "The last train again.",
+        "photo": "An empty metro carriage",
+        "likes": [
+          "Cousin Jie"
+        ]
+      }
+    ],
+    "9": [
+      {
+        "t": "10:15",
+        "who": "Cousin Bo",
+        "text": "Graduated. Thank you, company.",
+        "photo": "A cardboard box: a pot plant and a staff badge",
+        "comments": [
+          {
+            "who": "Little Aunt",
+            "text": "Congratulations on graduating [rose]"
+          },
+          {
+            "who": "Big Aunt",
+            "text": "Good that you've graduated. Come home and sit the civil service exam"
+          }
+        ]
+      },
+      {
+        "t": "18:45",
+        "who": "Evenlight Group",
+        "text": "Welcome to the family, Future Intelligence.",
+        "photo": "A group photo, a ring of light over every head",
+        "likes": [
+          "boss",
+          "partner",
+          "laozhou"
+        ]
+      }
+    ],
+    "10": [
+      {
+        "t": "07:50",
+        "who": "Little Aunt",
+        "text": "Good morning. A new day starts with a glass of warm water.",
+        "photo": "A glass of water, the sunrise behind it",
+        "likes": [
+          "Big Aunt",
+          "Uncle Two"
+        ]
+      },
+      {
+        "t": "09:00",
+        "who": "Evenlight Group",
+        "text": "She arrives today.",
+        "photo": "A corridor, light at the far end"
+      }
+    ],
+    "11": [
+      {
+        "t": "10:00",
+        "who": "Big Aunt",
+        "text": "The clivia at home has flowered.",
+        "photo": "A pot plant with one flower open",
+        "likes": [
+          "Little Aunt",
+          "Cousin Jie"
+        ]
+      },
+      {
+        "t": "17:50",
+        "who": "partner",
+        "text": "The sheet balances.",
+        "photo": "A spreadsheet; the last row reads 0.00",
+        "likes": [
+          "Evenlight Group"
+        ]
+      }
+    ],
+    "12": [
+      {
+        "t": "09:30",
+        "who": "Cousin Jie",
+        "text": "Dot came first in the midterms. 96 in maths.",
+        "photo": "An exam paper, 96 in the top right corner",
+        "comments": [
+          {
+            "who": "Big Aunt",
+            "text": "96 is very good."
+          },
+          {
+            "who": "Uncle Two",
+            "text": "96 is very good."
+          }
+        ]
+      },
+      {
+        "t": "22:00",
+        "who": "laozhou",
+        "text": "On duty.",
+        "photo": "A duty rota, the same name in every cell"
+      }
+    ],
+    "13": [
+      {
+        "t": "12:05",
+        "who": "Big Aunt",
+        "text": "Our child used to hold on to a thing and never let go. The time the teacher took it away, there were no tears.",
+        "photo": "An old photograph: a child's hand, closed around something"
+      },
+      {
+        "t": "15:00",
+        "who": "boss",
+        "text": "The upgrade.",
+        "photo": "A row of desks, all alike",
+        "likes": [
+          "Evenlight Group"
+        ]
+      }
+    ],
+    "14": [
+      {
+        "t": "09:00",
+        "who": "Evenlight Group",
+        "text": "A thousand new staff join today. All treated alike.",
+        "photo": "A thousand desks, one face"
+      },
+      {
+        "t": "18:30",
+        "who": "Uncle Two",
+        "text": "All fine here.",
+        "photo": "A family portrait, everyone smiling the same smile"
+      }
+    ],
+    "15": [
+      {
+        "t": "07:50",
+        "who": "Little Aunt",
+        "text": "Good morning. A new day. No need to reply.",
+        "photo": "A glass of water; no sun in the window"
+      },
+      {
+        "t": "14:00",
+        "who": "Evenlight Group",
+        "text": "The launch. The whole Group attends.",
+        "photo": "The audience, every face turned the same way, and not at the stage"
+      }
+    ],
+    "16": [
+      {
+        "t": "08:00",
+        "who": "family",
+        "text": "All well.",
+        "photo": "A table of dishes, three sets of bowls and chopsticks"
+      },
+      {
+        "t": "08:00",
+        "who": "Big Aunt",
+        "text": "Good child.",
+        "likes": [
+          "Uncle Two",
+          "Little Aunt",
+          "Cousin Jie",
+          "Cousin Bo",
+          "Grandma"
+        ]
+      }
+    ],
+    "17": [
+      {
+        "t": "08:00",
+        "who": "Big Aunt",
+        "text": "You look lovely today.",
+        "photo": "A door, photographed from outside"
+      },
+      {
+        "t": "08:00",
+        "who": "boss",
+        "text": "You look lovely today.",
+        "photo": "A door, photographed from outside"
+      },
+      {
+        "t": "08:00",
+        "who": "partner",
+        "text": "You look lovely today.",
+        "photo": "A door, photographed from outside"
+      }
+    ],
+    "18": [
+      {
+        "t": "08:00",
+        "who": "Evenlight Group",
+        "text": "Soften the light. Be one with the dust.",
+        "photo": "White, all of it",
+        "likes": [
+          "Big Aunt",
+          "Uncle Two",
+          "Little Aunt",
+          "Cousin Jie",
+          "Cousin Bo",
+          "Grandma",
+          "family",
+          "boss",
+          "partner",
+          "laozhou",
+          "xiaozhang",
+          "Ms Sun",
+          "Prof. Chen",
+          "Kevin"
+        ]
+      }
+    ]
+  }
+}

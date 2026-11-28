@@ -61,6 +61,8 @@
   "msgs.section.company": "Company",
   "msgs.section.family": "Home",
   "msgs.feed": "Moments",
+  "msgs.feed.sep": ", ",
+  "msgs.feed.colon": ": ",
   "msgs.boss": "Boss",
   "msgs.boss.role": "Future Intelligence · CEO",
   "msgs.partner": "Vivi",

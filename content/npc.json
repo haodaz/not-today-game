@@ -291,6 +291,7 @@
     "/npc/wx/gate.svg": ["陈教授", "Prof. Chen"],
     "/npc/wx/headshot.svg": ["Lisa"],
     "/npc/wx/ski.svg": ["Kevin"],
-    "/npc/wx/golf.svg": ["Tony"]
+    "/npc/wx/golf.svg": ["Tony"],
+    "/npc/evenlight.svg": ["和光集团", "Evenlight Group"]
   }
 }

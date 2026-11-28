@@ -7,7 +7,7 @@ import { threadCardFor } from "@world/loop/dialogue";
 import { isDeregistered, menu } from "@state/replies/resolve";
 import type { State } from "@state/types.gen";
 import { cls, html, raw, type SafeHtml } from "@world/html";
-import { hasString, t, tr } from "@world/i18n";
+import { getLocale, hasString, t, tr } from "@world/i18n";
 import { aliasAvatar, npcAvatar } from "@world/npc";
 import { faceAttr, markFaces, withoutFaces } from "./face-mark";
 import { HOME_CONVERSATIONS, msgFaceNow, wrongAvatar } from "../workbench/collapse";
@@ -17,6 +17,7 @@ import type { AppContext, Session } from "../model";
 import { voiceDay, voiceTable } from "@world/sound/voice-table";
 import { previewOf, type Body } from "./bubbles";
 import { renderCard, voiceNote, type VoiceView } from "./cards";
+import { feedAt, feedFace, type FeedPost } from "./feed";
 import { FEED, threadsIn, type ThreadApp } from "./threads";
 import { inInputText, lastMessage, lastMessageDay, sentFiles, sentReplies, SPEAKER_CONVERSATIONS, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
 
@@ -201,7 +202,9 @@ function rowText(c: ConversationData, today: number, names: State["names"]): { p
   const lastDay = lastMessageDay(c.bubbles);
   // The list shows who spoke last in a group: the prefix as written ("大姨：…", "Big Aunt：…").
   const said = last ? (last.labelKey ? t(last.labelKey) : fillPlaceholders(previewOf(last.body), names)) : "";
-  const preview = last?.prefix !== undefined ? `${last.prefix}：${said}` : said;
+  // An NPC written by id (「father：」 in the parents' group) is shown by name (爸), never by the id.
+  const speaker = last?.prefix === undefined ? undefined : last.alias === undefined && hasString(`msgs.${last.who}`) ? t(`msgs.${last.who}`) : last.prefix;
+  const preview = speaker !== undefined ? `${speaker}：${said}` : said;
   const when = last === null ? null : lastDay === today ? last.t : dayLabel(lastDay ?? 1, today);
   return { preview, when };
 }
@@ -290,6 +293,23 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
 }
 
 /** The three glyphs on the right of WeChat's conversation head (chat, call, more); decorative. */
+/** A name in 朋友圈: an NPC's (Mum by her own name, not the parents' group's), or the name as written. */
+function feedName(who: string): SafeHtml {
+  if (who === "family") return tr("msgs.mother");
+  return hasString(`msgs.${who}`) ? nameOf(who) : html`${who}`;
+}
+
+/** One post: face, name, words, the photograph (its caption on a tile until there is a picture), where, when, likes and comments. */
+function feedPost(p: FeedPost, today: number): SafeHtml {
+  const photo = p.photo !== undefined ? html`<div class="fp-photo" role="img" aria-label="${p.photo}"><span>${p.photo}</span></div>` : null;
+  const place = p.place !== undefined ? html`<small class="fp-place">${p.place}</small>` : null;
+  const likes = p.likes.length > 0 ? html`<div class="fp-likes">${p.likes.map((w, i) => html`${i > 0 ? tr("msgs.feed.sep") : ""}<b>${feedName(w)}</b>`)}</div>` : null;
+  const comments = p.comments.map((c) => html`<div class="fp-c"><b>${feedName(c.who)}</b>${tr("msgs.feed.colon")}${c.text}</div>`);
+  const social = likes || comments.length > 0 ? html`<div class="fp-social">${likes}${comments}</div>` : null;
+  const when = p.day === today ? html`${p.t}` : dayLabel(p.day, today);
+  return html`<article class="fp" data-day="${p.day}"><img class="av av-img" src="${feedFace(p.who)}" alt="" aria-hidden="true" draggable="false"><div class="fp-b"><b class="fp-who">${feedName(p.who)}</b><p class="fp-text">${p.text}</p>${photo}${place}<time class="fp-when">${when}</time>${social}</div></article>`;
+}
+
 const HEAD_GLYPHS = html`<span class="glyphs" aria-hidden="true"><i class="g chat"></i><i class="g call"></i><i class="g more"></i></span>`;
 
 /** 消息, the personal app (WeChat desktop look): 家里 and 朋友圈. */
@@ -326,9 +346,9 @@ function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
   const list = html`<div class="list wx-list">${search}${all.map((c) => wxRow(c, c.id === active?.id, today, names))}${feedRow}</div>`;
 
   if (feedOpen) {
-    // 朋友圈 is a feed from content; content has no feed entries yet, so it is an empty column.
-    // TODO(Claude): the 朋友圈 entries (cards per the WeChat addition) need a content file.
-    return { body: html`<div class="body wx">${list}<div class="conv feed"><div class="head"><b>${tr("msgs.feed")}</b>${HEAD_GLYPHS}</div><div class="feed-list"></div></div></div>`, badge };
+    // 朋友圈 (author 2026-11-28): what everyone has posted so far, the newest first (content/feed.json).
+    const posts = feedAt(today, ctx.session.clock.time, getLocale());
+    return { body: html`<div class="body wx">${list}<div class="conv feed"><div class="head"><b>${tr("msgs.feed")}</b>${HEAD_GLYPHS}</div><div class="feed-list">${posts.map((p) => feedPost(p, today))}</div></div></div>`, badge };
   }
   if (!active) return { body: html`<div class="body wx">${list}<div class="conv empty"></div></div>`, badge };
   // 「群名 (N)」: who has spoken so far, and the player; none before anyone has.

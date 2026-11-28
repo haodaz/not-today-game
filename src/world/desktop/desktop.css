@@ -470,7 +470,21 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .reply.wx-composer .kbd{height:84px;align-items:flex-start;padding:8px 0;border:0;border-radius:0}
 .reply.wx-composer .send{align-self:flex-end;margin-left:0;background:#eceef1;color:var(--ink-2)}
 .reply.wx-composer .send:not(:disabled){background:#dfe3ea;color:var(--ink)}
-.conv.feed .feed-list{flex:1;overflow:hidden;background:#fff}
+.conv.feed .feed-list{flex:1;overflow-y:auto;background:#fff;padding:4px 0 24px}
+/* 朋友圈 posts (author 2026-11-28): WeChat's column: face, blue name, words, one photograph, when, the grey block of likes and comments */
+.fp{display:flex;gap:12px;padding:16px 22px;border-bottom:1px solid #f0f0f0}
+.fp>.av{flex:0 0 auto;width:44px;height:44px;border-radius:6px;object-fit:cover}
+.fp-b{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.fp-who{font-size:15px;font-weight:600;color:#576b95}
+.fp-text{margin:0;font-size:15px;line-height:1.5;color:var(--ink)}
+.fp-photo{width:190px;height:190px;display:flex;align-items:flex-end;background:linear-gradient(160deg,#e9edf1,#cfd6de);border-radius:3px;overflow:hidden}
+.fp-photo span{width:100%;padding:8px 10px;background:rgba(40,46,56,.5);color:#fff;font-size:12px;line-height:1.4}
+.fp-place{font-size:12px;color:#576b95}
+.fp-when{font-size:12px;color:var(--ink-3)}
+.fp-social{align-self:stretch;background:#f7f7f7;border-radius:4px;padding:6px 10px;font-size:13px;line-height:1.6;color:var(--ink)}
+.fp-social b{font-weight:600;color:#576b95}
+.fp-likes::before{content:"♡ ";color:#576b95}
+.fp-likes+.fp-c{margin-top:4px;padding-top:4px;border-top:1px solid #ebebeb}
 /* added (desktop-ui 2026-11-02, evening): 工作台 holds the work conversations, DingTalk-like; no green. */
 .wb-rail{width:68px;flex:0 0 auto;background:#eef0f4;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px}
 .wb-rail .ri{position:relative;width:56px;padding:8px 0 6px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--ink-2);background:none;border:0;font-family:inherit;cursor:default}

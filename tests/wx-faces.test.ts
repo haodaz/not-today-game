@@ -32,9 +32,9 @@ function written(conversations: readonly string[]): Set<string> {
 }
 
 describe("the pictures people chose (npc.json faces)", () => {
-  it("fifteen pictures, every file there, one picture per name", () => {
+  it("a picture each (fifteen people and the Group), every file there, one picture per name", () => {
     const paths = new Set(Object.values(npcData.faces));
-    expect(paths.size).toBe(15);
+    expect(paths.size).toBe(16);
     for (const p of paths) expect(fs.existsSync(`public${p}`), p).toBe(true);
     expect(aliasAvatar("大姨")).toBe("/npc/wx/lotus.svg");
     expect(aliasAvatar("Big Aunt")).toBe("/npc/wx/lotus.svg");
