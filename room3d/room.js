@@ -2462,6 +2462,28 @@ composer.addPass(new OutputPass());
 // ---------- state ----------
 const q = new URLSearchParams(location.search);
 const LOW = q.get("low") === "1"; // for weak machines: one pixel per pixel, no ambient occlusion, smaller shadow maps
+// ---------- quality (2026-11-28) ----------
+// After the Caelune lookdev lab's QualityController (github.com/bigdrum/caelune2, the author's CTO; used with his leave):
+// spend less per second without changing what a still frame looks like. Measured before this, day 17 at 1534 × 862 @2x:
+// 1,979 draw calls and 1.76 M triangles a frame, every frame, because the scene is drawn four times (the picture, the
+// ambient-occlusion normals, the sun's shadow map, the lamp's). Three levers:
+//   · the shadow maps are redrawn every `shadowEvery`-th frame (and at once when a light, the day or a thing changes);
+//   · inside the game, while nothing is being turned or dragged, the room is drawn 30 times a second, not 60;
+//   · the pixel ratio is capped (1.5 inside the game), and a governor steps down when the machine cannot keep up:
+//     tier 1 one pixel per pixel, tier 2 no ambient occlusion, tier 3 shadows half as often and 3/4 resolution.
+const EMBEDDED = q.get("embed") === "1";
+const QUALITY = { tier: LOW ? 1 : 0, dpr: LOW ? 1 : EMBEDDED ? 1.5 : 2, shadowEvery: 4, kick: 3, n: 0, lastDraw: 0, slow: 0, calm: 30 };
+renderer.shadowMap.autoUpdate = false;
+function kickShadows(frames = 2) { QUALITY.kick = Math.max(QUALITY.kick, frames); }
+function stepDown() {
+  if (QUALITY.tier >= 3) return;
+  QUALITY.tier += 1;
+  if (QUALITY.tier === 1) QUALITY.dpr = 1;
+  if (QUALITY.tier === 2) gtao.enabled = false;
+  if (QUALITY.tier === 3) { QUALITY.shadowEvery = 8; QUALITY.dpr = 0.75; }
+  QUALITY.slow = 0;
+  resize();
+}
 const state = {
   time: Number(q.get("t") ?? 13.5),
   collapse: Number(q.get("c") ?? 0),
@@ -2507,6 +2529,7 @@ const visionOn = (ms) => { const h = (n) => { const x = Math.sin(n * 127.1) * 43
 const PX_MAX = 0.2, UN_MAX = 0.4;
 let flash = false;
 function apply() {
+  kickShadows(); // a light, the hour or the day's look is about to change
   const t = state.time, c = state.collapse, u = flash ? 1 : state.unreal * UN_MAX;
   const white = smooth(0.45, 1, u);
   drift = smooth(0.12, 0.85, visionEnd ? visionBase : u); // things do not jump off the desk for a flash
@@ -2607,7 +2630,7 @@ function toDesk(spot) {
 function resize() {
   const r = document.getElementById("frame").getBoundingClientRect();
   const w = Math.max(2, Math.round(r.width)), h = Math.max(2, Math.round(r.height));
-  const pr = LOW ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+  const pr = Math.min(window.devicePixelRatio || 1, QUALITY.dpr);
   renderer.setPixelRatio(pr);
   renderer.setSize(w, h, false);
   composer.setPixelRatio(pr);
@@ -3101,6 +3124,20 @@ function updateFar(s, dt) {
   }
   const fov = 47 + 6 * e; if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
+/** What the animation loop calls: it lets `frame` draw 60 times a second while the view is moving, 30 while it rests inside the game, and watches whether the machine keeps up. */
+function loop(now) {
+  const moving = !!state.turn || !!dragging || Math.abs((state.desk ? 1 : 0) - state.deskK) > 0.003 || SURGE.on || BOSS.on || FAR.k > 0.001;
+  const cap = EMBEDDED && !moving ? QUALITY.calm : 60;
+  const since = now - QUALITY.lastDraw;
+  if (since < 1000 / cap - 3) return;
+  // the governor: a drawn frame that came far later than asked, many times running, means the machine cannot keep up
+  if (QUALITY.lastDraw && since < 1000) {
+    QUALITY.slow = since > (1000 / cap) * 1.7 ? QUALITY.slow + 1 : Math.max(0, QUALITY.slow - 2);
+    if (QUALITY.slow > 40 && framesDrawn > 20) stepDown();
+  }
+  QUALITY.lastDraw = now;
+  frame(now);
+}
 function frame(now) {
   glowFrame(now);
   const dt = Math.min(0.05, (now - last) / 1000);
@@ -3190,6 +3227,9 @@ function frame(now) {
   updateBoss(now / 1000, dt);
   updateCondense(now / 1000);
   if (PEEK) { camera.position.set(PEEK[0], PEEK[1], PEEK[2]); camera.lookAt(PEEK[3], PEEK[4], PEEK[5]); if (PEEK[6] && camera.fov !== PEEK[6]) { camera.fov = PEEK[6]; camera.updateProjectionMatrix(); } } // { peek: [ex, ey, ez, tx, ty, tz, fov] }: a close look at one thing while it is being built; never sent by the game
+  // the shadow maps: every few frames, and at once after a change (QUALITY)
+  if (QUALITY.kick > 0 || QUALITY.n % QUALITY.shadowEvery === 0) { renderer.shadowMap.needsUpdate = true; if (QUALITY.kick > 0) QUALITY.kick -= 1; }
+  QUALITY.n += 1;
   composer.render();
   if (++framesDrawn === (document.body.classList.contains("embed") ? 1 : 3)) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ if (q.get("surge") === "wait") { /* loaded ahead of the door moment (author 2026-11-28: 「屋子等素材可以提前加载好吗」): face the door, draw long enough to have everything compiled, then stop drawing until { surge: true } */ setFace(2); apply(); setTimeout(() => { if (!SURGE.on) renderer.setAnimationLoop(null); }, 1500); } document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
@@ -3426,7 +3466,7 @@ async function surge(at) {
   setFace(2);
   apply();
   SURGE.on = true; SURGE.t0 = Infinity; // armed: the wait-mode pause leaves it alone, nothing grows yet
-  renderer.setAnimationLoop(frame); // a page loaded ahead and paused draws again
+  renderer.setAnimationLoop(loop); // a page loaded ahead and paused draws again
   await wait(at ? Math.max(0, Number(at) - Date.now()) : 0);
   SURGE.t0 = performance.now();
   tell("surge-start");
@@ -3451,7 +3491,7 @@ apply();
 applyDay();
 showFace();
 resize();
-renderer.setAnimationLoop(frame);
+renderer.setAnimationLoop(loop);
 
 // ================= embedded use =================
 // ?embed=1: nothing but the picture, filling the frame, driven from outside. The game puts this page in an <iframe>
@@ -3475,6 +3515,7 @@ function setSpot(spot) {
 }
 const ui = (id, v) => { const e = document.getElementById(id); if (!e) return; if (e.type === "checkbox") { e.checked = !!v; e.dispatchEvent(new Event("change", { bubbles: true })); } else { e.value = String(v); e.dispatchEvent(new Event("input", { bubbles: true })); e.dispatchEvent(new Event("change", { bubbles: true })); } };
 function command(m) {
+  kickShadows(); // whatever the game changes, the shadows follow at once
   if (m.day != null && Number(m.day) !== COFFEE.day) { if (COFFEE.day !== null) { COFFEE.level = 1; COFFEE.hot = 1; } COFFEE.day = Number(m.day); } // a new day, a new cup
   if (m.day != null) { ui("day", m.day); if (m.snap !== false) { Object.assign(state, dayLook(state.day)); goal = null; apply(); } }
   if (m.time != null) { ui("time", m.time); state.time = Number(m.time); apply(); }
@@ -3487,7 +3528,7 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.coat != null) setCoat(m.coat);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
-  if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
+  if (m.pause != null) { renderer.setAnimationLoop(m.pause ? null : loop); QUALITY.lastDraw = 0; QUALITY.slow = 0; kickShadows(); } // a frame the game has hidden should not go on drawing
   if (m.boss != null) { condense(false); home(false); BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; BOSS.eyesAt = m.risen ? performance.now() / 1000 - 3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
   if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
@@ -3517,7 +3558,7 @@ window.addEventListener("message", (e) => { const m = e.data; if (m && m.target 
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
 if (q.get("surge") === "1") surge(q.get("at"));
 if (q.get("coat")) setCoat(q.get("coat"));
-window.proto = { CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+window.proto = { QUALITY, renderer, scene, CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
 
 // ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws
 // the eye away and back, a drag carries it along him. Not used by the game.
