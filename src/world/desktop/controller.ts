@@ -314,6 +314,8 @@ export interface DesktopDeps {
   readonly sound?: SoundPlayer;
   /** The breathing collapse on the stills (room-scene addition 2026-11-02): a WebGL2 canvas in the `.fx` layer; absent when off. */
   readonly fx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** The screen's own collapse (textlife): creatures made of the screen's characters, from the wall ring on. */
+  readonly textLife?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** The hand (objects-in-hand): paints the held object's screen, turns it, its light, the chick's chirps and the pager's buzz. */
   readonly hand?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
@@ -472,6 +474,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     splat?.after();
     nav?.after();
     fx?.after();
+    textLife?.after();
     pull?.after();
     bossFx?.after();
     hand?.after();
@@ -525,6 +528,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const pull = deps.pull ? deps.pull(root, ctx) : null;
   const bossFx = deps.bossFx ? deps.bossFx(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
+  const textLife = deps.textLife ? deps.textLife(root, ctx) : null;
   const hand = deps.hand ? deps.hand(root, ctx, actions) : null;
   const room3d = deps.room3d ? deps.room3d(root, ctx, actions) : null;
 
@@ -780,6 +784,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       pull?.destroy();
       bossFx?.destroy();
       fx?.destroy();
+      textLife?.destroy();
       hand?.destroy();
       room3d?.destroy();
       nav?.destroy();

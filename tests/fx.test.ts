@@ -55,13 +55,13 @@ describe("the collapse is in the photos", () => {
     expect(stackOf(stillPage(14, "desk"))).toMatchSnapshot();
   });
 
-  it("snapshot: the desktop on days 13 and 17 keeps only the pores on the left monitor and the dimmed text", () => {
+  it("snapshot: the desktop on days 13 and 17 keeps only the pores on the left monitor", () => {
     const stage = (page: string) => /<div class="stage one-monitor"[^>]*>/.exec(page)![0];
     const d13 = desktopOf(13);
     const d17 = desktopOf(17);
     expect({ "day 13": stage(d13), "day 17": stage(d17) }).toMatchSnapshot();
     expect(stage(d13)).toContain('data-fx="pores" style="--fx-pores:0.5"');
-    expect(stage(d17)).toContain('data-fx="pores dim" style="--fx-pores:0.3"');
+    expect(stage(d17)).toContain('data-fx="pores" style="--fx-pores:1"'); // no dimmed windows, the skin at full (author 2026-11-28)
     // No photo stack and no overlay on the desktop.
     for (const page of [d13, d17]) expect(page).not.toContain('class="fx"');
   });
@@ -72,8 +72,10 @@ describe("the collapse is in the photos", () => {
     expect(at(12)).toEqual([["wall", 1]]);
     expect([13, 14, 15].map(at)).toEqual([[["other", 0.5]], [["other", 0.8]], [["other", 1]]]);
     expect(at(16)).toEqual([["other", 1], ["glitch", 0.45]]);
-    expect(at(17)).toEqual([["other", 0.4], ["white", 0.85]]);
-    expect(at(18)).toEqual([["white", 1]]);
+    // author 2026-11-28: no white days (「18天应该是血肉最多的，白乎乎的效果很奇怪」): the other side to the end
+    expect(at(17)).toEqual([["other", 1], ["glitch", 0.6]]);
+    expect(at(18)).toEqual([["other", 1]]);
+    for (let day = 1; day <= 19; day++) expect(at(day).map(([stage]) => stage), `day ${day}`).not.toContain("white");
     // The good ending's day 19 keeps day 18's photos.
     expect(at(19)).toEqual(at(18));
   });
@@ -132,16 +134,14 @@ describe("the collapse is in the photos", () => {
       );
     });
 
-    it("the stage order is monotone: wall → other → glitch → white, in a day and across days, never back", () => {
+    it("the stage order is monotone in a day (wall → other → glitch), and the other side, once whole, stays to the end", () => {
       fc.assert(
         fc.property(days, (day) => {
           const stages = (fxPlan(day, "room")?.layers ?? []).map((l) => stageIndex(l.stage));
           expect([...stages].sort((a, b) => a - b)).toEqual(stages);
           expect(new Set(stages).size).toBe(stages.length);
-          if (day > 1) {
-            const before = (fxPlan(day - 1, "room")?.layers ?? []).map((l) => stageIndex(l.stage));
-            expect(Math.max(-1, ...stages)).toBeGreaterThanOrEqual(Math.max(-1, ...before));
-          }
+          // from day 15 the room is wholly on the other side and never comes back (the breaking-up on top comes and goes)
+          if (day >= 15) expect((fxPlan(day, "room")?.layers ?? [])[0]).toMatchObject({ stage: "other", opacity: 1 });
         }),
       );
     });
@@ -155,11 +155,11 @@ describe("the collapse is in the photos", () => {
       );
     });
 
-    it("only the glitch layer flickers, and only the stack of day 16 has one", () => {
+    it("only the glitch layer flickers, and only the stacks of days 16 and 17 have one", () => {
       fc.assert(
         fc.property(days, (day) => {
           const flickers = (fxPlan(day, "room")?.layers ?? []).filter((l) => l.flicker).map((l) => l.stage);
-          expect(flickers).toEqual(day === 16 ? ["glitch"] : []);
+          expect(flickers).toEqual(day === 16 || day === 17 ? ["glitch"] : []);
         }),
       );
     });
@@ -214,18 +214,17 @@ describe("the collapse is in the photos", () => {
     });
   });
 
-  describe("the desktop keeps the pores, the tint and the dimmed text", () => {
-    it("pores from ring room: 0.5 / 0.75 / 1 across 13–15, 0.5 on 16, 0.3 on the white days; none before", () => {
+  describe("the desktop keeps the pores and the tint", () => {
+    it("pores from ring room: 0.5 / 0.75 / 1 across 13–15, full from then on; none before", () => {
       const pores = (day: number) => fxPlan(day, "desktop")?.pores ?? null;
       expect([11, 12].map(pores)).toEqual([null, null]);
-      expect([13, 14, 15, 16, 17, 18].map(pores)).toEqual([0.5, 0.75, 1, 0.5, 0.3, 0.3]);
+      expect([13, 14, 15, 16, 17, 18].map(pores)).toEqual([0.5, 0.75, 1, 1, 1, 1]);
       expect(fxPlan(12, "desktop")).toBeNull();
       expect(fxStageAttrs(fxPlan(12, "desktop"))).toBeNull();
     });
 
-    it("the text dims on days 17 and 18 only; the stills never carry the flag", () => {
-      expect([15, 16, 17, 18].map((d) => fxPlan(d, "desktop")!.dimText)).toEqual([false, false, true, true]);
-      expect(fxPlan(17, "room")!.dimText).toBe(false);
+    it("no window is dimmed on any day (author 2026-11-28: the veil is gone); the stills never carry pores", () => {
+      for (let day = 1; day <= 18; day++) expect(fxStageAttrs(fxPlan(day, "desktop"))?.value ?? "", `day ${day}`).not.toContain("dim");
       expect(fxPlan(17, "room")!.pores).toBeNull();
     });
 

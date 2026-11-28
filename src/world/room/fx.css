@@ -12,13 +12,14 @@
 @media (prefers-reduced-motion:reduce){.fx-photo[data-stage="glitch"]{animation:none}}
 
 /* the desktop frame: the left monitor's own background takes the pore tile (multiply) from ring room;
-   the tile's strength is a wash of the background's own colour over it. Days 17–18 the windows' text is at 60 %. */
+   the tile's strength is a wash of the background's own colour over it. (Until 2026-11-28 days 17–18 also faded every
+   window to 60 %: the whole screen looked veiled. Author: 「18天屏幕上的崩坏不能是这种的」. The screen's collapse is
+   its own text come alive: src/world/desktop/textlife.) */
 .stage[data-fx~="pores"]{--pw:color-mix(in srgb,var(--bg) calc((1 - var(--fx-pores)) * 100%),transparent);--pww:color-mix(in srgb,var(--panel) calc((1 - var(--fx-pores)) * 100%),transparent)}
 .stage[data-fx~="pores"] .monitor[data-side="left"] .os{background-color:var(--bg);background-image:linear-gradient(var(--pw),var(--pw)),url(/room/fx/pores.jpg);background-size:auto,512px 512px;background-blend-mode:normal,multiply}
 /* onboarding-steps R2: the wallpaper covers the .os's own background, so the pores lie over it too. */
 .stage[data-fx~="pores"] .monitor[data-side="left"] .os > .wall{background-image:linear-gradient(var(--pw),var(--pw)),url(/room/fx/pores.jpg),var(--wall-img);background-size:auto,512px 512px,cover;background-repeat:repeat,repeat,no-repeat;background-blend-mode:normal,multiply,normal}
 .stage[data-fx~="pores"] .monitor[data-side="left"] .os .win{background-color:var(--panel);background-image:linear-gradient(var(--pww),var(--pww)),url(/room/fx/pores.jpg);background-size:auto,512px 512px;background-blend-mode:normal,multiply}
-.stage[data-fx~="dim"] .monitor .os .win{opacity:.6}
 
 /* While the splat or the CSS push carries the move, the arriving stage's photo stack waits too. */
 .stage.m-nobg>.fx{visibility:hidden}
