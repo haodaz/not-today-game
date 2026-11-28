@@ -237,11 +237,18 @@ describe("klotski: the stage", () => {
     const last = main.p[main.p.length - 1]!;
     expect(last[0] < 0 || last[0] > 4 || last[1] < 0 || last[1] > 5).toBe(true);
     for (const st of strands) expect(st.d).toBeGreaterThanOrEqual(KLOTSKI_SLIDE_MS);
-    // the room's cutscene: the 3D room's surge, loaded from the door moment, started on the door's own clock, shown after KLOTSKI_ROOM_MS
-    expect(r.out()).toContain(`<iframe class="kl-room" data-keep="kl-room" src="/room3d/index.html?embed=1&amp;day=17&amp;low=1&amp;surge=1&amp;at=${String(g.outAt! + KLOTSKI_ROOM_MS)}"`);
-    expect(klotskiRoomSrc(17, 1000)).toBe(`/room3d/index.html?embed=1&day=17&low=1&surge=1&at=${String(1000 + KLOTSKI_ROOM_MS)}`);
+    // the room's cutscene: the 3D room's page was there, unseen, from the moment the tray was on screen (author 2026-11-28:
+    // 「屋子等素材可以提前加载好吗」): one address for the whole stage so the frame is kept; the door moment adds its clock to the wrapper
+    const src = klotskiRoomSrc(17);
+    expect(src).toBe("/room3d/index.html?embed=1&day=17&low=1&surge=wait");
+    expect(r.out()).toContain(`<div class="kl-room-wrap" data-at="${String(g.outAt! + KLOTSKI_ROOM_MS)}" style="--at:${String(KLOTSKI_ROOM_MS)}ms"><iframe class="kl-room" data-keep="kl-room" src="${src.replace(/&/g, "&amp;")}"`);
+    const fresh = rig(); fresh.fillOthers();
+    expect(fresh.out()).toContain(`<div class="kl-room-wrap"><iframe class="kl-room" data-keep="kl-room" src="${src.replace(/&/g, "&amp;")}"`);
     expect(KLOTSKI_ROOM_MS).toBeLessThan(KLOTSKI_DONE_MS - 4000);
-    expect(fs.readFileSync(new URL("../room3d/room.js", import.meta.url), "utf8")).toContain('if (q.get("surge") === "1") surge(q.get("at"));');
+    const roomJs = fs.readFileSync(new URL("../room3d/room.js", import.meta.url), "utf8");
+    expect(roomJs).toContain('if (q.get("surge") === "wait")');
+    expect(roomJs).toContain("if (m.surge) surge(m.at);");
+    expect(fs.readFileSync(new URL("../src/world/motion/dom.ts", import.meta.url), "utf8")).toContain('postMessage({ target: "nt-room", surge: true, at: roomCue.at }, "*")');
     // the photo look (`?desk=photo`, the walk's software renderer): no 3D page is loaded; the flat tentacles stand in
     const flat = klotskiStage(r.task, r.board, boardState(r.board, 17, r.task.id, r.store.getEvents()), r.session, false, r.clock.now, null, false).value;
     expect(flat).not.toContain("<iframe");

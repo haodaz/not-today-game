@@ -3176,7 +3176,7 @@ function frame(now) {
   updateCondense(now / 1000);
   if (PEEK) { camera.position.set(PEEK[0], PEEK[1], PEEK[2]); camera.lookAt(PEEK[3], PEEK[4], PEEK[5]); if (PEEK[6] && camera.fov !== PEEK[6]) { camera.fov = PEEK[6]; camera.updateProjectionMatrix(); } } // { peek: [ex, ey, ez, tx, ty, tz, fov] }: a close look at one thing while it is being built; never sent by the game
   composer.render();
-  if (++framesDrawn === (document.body.classList.contains("embed") ? 1 : 3)) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
+  if (++framesDrawn === (document.body.classList.contains("embed") ? 1 : 3)) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ if (q.get("surge") === "wait") { /* loaded ahead of the door moment (author 2026-11-28: 「屋子等素材可以提前加载好吗」): face the door, draw long enough to have everything compiled, then stop drawing until { surge: true } */ setFace(2); apply(); setTimeout(() => { if (!SURGE.on) renderer.setAnimationLoop(null); }, 1500); } document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
 }
 
@@ -3410,8 +3410,10 @@ async function surge(at) {
   goal = null;
   setFace(2);
   apply();
+  SURGE.on = true; SURGE.t0 = Infinity; // armed: the wait-mode pause leaves it alone, nothing grows yet
+  renderer.setAnimationLoop(frame); // a page loaded ahead and paused draws again
   await wait(at ? Math.max(0, Number(at) - Date.now()) : 0);
-  SURGE.on = true; SURGE.t0 = performance.now();
+  SURGE.t0 = performance.now();
   tell("surge-start");
   { const st = document.createElement("style"); st.textContent = "@keyframes nt-surge-shake{0%,100%{transform:none}15%{transform:translate(-10px,5px)}35%{transform:translate(9px,-6px)}55%{transform:translate(-7px,-3px)}75%{transform:translate(6px,5px)}} body.nt-surge canvas{animation:nt-surge-shake .5s linear 2}"; document.head.append(st); }
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) { document.body.classList.add("nt-surge"); await wait(1000); document.body.classList.remove("nt-surge"); }

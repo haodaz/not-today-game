@@ -164,6 +164,30 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   const timers = new Set<number>();
   // The browser's text tentacles (late-days FR5): drawn only while the browser window is shown.
   const tentacles = createTentacleDriver(win);
+  // klotski's room cutscene (author 2026-11-28): the room page is loaded ahead and paused; when the stage's
+  // wrapper carries the door moment's clock (`data-at`), the page is told to draw again and to start its surge
+  // then. Told once per page and clock, and once more if the page only now says it is ready.
+  let roomCue: { frame: HTMLIFrameElement; at: number } | null = null;
+  const tellRoom = () => {
+    const w = roomCue?.frame.contentWindow;
+    if (!w || !roomCue) return;
+    w.postMessage({ target: "nt-room", pause: false }, "*");
+    w.postMessage({ target: "nt-room", surge: true, at: roomCue.at }, "*");
+  };
+  const onRoomReady = (e: MessageEvent) => {
+    const m = e.data as { source?: string; type?: string } | null;
+    if (roomCue && e.source === roomCue.frame.contentWindow && m?.source === "nt-room" && m.type === "ready") tellRoom();
+  };
+  win.addEventListener("message", onRoomReady);
+  const klRoomCue = (root: ParentNode) => {
+    const wrap = root.querySelector<HTMLElement>(".kl-room-wrap[data-at]");
+    const frame = wrap?.querySelector<HTMLIFrameElement>("iframe.kl-room") ?? null;
+    if (!wrap || !frame) { if (!root.querySelector(".kl-room-wrap")) roomCue = null; return; }
+    const at = Number(wrap.dataset.at);
+    if (roomCue && roomCue.frame === frame && roomCue.at === at) return;
+    roomCue = { frame, at };
+    tellRoom();
+  };
 
   const after = (ms: number, fn: () => void) => {
     const id = win.setTimeout(() => {
@@ -1074,6 +1098,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     sleepWake(t);
     closerEntry(t);
     tentacles.after(root);
+    klRoomCue(root);
   }
 
   // ---- late-days FR4 + correction: Kuro crawls along the page window's edges to its × --------
@@ -1114,6 +1139,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     after: afterRender,
     destroy() {
       tentacles.destroy();
+      win.removeEventListener("message", onRoomReady);
       if (frame) win.cancelAnimationFrame(frame);
       timers.forEach((id) => win.clearTimeout(id));
       ghosts.forEach((g) => g.el.remove());

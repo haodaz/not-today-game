@@ -342,7 +342,8 @@ export const KLOTSKI_FLESH_MARGIN = [1, 1, 1, 2] as const;
 export const KLOTSKI_ROOM_MS = 3600;
 /** The day whose room it is (the klotski is day 17's). */
 export const KLOTSKI_ROOM_DAY = 17;
-export const klotskiRoomSrc = (day: number, outAt: number): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=1&at=${String(Math.round(outAt + KLOTSKI_ROOM_MS))}`;
+/** Loaded ahead (author 2026-11-28: 「屋子等素材可以提前加载好吗」): the page waits, facing the door and paused, from the moment the tray is on screen; the door moment starts it by a message (`klRoomCue` in motion/dom.ts) and shows it. One address for the whole stage, so the frame is kept. */
+export const klotskiRoomSrc = (day: number): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=wait`;
 
 export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null, flesh = true): SafeHtml {
   // `flesh` false (the photo look: `?desk=photo`, the walk driver's software renderer): no 3D pages at the door moment, the flat tentacles instead
@@ -388,8 +389,9 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   else foot = html`<div class="mn-ctl sn-ctl"><span class="mn-left">${S("klotski.stage.moves", { n: String(g.moves) })}</span><div class="sk-pad sn-pad">${pad}</div><button type="button" class="mn-mode" data-action="klotski-undo"${g.history.length ? null : html` disabled`}>${S("klotski.stage.undo")}</button><button type="button" class="mn-mode" data-action="klotski-start">${S("klotski.stage.reset")}</button><span class="sn-hint">${S("klotski.stage.keys")}</span>${nameless}</div>`;
   // the room's own picture of it, over the tray for the second half of the moment (its lines stay in the header)
   const since = g && out && g.outAt !== null ? nowMs - g.outAt : -1;
-  const room = flesh && g && out && g.outAt !== null
-    ? html`<iframe class="${cls("kl-room", since >= KLOTSKI_ROOM_MS && "in")}" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY, g.outAt)}" style="--at:${String(Math.max(0, Math.round(KLOTSKI_ROOM_MS - since)))}ms" title="" aria-hidden="true" tabindex="-1"></iframe>`
+  const cue = g && out && g.outAt !== null ? html` data-at="${String(Math.round(g.outAt + KLOTSKI_ROOM_MS))}" style="--at:${String(Math.max(0, Math.round(KLOTSKI_ROOM_MS - since)))}ms"` : null;
+  const room = flesh && !(approved && !out)
+    ? html`<div class="${cls("kl-room-wrap", since >= KLOTSKI_ROOM_MS && "in")}"${cue}><iframe class="kl-room" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY)}" title="" aria-hidden="true" tabindex="-1"></iframe></div>`
     : null;
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="klotski-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
   return html`<div class="${cls("mn kl", out && "done", out && "haunted")}" data-screen="klotski">
