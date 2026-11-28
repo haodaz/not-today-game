@@ -265,7 +265,7 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   // day1-playtest-1117 R5: when the day's reply to this thread is the thing to do, its prompt
   // (`msgs.reply.prompt.d<day>`, when content has one) heads the choices; the choices are the guide
   const prompt = replyPromptKey(ctx, conversation);
-  const hint = prompt ? html`<div class="hint prompt">${tr(prompt)}</div>` : ownHint ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : otherHint ? html`<div class="hint">${tr("reply.hint.other")}</div>` : null;
+  const hint = prompt ? html`<div class="hint prompt">${tr(prompt)}</div>` : ownHint ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : otherHint ? html`<div class="hint">${tr(hasString(`reply.hint.other.${conversation}`) ? `reply.hint.other.${conversation}` : "reply.hint.other")}</div>` : null; // a thread with three replies says three (Dad's chat)
   const chips = items
     .filter((item) => item.kind !== "free")
     .map((item) => {

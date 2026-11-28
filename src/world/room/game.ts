@@ -33,7 +33,7 @@ import { mealView } from "@world/delivery/meals";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
 import { writeCoat } from "./coat";
-import { guideNow, withRing } from "@world/loop/guide";
+import { guideNow, ringNow, withRing } from "@world/loop/guide";
 import { recordedOn } from "@state/sleeptalk";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
@@ -70,7 +70,7 @@ import { endingNext, bossActions } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
 import { bossStart } from "@world/endings/boss";
 import { bossScene } from "./outside";
-import { boxObjectFor, CASE_WOBBLE_MS, checklistNow, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, CASE_WOBBLE_MS, checklistNow, countdownText, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { hudTiles, statusPanel } from "./status";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
@@ -83,7 +83,7 @@ import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { composerActions, queueLaunchIntro, workbenchActions, workbenchUiActions } from "@world/desktop/workbench/actions";
-import { gameRunning, workHold, workNow } from "@world/desktop/workbench/work-mode";
+import { gameRunning, workBar, workNow } from "@world/desktop/workbench/work-mode";
 import { hungerNumbers, tooHungryToSleep } from "@state/hunger";
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
@@ -107,7 +107,7 @@ import { sendEmailLink } from "@net/email";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   // guidance R1: the guided moment's target carries the ring (data-guide), one at a time.
-  const body = raw(withRing(renderGameBody(store, session, nowMs).value, guideNow(store.getState(), store.getEvents(), session)));
+  const body = raw(withRing(renderGameBody(store, session, nowMs).value, ringNow(store.getState(), store.getEvents(), session))); // the guide, else the route to the list's current step (2026-11-28)
   // first-use-hints: the hint that shows now (its anchor on this page), over everything.
   const hint = session.hintsOn ? hintLayer(store.getState(), session, body.value) : null;
   return hint ? html`${body}${hint}` : body;
@@ -150,7 +150,10 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day, PORTRAIT_FILES[state.names.portrait])}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${statusPanel(state, events, session)}</div>`;
+    // 2026-11-28 (author: 等饭 … 不知道去哪): the wait is on the screen too, as on the room's card — the idle line when
+    // nothing else is current, and 外卖在路上 with its countdown
+    const nowView = lc ? checklistNow(lc, state, events, session) : null;
+    return html`${renderDesktop({ ...shell, nextItem: nowView ? (nextItemText(nowView) ?? (nowView.waiting ? t("checklist.waitIdle") : null)) : null, waitText: nowView?.waiting ? { label: t("checklist.wait.text"), left: waitLeft(session, nowMs) } : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day, PORTRAIT_FILES[state.names.portrait])}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session, { home: true, room: { day: state.day, found: state.found.length } })}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -191,6 +194,13 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   const main = scene.me !== undefined ? figure(scene.me, scene.meIdle, " me") : stand === undefined ? null : figure(stand, scene.standIdle, scene.other !== undefined ? " speaking" : "");
   const standImg = html`<div class="scene-stands" id="scene-stands"><div class="stand-slot">${side}</div><div class="stand-slot">${main}</div></div>`;
   return html`<div class="${cls("dlg-layer", story && "masked", scene.me !== undefined && !story && "me-on", chat && !thread && "top", thread && "thread")}" id="dlg-layer">${standImg}${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+}
+
+/** The soonest order's countdown (mm:ss), or null without a clock or an order. */
+function waitLeft(session: Session, nowMs: number): string | null {
+  let left: number | null = null;
+  for (const o of session.loop?.orders.values() ?? []) { const l = o.atMs + o.waitMs - nowMs; if (nowMs > 0 && (left === null || l < left)) left = l; }
+  return left === null ? null : countdownText(left);
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
@@ -820,6 +830,7 @@ function goToItem(ctx: ActionContext, id: string): void {
     case "openBox": go("view", { view: "room" }); go("pick-box"); break;
     case "eat": go("view", { view: "window" }); go("meal-table"); break; // up to the little table (its click works from 窗)
     case "beat": if (e.beat === "desk") go("view", { view: "desk" }); else desktop(); break;
+    case "loanDecided": thread(LOAN_CONVERSATION); break; // 2026-11-28: 前往 went nowhere for 老周's loan (day 5)
     case "chat": kuroActions["kuro-call"]!(ctx, {} as DOMStringMap, null as never); break;
     case "lieDown": go("view", { view: "bed" }); break; // at the bed; lying down is the player's click
     default: break;
@@ -1600,16 +1611,18 @@ export const loopActions: Record<string, ActionHandler> = {
     const state = ctx.store.getState();
     const events = ctx.store.getEvents();
     const now = workNow(state, events, ctx.session);
-    if (!now) return;
     // hunger (author 2026-11-20): too hungry, or the meal still on its way — one line, nothing opens;
-    // the protagonist's on day 1 (the story teaches it), Kuro's after that
-    const hold = now.started ? null : workHold(state, ctx.session);
+    // the protagonist's on day 1 (the story teaches it), Kuro's after that. 2026-11-28: the same when the
+    // day's work is not open yet (`later`): the button answers, it is never dead.
+    const hold = now?.started ? null : (workBar(state, events, ctx.session).hold ?? null);
     if (hold !== null) {
-      const line: SayLine = state.day === 1 ? { k: "inner", t: t(`hunger.${hold === "hungry" ? "work" : "wait"}.me`) } : { k: "speaker", who: "kuro", t: t(`hunger.${hold === "hungry" ? "work" : "wait"}.kuro`) };
+      const key = hold === "hungry" ? "hunger.work" : hold === "waiting" ? "hunger.wait" : "work.later";
+      const line: SayLine = state.day === 1 ? { k: "inner", t: t(`${key}.me`) } : { k: "speaker", who: "kuro", t: t(`${key}.kuro`) };
       ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state.day}:work:${hold}`, lines: [line], ending: { kind: "none" } });
       ctx.rerender();
       return;
     }
+    if (!now) return;
     const { task, key } = now;
     if (!now.started) cutOn(ctx, "work:start");
     ctx.session.wbFull = true;

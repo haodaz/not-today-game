@@ -17,7 +17,7 @@ import { push } from "@world/loop/dialogue";
 import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
 import { actWant, bossPosts, HOME_KURO_STEP, homeKept, homePosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
-import { guideNow } from "@world/loop/guide";
+import { ringNow } from "@world/loop/guide";
 import { CHICK_STEP_MS, clampDay, glowTarget, deskCommand, deskPick, desk3dOn, faceCommand, faceLocateCommand, locateCommand, room3dOn, roomPick, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
 
 export { outsideCommand, roomHour, ROOM_TARGET, type RoomCommand } from "./desk3d";
@@ -152,7 +152,7 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       }
       if (m !== "desk") return { mode: m, main, objects: [], prints: false, chick: "" };
       // R6: the guided object glows in the room itself
-      const g = guideNow(state, events, ctx.session);
+      const g = ringNow(state, events, ctx.session);
       const glow = glowTarget(g?.target.kind ?? null, root.querySelector<HTMLElement>(":scope > .prompt-layer")?.dataset.hint ?? null);
       // #104: a mug still held with no question open (the question went some other way) goes back down
       const held = ctx.session.mug;

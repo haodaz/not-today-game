@@ -58,13 +58,43 @@ export function allWorkDone(state: State, events: readonly GameEvent[]): boolean
   return tasks.length > 0 && tasks.every((it) => states.get(it.id)!.done);
 }
 
+/** A meal's own step is open now: ordering it, taking it in, or eating it. */
+function mealAtHand(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  if (!lc) return false;
+  const states = itemStates(lc);
+  return lc.file.items.some((it) => it.done.kind === "event" && (it.done.event.type === "order" || it.done.event.type === "pickup" || it.done.event.type === "eat") && states.get(it.id)!.unlocked && !states.get(it.id)!.done);
+}
+
+/** Today has work that is not done (open now, or still locked behind the checklist's earlier steps). */
+export function workToCome(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  if (!lc) return false;
+  const states = itemStates(lc);
+  return lc.file.items.some((it) => it.done.kind === "flag" && isWorkTask(it) && it.required && !states.get(it.id)!.done);
+}
+
+/**
+ * Where today's work stands, for the home page's line (2026-11-28: it said 今天没有活了 before lunch on day 1, with
+ * the day's work still locked): open now, held (and why), all done, or a day with none.
+ */
+export function workPhase(state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow"> & Partial<Pick<Session, "loop">>): "open" | "hungry" | "waiting" | "later" | "done" {
+  const bar = workBar(state, events, session);
+  if (bar.hold) return bar.hold;
+  return workNow(state, events, session) ? "open" : "done";
+}
+
 /** The work bar's primary: its label, and whether it can be pressed; and whether 退出工作模式 is drawn. */
 export interface WorkBar {
   readonly label: "work.start" | "work.resume" | "work.allDone";
   readonly enabled: boolean;
   readonly exit: boolean;
-  /** hunger (2026-11-20): why the primary is held when it is held for the stomach's sake (the shell writes it as data-hold). */
-  readonly hold?: Exclude<WorkHold, null>;
+  /**
+   * Why the primary is held, when it is (the shell writes it as data-hold; pressing it says the reason, it is never a
+   * dead button: author 2026-11-28, 「进入工作台 … 不知道去哪」). hunger (2026-11-20): the stomach, or a meal on its way;
+   * `later`: today's work is still to come and not open yet (the checklist's step comes first).
+   */
+  readonly hold?: Exclude<WorkHold, null> | "later";
 }
 
 /**
@@ -76,9 +106,10 @@ export interface WorkBar {
 /** hunger (author 2026-11-20): why 开始工作 cannot be pressed now, if it cannot. */
 export type WorkHold = "hungry" | "waiting" | null;
 export function workHold(state: State, session: Pick<Session, "loop">): WorkHold {
-  if (tooHungryToWork(state)) return "hungry";
-  // 「外卖点了之后 … 这期间不能工作，但是用户可以干别的」
+  // 「外卖点了之后 … 这期间不能工作，但是用户可以干别的」. A meal on its way is the reason even on an empty stomach
+  // (2026-11-28: with the order placed, 「先吃点东西」 was the wrong word; the food is coming).
   if ((session.loop?.orders.size ?? 0) > 0) return "waiting";
+  if (tooHungryToWork(state)) return "hungry";
   return null;
 }
 
@@ -90,7 +121,12 @@ export function workBar(state: State, events: readonly GameEvent[], session: Pic
   if (hold !== null) return { label: "work.start", enabled: false, exit, hold };
   if (now) return { label: now.started ? "work.resume" : "work.start", enabled: true, exit };
   if (allWorkDone(state, events)) return { label: "work.allDone", enabled: false, exit };
-  return { label: "work.start", enabled: false, exit };
+  // no task open yet: if work is still to come today the button says why when pressed; a day with no work has none to start
+  if (!workToCome(state, events)) return { label: "work.start", enabled: false, exit };
+  // the stomach is the reason only once the meal is the step at hand (ordering it, taking it in, eating it); before
+  // that (the messages not read yet) the work is simply not there yet
+  const h = workHold(state, { loop: session.loop ?? null });
+  return { label: "work.start", enabled: false, exit, hold: h === "waiting" || (h === "hungry" && mealAtHand(state, events)) ? h : "later" };
 }
 
 /**

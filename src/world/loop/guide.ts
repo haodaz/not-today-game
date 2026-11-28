@@ -13,7 +13,8 @@ import { dayTable } from "@state/replies/table";
 /** The boss has a message of his own this morning (an incoming line that waits for nothing). */
 const bossNews = (day: number): boolean => (dayTable(day)?.recipients.get("boss")?.incoming ?? []).some((l) => !("cond_show" in l) || l.cond_show === undefined);
 import { push } from "./dialogue";
-import { booted, itemStates, loopContext } from "./checklist";
+import { booted, checklist, itemStates, loopContext, WORK_LINE_ID } from "./checklist";
+import { threadsIn } from "@world/desktop/messages/threads";
 import { taskPageId } from "@world/desktop/model";
 import { hasString, t } from "@world/i18n";
 
@@ -34,6 +35,8 @@ export type GuideTarget =
   | { readonly kind: "door" }
   | { readonly kind: "task"; readonly id: string }
   /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
+  /** route (2026-11-28): the way to the list's current step, as the elements to try in order (see `routeNow`). */
+  | { readonly kind: "route"; readonly anchors: readonly (readonly (readonly [string, string])[])[] }
   | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer" | "launch"; readonly slot?: string };
 
 /**
@@ -43,7 +46,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "G8" | "G9" | "G9b" | "next";
+  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "G8" | "G9" | "G9b" | "next" | "route";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -180,6 +183,59 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
 }
 
 /**
+ * The route (author 2026-11-28: 「玩家不知道去哪这个问题全盘看一下」). The guides above cover day 1's morning and the
+ * lunch; everywhere else the list's line and its 前往 were all the player had, and from inside the screen not even
+ * that (the dinner's phone, the meal at the door, the bed: nothing on the screen said "leave"). So: when no guide is
+ * on, the way to the list's current step is lit, on whatever view the player is in — the thing itself where it is in
+ * sight, else the way toward it (离开屏幕 from the screen, the screens from the room, the tile on the dock). It only
+ * lights: nothing is refused, the list does not reorder, Kuro's hints do not change (those read `guideNow`).
+ * While a meal is on its way and nothing else is current there is no route: that time is the player's.
+ */
+const at = (action: string, key?: string, value?: string): readonly (readonly [string, string])[] => (key ? [["data-action", action], [key, value ?? ""]] : [["data-action", action]]);
+export function routeNow(state: State, events: readonly GameEvent[], session: Session): Guide | null {
+  const lc = loopContext(state, events);
+  if (!lc || state.ending !== "none" || session.dialogue.queue.length > 0) return null;
+  const line = checklist(lc).lines.find((l) => l.state === "now");
+  if (!line) return null;
+  const item = line.id === WORK_LINE_ID ? openWork(state, events)?.item : lc.file.items.find((it) => it.id === line.id);
+  if (!item) return null;
+  const desktop = session.view === "desktop";
+  const of = (target: GuideTarget): Guide => ({ id: "route", target, refuse: null, scope: "none" });
+  const route = (...anchors: (readonly (readonly [string, string])[])[]): Guide => of({ kind: "route", anchors });
+  const leave = route(at("view", "data-view", "desk")); // on the screen that is 离开屏幕
+  const toScreen = booted(state, events) ? of({ kind: "screen" }) : session.view === "lying" ? route(at("rise")) : of({ kind: "tower" });
+  const appOf = (conv: string) => (threadsIn("msgs", state.day).includes(conv) ? "msgs" : "tingtalk");
+  const d = item.done;
+  if (d.kind === "flag") return desktop ? route(at("work-start"), at("dock", "data-app", "workbench")) : toScreen;
+  if (d.kind !== "event") return null;
+  const e = d.event;
+  switch (e.type) {
+    case "rise": return route(at("rise"));
+    case "boot": return desktop ? null : toScreen;
+    case "openApp": return desktop ? route(at("dock", "data-app", e.app === "msgs" ? "tingtalk" : e.app)) : toScreen;
+    case "reply": return desktop ? route(at("chip", "data-conv", e.recipient), at("conv", "data-conv", e.recipient), at("dock", "data-app", appOf(e.recipient))) : toScreen;
+    case "open": {
+      if (!e.target.startsWith("conv:")) return desktop ? null : toScreen;
+      const conv = e.target.slice("conv:".length);
+      return desktop ? route(at("conv", "data-conv", conv), at("dock", "data-app", appOf(conv))) : toScreen;
+    }
+    case "order": return of({ kind: "phone" }); // the phone at the desk; else the desk; on the screen 离开屏幕
+    case "arrives":
+    case "pickup": return desktop ? leave : of({ kind: "door" });
+    case "openBox": return desktop ? leave : route(at("pick-box"), at("bed-box"), at("nav-back"));
+    case "eat": return desktop ? leave : route(at("meal-table"), at("view", "data-view", "table"), at("view", "data-view", "window"), at("nav-back"));
+    case "beat": return e.beat === "desk" ? (desktop ? leave : route(at("view", "data-view", "desk"))) : desktop ? route(at("desktop-shutdown")) : toScreen;
+    case "loanDecided": return desktop ? route(at("conv", "data-conv", "laozhou"), at("dock", "data-app", "tingtalk")) : toScreen; // answered in 老周's thread
+    case "chat": return route(at("kuro-call"));
+    case "lieDown": return desktop ? leave : route(at("bed"), at("view", "data-view", "bed"), at("nav-back"));
+    default: return null;
+  }
+}
+
+/** What is lit now: the guide of a guided moment, else the route to the list's current step. For the ring and the room's glow only. */
+export const ringNow = (state: State, events: readonly GameEvent[], session: Session): Guide | null => guideNow(state, events, session) ?? routeNow(state, events, session);
+
+/**
  * Always answered while a guide is on (R1): the box's own controls, settings, Kuro and its chat,
  * every room move (回房间 too), the bed and getting up, the 道具 strip and the objects' own layers,
  * the coach marks, the call's controls, the pointer's dock peek.
@@ -245,6 +301,8 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return (action === "view" && data.view === "door") || action === "loop-door" || action === "turn";
     case "task":
       return action === "wb-nav" && data.page === `task:${target.id}`;
+    case "route":
+      return false; // a route never refuses: nothing asks whether a click is on it
     case "board":
       // G7 never refuses; its target is the board's own controls.
       return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print" || action === "board-settle" || action === "board-settle-back" || action === "settle-kuro" || action === "stack-assist" || action === "battle-start" || action === "battle-act" || action === "battle-done" || action === "mines-start" || action === "mines-open" || action === "mines-mode" || action === "mines-assist" || action === "mines-cheat" || action === "pipes-start" || action === "pipes-turn" || action === "pipes-cheat" || action === "match3-start" || action === "match3-tap" || action === "match3-assist" || action === "match3-cheat" || action === "link-start" || action === "link-tap" || action === "link-shuffle" || action === "link-cheat" || action === "snake-start" || action === "snake-turn" || action === "snake-resume" || action === "snake-assist" || action === "snake-cheat" || action === "tetris-start" || action === "tetris-key" || action === "tetris-resume" || action === "tetris-assist" || action === "tetris-cheat" || action === "rhythm-start" || action === "rhythm-tap" || action === "rhythm-resume" || action === "rhythm-assist" || action === "rhythm-cheat" || action === "balance-start" || action === "balance-drop" || action === "balance-resume" || action === "balance-assist" || action === "balance-cheat" || action.startsWith("klotski-") || action.startsWith("echo-") || action.startsWith("nonogram-") || action === "sokoban-start" || action === "sokoban-move" || action === "sokoban-undo" || action === "sokoban-cheat" || action.startsWith("fill-") || action === "moles-start" || action === "moles-tap" || action === "moles-resume" || action === "moles-assist" || action === "moles-cheat" || action === "pacman-start" || action === "pacman-turn" || action === "pacman-resume" || action === "pacman-assist" || action === "pacman-cheat" || action === "spot-miss";
@@ -302,6 +360,8 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
       return [[["data-action", "loop-door"]], [["data-action", "view"], ["data-view", "door"]]];
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
+    case "route":
+      return target.anchors;
     case "board":
       return boardAnchors(target.step, target.slot);
   }

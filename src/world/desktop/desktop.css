@@ -17,6 +17,8 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .monitor .os{position:absolute;inset:0;transform:translate(var(--drift-x),var(--drift-y))}
 /* 顶栏 */
 .os > .top .next-item{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500;white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis}
+.os > .top .wait-chip{display:inline-flex;align-items:center;gap:6px;padding:1px 8px;border:1px solid rgba(0,0,0,.18);border-radius:9px;color:var(--ink);white-space:nowrap}
+.os > .top .wait-chip b{font-variant-numeric:tabular-nums;font-weight:600}
 .os > .top .next-item i{width:10px;height:10px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto}
 .os > .top{height:28px;box-sizing:border-box;display:flex;align-items:center;gap:18px;padding:0 16px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2);backdrop-filter:blur(8px)}
 .os > .top .brand{font-weight:600;color:var(--ink);letter-spacing:.02em}
@@ -2639,7 +2641,9 @@ button.fl-cell:not(.on):hover{background:rgba(29,33,41,.08)}
 .work-bar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:14px;padding:10px 16px 14px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-bottom:0;border-radius:16px 16px 0 0;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.08);z-index:9}
 .work-bar .wk-start{min-width:220px;padding:10px 22px;border:3px solid #1d2129;border-radius:0;background:#F2D33A;color:#1d2129;font:inherit;font-weight:900;font-size:18px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;box-shadow:4px 4px 0 #1d2129;transition:transform 120ms,box-shadow 120ms}
 .work-bar .wk-start:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 #1d2129}
-.work-bar .wk-start:disabled{background:#e6e3dc;color:#8a8478;border-color:#b9b3a8;box-shadow:none;cursor:default}
+.work-bar .wk-start:disabled,.work-bar .wk-start[data-hold]{background:#e6e3dc;color:#8a8478;border-color:#b9b3a8;box-shadow:none}
+.work-bar .wk-start:disabled{cursor:default}
+.work-bar .wk-start[data-hold]:hover{transform:none;box-shadow:none}
 .work-bar .wk-exit{padding:8px 14px;border:1px solid rgba(29,33,41,.25);border-radius:8px;background:transparent;color:#5a5f69;font:inherit;font-size:13px;cursor:pointer}
 /* work-mode: the task page's chips and composer sit clear of the bar (author 2026-11-19: the bar covered 自己做 / 让它做) */
 .win.wb.full .ask{margin-bottom:104px}

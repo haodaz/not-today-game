@@ -17,7 +17,7 @@ import { handStage } from "./hand";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { getLocale, hasString, t, tr, type Locale } from "@world/i18n";
 import { booted, checklist, deskMeal, itemStates, loopContext, openItemFor, WORK_LINE_ID, type ChecklistView, type LoopContext } from "@world/loop/checklist";
-import { guideNow, type Guide } from "@world/loop/guide";
+import { guideNow, ringNow, type Guide } from "@world/loop/guide";
 import type { EventToken } from "@state/days/table";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
@@ -351,7 +351,7 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
   const rects = session.roomRects ?? {};
   // day1-playtest-1117 R6: the guided object glows in the room itself; its mark keeps the ring's
   // anchor but draws no ring of its own (room.css), so nothing is left behind when it is dragged
-  const g = guideNow(state, events, session);
+  const g = ringNow(state, events, session);
   const glow = glowTarget(g?.target.kind ?? null, session.hintsOn && session.hintQueue[0] === "phone" ? "phone" : null);
   const mark = (id: string, attrs: string, extra: string | false | null = null): SafeHtml | null => {
     const r0 = rects[id];

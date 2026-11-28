@@ -18,6 +18,7 @@ import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
 import { openWork } from "./work";
+import { workPhase } from "./work-mode";
 import { renderShell } from "./shell";
 import { sessionList, type SessionEntry } from "./sessions";
 import { COMPOSER_FOCUS } from "./actions";
@@ -147,6 +148,9 @@ function changelogCollapsed(day: number): boolean {
   return day >= CHANGELOG_COLLAPSE_DAY;
 }
 
+/** The line under the greeting: where today's work stands (Kuro's words; the held ones are the lines 开始工作 answers with). */
+const HELLO_SUB = { open: "wb.hello.sub", done: "wb.hello.none", hungry: "hunger.work.kuro", waiting: "hunger.wait.kuro", later: "work.later.kuro" } as const;
+
 function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml {
   const { state } = ctx;
   // 在办: the task under way opens its task page (workspace R1); then the day's own lines.
@@ -194,7 +198,7 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const common = items.length ? html`<div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div>` : null;
   // Home is the greeting, the composer and today's cards: never a board or task content (workspace R1).
   // guidance R6: the greeting follows the clock (12:04 is 下午好).
-  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr(openWork(state, ctx.events) ? "wb.hello.sub" : "wb.hello.none")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
+  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr(HELLO_SUB[workPhase(state, ctx.events, ctx.session)])}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
 }
 
 

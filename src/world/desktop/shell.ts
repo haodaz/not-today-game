@@ -93,12 +93,14 @@ export interface ShellModel {
   /** guidance R5: the room's 今日 card, over the OS area's top-left under the top bar (absent: none). */
   /** guidance R5 (2026-11-08): the checklist's current line, shown in the top bar after the app's name. */
   readonly nextItem?: string | null;
+  /** A meal on its way (2026-11-28): 外卖在路上 and its countdown, beside the current line, as the room's wait card. */
+  readonly waitText?: { readonly label: string; readonly left: string | null } | null;
   /**
    * work-mode §1: the work bar that stands in the dock's place over full-screen 工作台 — the primary's
    * label (`work.start` / `work.resume` / `work.allDone`), whether it can be pressed, and whether
    * 退出工作模式 is drawn (not while a game runs). Absent: 开始工作, pressable, with the exit.
    */
-  readonly work?: { readonly label: "work.start" | "work.resume" | "work.allDone"; readonly enabled: boolean; readonly exit: boolean; readonly hold?: "hungry" | "waiting" };
+  readonly work?: { readonly label: "work.start" | "work.resume" | "work.allDone"; readonly enabled: boolean; readonly exit: boolean; readonly hold?: "hungry" | "waiting" | "later" };
 }
 
 // ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
@@ -206,7 +208,7 @@ function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
     : m.weather.text
       ? html`<span>${m.weather.text}</span>`
       : null;
-  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span>${m.nextItem ? html`<span class="next-item"><i aria-hidden="true"></i>${m.nextItem}</span>` : null}<div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(clockLabelKey(m.clock.beat, m.clock.time))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
+  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span>${m.nextItem ? html`<span class="next-item"><i aria-hidden="true"></i>${m.nextItem}</span>` : null}${m.waitText ? html`<span class="wait-chip">${m.waitText.label}${m.waitText.left ? html`<b>${m.waitText.left}</b>` : null}</span>` : null}<div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(clockLabelKey(m.clock.beat, m.clock.time))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
 }
 
 /** 调度中心 / Mission Control's button in the top bar (tingtalk R1b); F3 does the same. */
@@ -302,7 +304,7 @@ function dock(m: ShellModel, hides = false): SafeHtml {
  */
 function workBar(m: ShellModel): SafeHtml {
   const w = m.work ?? { label: "work.start" as const, enabled: true, exit: true };
-  const start = html`<button type="button" class="wk-start" data-action="work-start"${w.enabled ? null : html` disabled`}${w.hold ? html` data-hold="${w.hold}"` : null}>${tr(w.label)}</button>`;
+  const start = html`<button type="button" class="wk-start" data-action="work-start"${w.enabled || w.hold ? null : html` disabled`}${w.hold ? html` data-hold="${w.hold}" aria-disabled="true"` : null}>${tr(w.label)}</button>`;
   const exit = w.exit ? html`<button type="button" class="wk-exit" data-action="work-exit">${tr("work.exit")}</button>` : null;
   return html`<div class="work-bar">${start}${exit}</div>`;
 }
