@@ -333,9 +333,16 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* author 2026-11-11: the two frames cut, never crossfade: half-drawn tentacles read as a double image. */
 .kpet .layer img.f2{animation:kuro-frames 2.8s steps(1,end) infinite alternate}
 @keyframes kuro-frames{0%,49%{opacity:0}50%,100%{opacity:1}}
+/* author 2026-11-27 (#164, a carried Kuro showed two bodies): the first frame goes out while the second is
+   in. The frames of one pose do not share an outline (the crawl leans, then sits), so the one underneath
+   showed round the edges of the one on top. One frame on at any moment, in every pose. */
+.kpet .layer:not(.cut) img.f1{animation:kuro-frames-a 2.8s steps(1,end) infinite alternate}
+@keyframes kuro-frames-a{0%,49%{opacity:1}50%,100%{opacity:0}}
 /* guidance R4: talking: base / blink alternating, 220 ms each. */
 .kpet .layer[data-state="talk"] img.f2{animation:kuro-talk 440ms steps(1,end) infinite}
 @keyframes kuro-talk{0%{opacity:0}50%{opacity:1}}
+.kpet .layer[data-state="talk"] img.f1{animation:kuro-talk-a 440ms steps(1,end) infinite}
+@keyframes kuro-talk-a{0%{opacity:1}50%{opacity:0}}
 .kmini .c .bed{color:var(--ink-3);font-style:italic}
 /* Workbench */
 .wb .side .it{background:none;border:0;text-align:left;cursor:pointer;width:100%}
@@ -369,6 +376,8 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .kpet.kuro-closer{position:absolute;right:-6px;top:-58px;width:140px;height:140px;z-index:7;pointer-events:none;transform-origin:50% 50%}
 .kpet.kuro-closer[data-phase="crawl"] .layer img.f2{animation:kuro-step 333ms steps(1,end) infinite}
 @keyframes kuro-step{0%{opacity:0}50%{opacity:1}}
+.kpet.kuro-closer[data-phase="crawl"] .layer img.f1{animation:kuro-step-a 333ms steps(1,end) infinite}
+@keyframes kuro-step-a{0%{opacity:1}50%{opacity:0}}
 .wb-closer{position:absolute;right:18px;top:0;width:1px;height:1px}
 .wb .body{position:relative}
 /* late-days FR5: the text tentacles, over the browser window only */

@@ -98,4 +98,7 @@
 /* Anyone who prefers less motion gets the end states at once. */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:var(--m-none) !important;animation-delay:0ms !important;transition-duration:var(--m-none) !important}
+  /* Kuro's two frames: only the first, standing still (one body, never two) */
+  .kpet .layer img.f1{animation:none !important;opacity:1 !important}
+  .kpet .layer img.f2{display:none}
 }

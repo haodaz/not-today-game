@@ -108,7 +108,9 @@ export class KuroBodyElement {
 
   set(state: BodyState, red = false): void {
     if (state === this.state && red === this.red) return;
-    const cut = isMaw(state) || isMaw(this.state) || isMood(state) || isMood(this.state);
+    // The crawl is cut in and out too (author 2026-11-27, #164): it leans where every other pose sits, so
+    // a fade between them is two bodies for a third of a second, and a carried Kuro changes pose at once.
+    const cut = isMaw(state) || isMaw(this.state) || isMood(state) || isMood(this.state) || state === "crawl" || this.state === "crawl";
     const now = Date.now();
     if (!cut && this.state !== null && now - this.changedAt < HOLD_MS) return;
     this.changedAt = now;
@@ -120,7 +122,7 @@ export class KuroBodyElement {
     const layer = holder.firstElementChild as HTMLElement;
     const old = [...this.element.children] as HTMLElement[];
     if (cut) {
-      // The maw is cut in and out, never crossfaded (late-days FR3).
+      // The maw is cut in and out, never crossfaded (late-days FR3); so are the moods and the crawl.
       old.forEach((o) => o.remove());
       this.element.appendChild(layer);
       return;
