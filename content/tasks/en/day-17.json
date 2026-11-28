@@ -43,7 +43,7 @@
           },
           {
             "id": "r2",
-            "label": "Why them",
+            "label": "Why",
             "answer": "c2"
           },
           {
@@ -60,23 +60,23 @@
         "cards": [
           {
             "id": "c1",
-            "text": "The contact at Qinghe Logistics",
+            "text": "Myself",
             "from": {
-              "file": "e-receivable"
+              "file": "call-log"
             },
-            "hint": "in the receivables sheet: the only one that really paid"
+            "hint": "in the call log: the last entry"
           },
           {
             "id": "c2",
-            "text": "The money was really paid",
+            "text": "Only this one asks about me",
             "from": {
-              "file": "e-receivable"
+              "file": "call-log"
             },
-            "hint": "in the receivables sheet"
+            "hint": "in the call log's voicemail"
           },
           {
             "id": "c3",
-            "text": "The first call, unanswered",
+            "text": "My own number, unanswered",
             "from": {
               "file": "call-log"
             },
@@ -141,7 +141,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "6603 2047, Qinghe's number. One bar of signal by the window."
+                "text": "6603 2047. That is your own number. One bar of signal by the door."
               }
             ]
           },
@@ -150,7 +150,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Reply to Qinghe. They are the only ones who ever really paid."
+                "text": "Reply to yourself. Only this one asks whether you are still here."
               }
             ]
           },
@@ -273,7 +273,7 @@
         "who": "boss",
         "note": [
           "Everyone is looking for you, saying the same sentence. Only one call back.",
-          "The numbers are in the call log; the receivables sheet says who owes whom."
+          "The numbers are in the call log."
         ],
         "call": "Pick one and call.",
         "cta": "Start work",
