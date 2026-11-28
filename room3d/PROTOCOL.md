@@ -67,6 +67,8 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | Field | Value | What the room does |
 |---|---|---|
 | `wake` | `true` | the day-4 wake flash (answers `wake-line`, then `wake-done`) |
+| `surge` | `true` | day 17's surge: the door wall, the door thrown open, the tentacles coming in (answers `surge-start`, then `surge-done`); also played from the URL with `surge=1` |
+| `at` | epoch ms | with `surge`: when to start it, on the caller's clock (absent: at once) |
 | `vision` | `true` | debug: toggles the vision overlay |
 
 ## Room → game
@@ -81,6 +83,8 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `moved` | `id`, `x`, `z` | a dragged thing is set down | `outside.ts`: keeps the layout, asks `locate` again |
 | `wake-line` | none | the wake flash wants the game's line said | `wake.ts` |
 | `wake-done` | none | the wake flash is over | `wake.ts` |
+| `surge-start` | none | the door is opening | nobody yet (the klotski stage runs on its own clock) |
+| `surge-done` | none | the surge has played | nobody yet |
 | `dislocated` | none | after `dislocate` | `flow.ts` |
 | `risen` | none | the boss is up | `flow.ts` |
 | `left` | none | the leave has ended | `flow.ts` |
