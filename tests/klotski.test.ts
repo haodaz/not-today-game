@@ -16,7 +16,7 @@ import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { gradeGame } from "@world/desktop/workbench/grades";
-import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves, KLOTSKI_ROOM_MS, klotskiRoomSrc } from "@world/desktop/workbench/klotski";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
@@ -158,7 +158,8 @@ describe("klotski: the engine", () => {
 
 describe("klotski: the stage", () => {
   it("the room, then you through the door in 28: r1 = c1, approved, perfect; the three lines in order; the form after KLOTSKI_DONE_MS", () => {
-    expect(KLOTSKI_DONE_MS).toBe(6000);
+    // the tray's own moment, then the room's cutscene (author 2026-11-27): 8.8 s in all
+    expect(KLOTSKI_DONE_MS).toBe(8800);
     const r = rig();
     r.fillOthers();
     expect(r.out()).toContain('data-screen="klotski"');
@@ -236,6 +237,11 @@ describe("klotski: the stage", () => {
     const last = main.p[main.p.length - 1]!;
     expect(last[0] < 0 || last[0] > 4 || last[1] < 0 || last[1] > 5).toBe(true);
     for (const st of strands) expect(st.d).toBeGreaterThanOrEqual(KLOTSKI_SLIDE_MS);
+    // the room's cutscene: the 3D room's surge, loaded from the door moment, started on the door's own clock, shown after KLOTSKI_ROOM_MS
+    expect(r.out()).toContain(`<iframe class="kl-room" data-keep="kl-room" src="/room3d/index.html?embed=1&amp;day=17&amp;low=1&amp;surge=1&amp;at=${String(g.outAt! + KLOTSKI_ROOM_MS)}"`);
+    expect(klotskiRoomSrc(17, 1000)).toBe(`/room3d/index.html?embed=1&day=17&low=1&surge=1&at=${String(1000 + KLOTSKI_ROOM_MS)}`);
+    expect(KLOTSKI_ROOM_MS).toBeLessThan(KLOTSKI_DONE_MS - 4000);
+    expect(fs.readFileSync(new URL("../room3d/room.js", import.meta.url), "utf8")).toContain('if (q.get("surge") === "1") surge(q.get("at"));');
     // parted, not covered (「感觉是盖在上面的，不是从通道过去的」): the blocks standing on your way are pushed off it; you are not
     const shoves = klotskiShoves(g);
     expect(Object.keys(shoves).length).toBeGreaterThan(0);

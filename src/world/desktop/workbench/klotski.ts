@@ -54,7 +54,7 @@ export interface KlotskiGame {
 /** klotski-door R3: the door opens under the block; the tentacles come after this. */
 export const KLOTSKI_SLIDE_MS = 700;
 /** The door moment holds the stage this long before the form returns (klotski-door R3: 6000). */
-export const KLOTSKI_DONE_MS = 6000;
+export const KLOTSKI_DONE_MS = 8800;
 /** The tentacles' growth: from KLOTSKI_SLIDE_MS, over this long, cell by cell. */
 export const KLOTSKI_GROW_MS = 3200;
 /** The three lines' delays from the door opening (door1, door2, door3). */
@@ -334,6 +334,15 @@ export function klotskiShoves(g: Pick<KlotskiGame, "trail" | "blocks" | "exit">)
 }
 /** The margins (in cells) of the flesh page round the tray: left, top, right, bottom (the door and the path are below). */
 export const KLOTSKI_FLESH_MARGIN = [1, 1, 1, 2] as const;
+/**
+ * The room (author 2026-11-27: 「先做游戏视角的，再做一个屋子的过场动画」): after the tray, the same moment in
+ * the code-built room: the door thrown open, the tentacles coming in (room3d `surge=1`, started on the door's
+ * own clock). The page is put in at the door moment so it has loaded by the time it shows, this long after.
+ */
+export const KLOTSKI_ROOM_MS = 3600;
+/** The day whose room it is (the klotski is day 17's). */
+export const KLOTSKI_ROOM_DAY = 17;
+export const klotskiRoomSrc = (day: number, outAt: number): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=1&at=${String(Math.round(outAt + KLOTSKI_ROOM_MS))}`;
 
 export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null): SafeHtml {
   const game = board.game as Game;
@@ -376,11 +385,16 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   if (out) foot = html`<div class="mn-state won">${nameless}</div>`;
   else if (!g) foot = html`<button type="button" class="wl-cta" data-action="klotski-start">${S("klotski.stage.start")}</button>`;
   else foot = html`<div class="mn-ctl sn-ctl"><span class="mn-left">${S("klotski.stage.moves", { n: String(g.moves) })}</span><div class="sk-pad sn-pad">${pad}</div><button type="button" class="mn-mode" data-action="klotski-undo"${g.history.length ? null : html` disabled`}>${S("klotski.stage.undo")}</button><button type="button" class="mn-mode" data-action="klotski-start">${S("klotski.stage.reset")}</button><span class="sn-hint">${S("klotski.stage.keys")}</span>${nameless}</div>`;
+  // the room's own picture of it, over the tray for the second half of the moment (its lines stay in the header)
+  const since = g && out && g.outAt !== null ? nowMs - g.outAt : -1;
+  const room = g && out && g.outAt !== null
+    ? html`<iframe class="${cls("kl-room", since >= KLOTSKI_ROOM_MS && "in")}" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY, g.outAt)}" style="--at:${String(Math.max(0, Math.round(KLOTSKI_ROOM_MS - since)))}ms" title="" aria-hidden="true" tabindex="-1"></iframe>`
+    : null;
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="klotski-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
   return html`<div class="${cls("mn kl", out && "done", out && "haunted")}" data-screen="klotski">
     <header class="mn-top"><div class="cs-title"><span class="cs-kick">${S("klotski.stage.kick")}</span><h2>${S("klotski.stage.title")}</h2>${sub}</div></header>
     ${phone ?? html`<aside class="mn-notes"><span class="mn-notes-h">${S("klotski.stage.notes")}</span><ul>${notes}</ul></aside>`}
-    <div class="mn-month kl-main">${field}${cheat}</div>
+    <div class="mn-month kl-main">${field}${cheat}${room}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
 }

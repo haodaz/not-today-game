@@ -819,8 +819,10 @@ box(0.026, 0.03, 0.028, mat.pvc, BED.x - 0.6, 0.3, Z0 + 0.02, { r: 0.005 });
 
 // ================= door =================
 const dx = (DOOR.x0 + DOOR.x1) / 2, dw = DOOR.x1 - DOOR.x0;
+let DOOR_LEAF = null; // the surge throws it open (day 17)
 G(dx, 0, Z1, () => {
-  box(dw - 0.07, DOOR.h - 0.035, 0.042, mat.door, 0, (DOOR.h - 0.035) / 2 + 0.005, 0.05, { r: 0.003 }); // a plain flush door
+  box(dw - 0.07, DOOR.h - 0.02, 0.01, new THREE.MeshBasicMaterial({ color: 0x050102 }), 0, (DOOR.h - 0.02) / 2, 0.14, { cast: false, noEdge: true }); // what is behind it: nothing to see
+  DOOR_LEAF = box(dw - 0.07, DOOR.h - 0.035, 0.042, mat.door, 0, (DOOR.h - 0.035) / 2 + 0.005, 0.05, { r: 0.003 }); // a plain flush door
   for (const s of [-1, 1]) { box(0.065, DOOR.h, 0.15, mat.pvc, s * (dw / 2 - 0.02), DOOR.h / 2, 0.03, { r: 0.004 }); box(0.04, DOOR.h + 0.02, 0.012, mat.pvc, s * (dw / 2 + 0.03), DOOR.h / 2 + 0.01, -0.006, { r: 0.003 }); } // jamb and architrave
   box(dw, 0.065, 0.15, mat.pvc, 0, DOOR.h - 0.012, 0.03, { r: 0.004 });
   box(dw + 0.1, 0.04, 0.012, mat.pvc, 0, DOOR.h + 0.04, -0.006, { r: 0.003 });
@@ -1703,8 +1705,9 @@ tentacle([[X1 - 0.03, ROOM.h - 0.04, 0.85], [X1 - 0.07, 2.1, 0.9], [X1 - 0.08, 1
 function updateTentacles(s) {
   let sc = 0;
   if (!SUCK.parent) room.add(SUCK);
+  updateSurge();
   for (const t of tentacles) {
-    const grow = t.boss ? BOSS.k * t.c0 : t.outer ? smooth(t.c0, t.c0 + 0.4, OUTER.k) : smooth(t.c0, t.c0 + 0.34, state.collapse);
+    const grow = t.surge ? Math.max(0, Math.min(1, (SURGE.k - t.lag) / (1 - t.lag))) : t.boss ? BOSS.k * t.c0 : t.outer ? smooth(t.c0, t.c0 + 0.4, OUTER.k) : smooth(t.c0, t.c0 + 0.34, state.collapse);
     t.mesh.visible = grow > 0.01;
     if (!t.mesh.visible) continue;
     const P = t.geo.attributes.position.array, Nn = t.geo.attributes.normal.array, { N, RS } = t;
@@ -2308,6 +2311,30 @@ tentacle([[X0 - 5, -4, 1.2], [X0 - 2.6, -1.2, 0.6], [X0 - 1.0, 0.8, 0.2], [X0 - 
 tentacle([[X0 - 4, 6, -1.8], [X0 - 1.8, 3.6, -1.2], [X0 - 0.6, 2.5, -0.9], [X0 - 0.36, 1.9, -0.4], [X0 - 0.4, 1.4, 0.05]], 0.14, 0.4, 0.22, true);
 tentacle([[X0 - 6, 0, -5], [X0 - 3, 0.8, -3.2], [X0 - 1.2, 1.2, -2.2], [X0 - 0.5, 1.6, -1.7]], 0.26, 0.15, 0.25, true);
 tentacle([[X1 + 4, -3, 1.4], [X1 + 1.6, 0.2, 1.4], [X1 + 0.42, 1.2, 1.42], [X1 + 0.36, 2.0, 1.36]], 0.11, 0.5, 0.14, true); // and one at the narrow window
+// ================= the surge (day 17; author 2026-11-27: 「门开之后，是汹涌的触手…再做一个屋子的过场动画」) =================
+// The door is thrown open and they come in all at once: across the floor to the desk and the bed, along the
+// ceiling, one at the eye. They are the room's own tentacles, grown by SURGE.k instead of by the rot.
+const SURGE = { on: false, k: 0, t0: 0 };
+{
+  const n0 = tentacles.length, cx = (DOOR.x0 + DOOR.x1) / 2, zo = Z1 + 0.9, zi = Z1 - 0.15;
+  tentacle([[cx, 0.9, zo], [cx, 0.85, zi], [cx + 0.3, 0.5, Z1 - 0.9], [0.1, 0.12, 0.7], [0.5, 0.08, 0.0], [DESK.x, 0.3, DESK.z + 0.6], [DESK.x, 0.85, DESK.z + 0.25]], 0.15, 0, 0.1);
+  tentacle([[cx - 0.2, 1.5, zo], [cx - 0.15, 1.45, zi], [cx + 0.2, 1.7, Z1 - 0.8], [0.3, 2.0, 0.6], [0.9, 2.2, -0.2], [1.2, 2.0, -1.0]], 0.12, 0, 0.14);
+  tentacle([[cx + 0.2, 0.3, zo], [cx + 0.2, 0.25, zi], [cx + 0.6, 0.06, Z1 - 0.8], [0.9, 0.05, 0.9], [BED.x - 0.3, 0.3, 0.5], [BED.x, 0.62, 0.2]], 0.13, 0, 0.1);
+  tentacle([[cx, 1.9, zo], [cx + 0.05, 1.85, zi], [cx + 0.3, 1.5, Z1 - 0.7], [0.1, 1.35, 0.7], [0.3, 1.28, 0.15]], 0.09, 0, 0.2); // at the eye, and it stops short of it
+  tentacle([[cx - 0.3, 0.6, zo], [cx - 0.3, 0.55, zi], [X0 + 0.5, 0.3, Z1 - 0.9], [X0 + 0.4, 0.1, 0.5], [X0 + 0.6, 0.06, -0.4]], 0.11, 0, 0.1);
+  tentacle([[cx + 0.3, 1.2, zo], [cx + 0.3, 1.2, zi], [cx + 0.9, 1.0, Z1 - 0.6], [0.8, 0.8, 0.8], [1.3, 0.5, 0.4]], 0.08, 0, 0.16);
+  tentacle([[cx, 0.05, zo], [cx, 0.04, zi], [cx - 0.1, 0.04, Z1 - 1.0], [-0.4, 0.04, 0.3], [-0.2, 0.05, -0.6], [0.2, 0.3, -1.2]], 0.1, 0, 0.08);
+  for (let i = n0; i < tentacles.length; i++) { tentacles[i].surge = true; tentacles[i].lag = (i - n0) * 0.06; }
+}
+function updateSurge() {
+  if (!SURGE.on) return;
+  const u = Math.min(1, Math.max(0, (performance.now() - SURGE.t0) / 2600));
+  SURGE.k = u * u * (3 - 2 * u);
+  if (DOOR_LEAF) { // thrown open inward, on its left edge
+    const a = Math.min(1, u * 6) * 1.75, half = (DOOR.x1 - DOOR.x0 - 0.07) / 2;
+    DOOR_LEAF.rotation.y = a; DOOR_LEAF.position.x = -half + half * Math.cos(a); DOOR_LEAF.position.z = 0.05 - half * Math.sin(a);
+  }
+}
 function updateOutside(s, dt) {
   const want = state.outer ? 1 : 0;
   OUTER.k += (want - OUTER.k) * (1 - Math.exp(-dt * 0.5));
@@ -3374,6 +3401,23 @@ async function wake() {
   waking = false;
 }
 document.getElementById("wake").addEventListener("click", wake);
+
+// The surge, played by the page itself from its URL (`surge=1`, `at=<epoch ms>` to start on the game's own clock)
+// or on { surge: true }. It faces the door wall, the door flies open, they come in; then it says it is done.
+async function surge(at) {
+  if (SURGE.on) return;
+  const EMBED = document.body.classList.contains("embed"), tell = (type) => { try { EMBED && window.parent.postMessage({ source: "nt-room", type }, "*"); } catch {} };
+  goal = null;
+  setFace(2);
+  apply();
+  await wait(at ? Math.max(0, Number(at) - Date.now()) : 0);
+  SURGE.on = true; SURGE.t0 = performance.now();
+  tell("surge-start");
+  { const st = document.createElement("style"); st.textContent = "@keyframes nt-surge-shake{0%,100%{transform:none}15%{transform:translate(-10px,5px)}35%{transform:translate(9px,-6px)}55%{transform:translate(-7px,-3px)}75%{transform:translate(6px,5px)}} body.nt-surge canvas{animation:nt-surge-shake .5s linear 2}"; document.head.append(st); }
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) { document.body.classList.add("nt-surge"); await wait(1000); document.body.classList.remove("nt-surge"); }
+  await wait(3200);
+  tell("surge-done");
+}
 document.getElementById("far").addEventListener("input", (e) => { FAR.to = Number(e.target.value); document.getElementById("farV").textContent = `${Math.round(FAR.to * 100)}%`; });
 document.getElementById("lampOn").addEventListener("change", (e) => { state.lamp = e.target.checked; click(); apply(); });
 document.getElementById("ceilOn").addEventListener("change", (e) => { state.ceil = e.target.checked; click(); apply(); });
@@ -3448,10 +3492,12 @@ function command(m) {
   if (m.far != null) FAR.to = Math.max(0, Math.min(1, Number(m.far)));
   if (m.mug != null) { const k = String(m.mug); if (k === "hold") COFFEE.hold = true; else if (k === "down") COFFEE.hold = false; else if (k === "sip" || k === "gulp" || k === "glug") drink(k); } // #104
   if (m.wake) wake();
+  if (m.surge) surge(m.at);
   if (m.vision) document.getElementById("vision").click();
 }
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
+if (q.get("surge") === "1") surge(q.get("at"));
 window.proto = { CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
 
 // ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws
