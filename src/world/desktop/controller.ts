@@ -8,7 +8,7 @@ import type { BeatClock } from "./beat";
 import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
 import { createFrameKeeper } from "./keepframes";
-import { playSfx, type SfxOptions } from "@world/loop/sfx";
+import { dayTune, playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, backdropFor } from "@world/fit";
 import { boxArrived } from "@world/room/arrival";
@@ -508,7 +508,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     session,
     rerender,
     later,
-    play: (id, opts) => playSfx(id, session.muted, opts),
+    play: (id, opts) => playSfx(id, session.muted, { ...dayTune(id, deps.store.getState().day), ...opts }),
     now: () => Date.now(),
     developed: deps.onPhotoDeveloped,
     hintSeen: deps.hints?.seenNow,
