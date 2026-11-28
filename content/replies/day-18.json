@@ -399,6 +399,21 @@
         "lines": []
       }
     },
+    "father": {
+      "incoming": [],
+      "fine": {
+        "status": "read",
+        "lines": []
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

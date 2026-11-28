@@ -542,6 +542,22 @@
         ]
       }
     },
+    "father": {
+      "incoming": [],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "He has not sent a word today."
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

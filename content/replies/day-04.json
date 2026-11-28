@@ -430,6 +430,40 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "07:10",
+          "text": "[链接] 久坐的人每天做这三个动作",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "三个动作我一个都没做。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "07:30",
+            "text": "做了没"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "07:31",
+            "text": "嗯"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

@@ -548,6 +548,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "10:22",
+          "text": "刚才群里我话重了",
+          "kind": "private"
+        },
+        {
+          "t": "10:22",
+          "text": "不是说你",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "10:25",
+            "text": "嗯"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "10:26",
+            "text": "不行就回来"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

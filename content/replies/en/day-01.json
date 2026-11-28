@@ -392,6 +392,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:05",
+          "text": "[Transfer] ¥2,000",
+          "kind": "private"
+        },
+        {
+          "t": "21:05",
+          "text": "don't tell your mum",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "I do not tap Accept. In twenty-four hours it goes back by itself."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:07",
+            "text": "mm"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:08",
+            "text": "what for"
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

@@ -506,6 +506,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "12:30",
+          "text": "吃的什么",
+          "kind": "private"
+        },
+        {
+          "t": "12:30",
+          "text": "拍给我看看",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "我没有拍。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:40",
+            "text": "有肉没有"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:41",
+            "text": "吃吧"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

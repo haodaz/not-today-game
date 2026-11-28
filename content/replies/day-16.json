@@ -453,6 +453,45 @@
         "lines": []
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "都好。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好。"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好。"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好。"
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

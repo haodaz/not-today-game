@@ -540,6 +540,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "18:33",
+          "text": "小鸡是我让你妈问的",
+          "kind": "private"
+        },
+        {
+          "t": "18:33",
+          "text": "还在的话别扔",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:35",
+            "text": "嗯"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "它就在桌上。"
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:36",
+            "text": "谢什么"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

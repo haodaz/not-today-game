@@ -536,6 +536,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:05",
+          "text": "[Transfer] ¥2,000",
+          "kind": "private"
+        },
+        {
+          "t": "21:05",
+          "text": "don't tell your mum",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "I did not accept the last one and it went back. This one is the same in every way."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:07",
+            "text": "mm"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:08",
+            "text": "what for"
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

@@ -563,6 +563,38 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "15:31",
+          "text": "You wrote that post, didn't you.",
+          "kind": "private"
+        },
+        {
+          "t": "15:31",
+          "text": "How old were you that year.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": []
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "15:35",
+            "text": "Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

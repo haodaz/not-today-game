@@ -52,7 +52,7 @@ export const msgFaceDelay = (seed: string): number => jitter(`${seed}:at`, MSG_F
 /** The attribute an avatar that may go wrong carries (an NPC's, never the player's, a silhouette or home's). */
 export const FACE_OK = 'data-face="1"';
 /** Home stays home (until day 16): the parents' and the clan's conversations never take part. */
-export const HOME_CONVERSATIONS: ReadonlySet<string> = new Set(["family", "clan"]);
+export const HOME_CONVERSATIONS: ReadonlySet<string> = new Set(["family", "father", "clan"]);
 
 /** Whether the message-app face is showing now in `app` on `day`. Pure. */
 export function msgFaceNow(msg: { readonly app: FaceApp; readonly day: number; readonly at: number; readonly seed: string } | null | undefined, app: FaceApp, day: number, nowMs: number): string | null {

@@ -559,6 +559,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:00",
+          "text": "今天腰不疼了。",
+          "kind": "private"
+        },
+        {
+          "t": "21:00",
+          "text": "一点都不疼了。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:02",
+            "text": "好。"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:03",
+            "text": "好。"
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

@@ -460,6 +460,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "19:05",
+          "text": "语音你听了没",
+          "kind": "private"
+        },
+        {
+          "t": "19:05",
+          "text": "我不是跟你要钱",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "19:08",
+            "text": "那你让它看看"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "19:09",
+            "text": "那它会什么"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

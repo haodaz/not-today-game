@@ -430,6 +430,40 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "07:10",
+          "text": "[Link] Three moves a day for people who sit all day",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "I do none of the three."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "07:30",
+            "text": "did you do them"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "07:31",
+            "text": "mm"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

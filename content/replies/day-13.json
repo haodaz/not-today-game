@@ -561,6 +561,39 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "12:10",
+          "text": "老师收走那次，你没哭。",
+          "kind": "private"
+        },
+        {
+          "t": "12:10",
+          "text": "我知道。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "这件事我没有跟家里说过。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:12",
+            "text": "好。"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

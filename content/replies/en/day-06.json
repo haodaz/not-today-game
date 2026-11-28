@@ -460,6 +460,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "19:05",
+          "text": "did you listen to the voice message",
+          "kind": "private"
+        },
+        {
+          "t": "19:05",
+          "text": "I'm not asking you for money",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "19:08",
+            "text": "then have it take a look"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "19:09",
+            "text": "then what can it do"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

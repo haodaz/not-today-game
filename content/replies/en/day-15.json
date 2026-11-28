@@ -530,6 +530,22 @@
         ]
       }
     },
+    "father": {
+      "incoming": [],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "Still nothing."
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

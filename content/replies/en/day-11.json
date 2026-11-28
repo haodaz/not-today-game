@@ -559,6 +559,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:00",
+          "text": "My back does not hurt today.",
+          "kind": "private"
+        },
+        {
+          "t": "21:00",
+          "text": "Not at all.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:02",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:03",
+            "text": "Good."
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

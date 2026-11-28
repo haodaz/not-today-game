@@ -540,6 +540,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "18:33",
+          "text": "I had your mum ask about the chick",
+          "kind": "private"
+        },
+        {
+          "t": "18:33",
+          "text": "if you still have it don't throw it out",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:35",
+            "text": "mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "inner": "It is right here on the desk."
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:36",
+            "text": "what for"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

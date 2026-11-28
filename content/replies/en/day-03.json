@@ -340,6 +340,39 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "18:36",
+          "text": "my back is fine your mum fusses",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:38",
+            "text": "mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:40",
+            "text": "not going costs money"
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

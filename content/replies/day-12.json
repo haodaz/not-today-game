@@ -563,6 +563,38 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "15:31",
+          "text": "那个帖子是你写的吧。",
+          "kind": "private"
+        },
+        {
+          "t": "15:31",
+          "text": "那年你才多大。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": []
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "15:35",
+            "text": "好。"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

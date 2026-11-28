@@ -548,6 +548,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "10:22",
+          "text": "I was too hard in the group just now",
+          "kind": "private"
+        },
+        {
+          "t": "10:22",
+          "text": "I didn't mean you",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "10:25",
+            "text": "mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "10:26",
+            "text": "if it doesn't work out come home"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

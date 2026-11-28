@@ -423,6 +423,45 @@
         "lines": []
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Good child.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "Good child."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "Good child."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "Good child."
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

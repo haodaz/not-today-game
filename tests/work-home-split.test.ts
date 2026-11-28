@@ -54,7 +54,7 @@ describe("which app shows which conversation", () => {
       for (const id of WORK_THREADS) expect(home, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
     }
     // the three clients' project groups are WeChat groups (author 2026-11-27); the parent company's are in 汀汀
-    expect(threadsIn("msgs", 1)).toEqual(["family", "clan", "g_gov", "g_uni", "g_corp"]);
+    expect(threadsIn("msgs", 1)).toEqual(["family", "father", "clan", "g_gov", "g_uni", "g_corp"]); // Dad has a chat of his own (author 2026-11-28)
     expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou"]);
     expect(threadsIn("tingtalk", 4)).toContain("g_invest");
     expect(threadsIn("tingtalk", 4)).not.toContain("g_gov");

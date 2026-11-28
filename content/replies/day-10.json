@@ -536,6 +536,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:05",
+          "text": "[转账] 2000 元",
+          "kind": "private"
+        },
+        {
+          "t": "21:05",
+          "text": "别跟你妈说",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "上次那笔我没有点，退回去了。这一笔和上次一模一样。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:07",
+            "text": "嗯"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:08",
+            "text": "谢什么"
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

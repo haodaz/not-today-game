@@ -506,6 +506,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "22:30",
+          "text": "还没睡吧",
+          "kind": "private"
+        },
+        {
+          "t": "22:30",
+          "text": "我也没睡",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "22:32",
+            "text": "睡吧"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "22:32",
+            "text": "睡吧"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_invest": {
       "incoming": [
         {

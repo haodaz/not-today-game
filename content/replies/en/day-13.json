@@ -561,6 +561,39 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "12:10",
+          "text": "The time the teacher took it away, you did not cry.",
+          "kind": "private"
+        },
+        {
+          "t": "12:10",
+          "text": "I know.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "I never told them about that at home."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:12",
+            "text": "Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

@@ -389,6 +389,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:06",
+          "text": "钱退回来了",
+          "kind": "private"
+        },
+        {
+          "t": "21:06",
+          "text": "不要就算了",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "他没有再转。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:09",
+            "text": "嗯"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:09",
+            "text": "早点睡"
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

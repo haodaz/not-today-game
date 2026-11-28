@@ -340,6 +340,39 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "18:36",
+          "text": "腰没事 你妈大惊小怪",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:38",
+            "text": "嗯"
+          }
+        ]
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "18:40",
+            "text": "不去 贵"
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

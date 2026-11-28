@@ -506,6 +506,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "12:30",
+          "text": "what are you eating",
+          "kind": "private"
+        },
+        {
+          "t": "12:30",
+          "text": "send me a picture",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "I do not take one."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:40",
+            "text": "any meat in it"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "12:41",
+            "text": "eat"
+          }
+        ]
+      }
+    },
     "g_invest": {
       "incoming": [
         {

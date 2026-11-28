@@ -389,6 +389,45 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "21:06",
+          "text": "the money came back",
+          "kind": "private"
+        },
+        {
+          "t": "21:06",
+          "text": "suit yourself",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "read",
+        "lines": [],
+        "inner": "He does not send it again."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:09",
+            "text": "mm"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "21:09",
+            "text": "sleep early"
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

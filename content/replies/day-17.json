@@ -423,6 +423,45 @@
         "lines": []
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "好孩子。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好孩子。"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好孩子。"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "08:00",
+            "text": "好孩子。"
+          }
+        ]
+      }
+    },
     "g_mgmt": {
       "incoming": [
         {

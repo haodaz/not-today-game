@@ -24,7 +24,7 @@ const BASE_PLACES = ["room", "desk", "door", "night", "screen", "screen:msgs", "
  * conversation is the one open (in whichever app holds it), `screen:workbench:<page>` only while
  * 工作台 shows that page. No falling back a level.
  */
-export const MSGS_THREADS = ["boss", "partner", "group", "xiaozhang", "laozhou", "g_invest", "g_merge", "g_mgmt", "g_gov", "g_uni", "g_corp", "family", "clan"] as const;
+export const MSGS_THREADS = ["boss", "partner", "group", "xiaozhang", "laozhou", "g_invest", "g_merge", "g_mgmt", "g_gov", "g_uni", "g_corp", "family", "father", "clan"] as const;
 export const WORKBENCH_PLACES = ["home", "tasks", "docs", "code", "ledger", "tickets", "projects"] as const;
 export type Place =
   | (typeof BASE_PLACES)[number]

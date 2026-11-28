@@ -506,6 +506,44 @@
         ]
       }
     },
+    "father": {
+      "incoming": [
+        {
+          "t": "22:30",
+          "text": "still up I suppose",
+          "kind": "private"
+        },
+        {
+          "t": "22:30",
+          "text": "so am I",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "22:32",
+            "text": "go to sleep"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "father",
+            "t": "22:32",
+            "text": "go to sleep"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      }
+    },
     "g_invest": {
       "incoming": [
         {
