@@ -201,7 +201,7 @@
       "deliverable": {
         "id": "d8-toasts",
         "label": "the team-night schedule",
-        "to": "group"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

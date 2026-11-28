@@ -201,7 +201,7 @@
       "deliverable": {
         "id": "d8-toasts",
         "label": "团建排期",
-        "to": "group"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

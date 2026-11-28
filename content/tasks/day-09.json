@@ -297,7 +297,7 @@
       "deliverable": {
         "id": "d9-seats",
         "label": "会议室座位",
-        "to": "boss"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

@@ -7,7 +7,7 @@
 import type { GameEvent } from "@state/events";
 import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, pathOnMenu, taskForId, tuneCarried, tuneOfferPending, tuneOffers, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
-import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard, type TuneMod, type TunePath } from "@state/days/tasks";
+import { API_FIELD, SLOT_FIELD, deliverableTarget, type Task, type TaskBoard, type TuneMod, type TunePath } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
@@ -85,9 +85,10 @@ export function shellOf(session: Pick<Session, "shell">, day: number, task: Task
 }
 
 /** Who a task is handed to, by name (a person's deliverable); null for the workbench / the hand. */
-function forWhom(task: Task): SafeHtml | null {
+export function forWhom(task: Task): SafeHtml | null {
   const to = task.deliverable?.to;
-  const key = to === "boss" || to === "partner" || to === "group" ? `msgs.${to}` : null;
+  // handin-targets R2: the receiver's name from DELIVERABLE_TARGETS (merge: the fusion group; kuro: Kuro)
+  const key = deliverableTarget(to)?.name ?? null;
   return key && hasString(key) && hasString("wb.task.for") ? tr("wb.task.for", { who: t(key) }) : null;
 }
 

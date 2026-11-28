@@ -11,7 +11,7 @@ import { step } from "@state/replay";
 import { condHolds } from "@state/replies/resolve";
 import { dayTable, FAMILY_GROUPS, OUTSIDE_GROUPS } from "@state/replies/table";
 import type { State } from "@state/types.gen";
-import { taskByFlag } from "@state/days/tasks";
+import { deliverableTarget, taskByFlag } from "@state/days/tasks";
 import { npcIdOf } from "@world/npc";
 import { planReply, IN_INPUT_FLAG, type ReplyPlan } from "@world/replies/plan";
 import type { BeatClock } from "../beat";
@@ -39,7 +39,7 @@ export interface SentReply {
 }
 
 /** The conversation id a person-sent deliverable goes to (work v2 addition 2026-11-03 night). */
-const CONVERSATION_OF_TO: Readonly<Record<string, string>> = { boss: "boss", partner: "partner", group: "group" };
+// handin-targets R2: the thread of each target comes from DELIVERABLE_TARGETS (merge → g_merge; kuro, workbench: none)
 
 /** A board deliverable the player sent to a person on screen, as a file card from 你. */
 export interface SentFile {
@@ -73,8 +73,8 @@ export function sentFiles(events: readonly GameEvent[]): SentFile[] {
     const d = deliverableFor(event.day, event.deliverableId);
     const to = d?.to;
     if (!d || to === undefined || to === "hand") return;
-    const conversation = CONVERSATION_OF_TO[to];
-    if (conversation === undefined) return; // workbench: sent nowhere a conversation shows it
+    const conversation = deliverableTarget(to)?.conversation ?? null;
+    if (conversation === null) return; // workbench, kuro: sent nowhere a conversation shows it
     out.push({ day: event.day, conversation, label: d.label, t: event.t ?? "", order: index });
   });
   return out;

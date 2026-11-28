@@ -3,7 +3,7 @@
 // the stand-in beat clock. Everything it adds to the log goes through store.appendEvent.
 import { holdUntilQuiet, releaseQuiet, replyLive } from "./quiet";
 import type { BeatName, Item, SayLine, Sequence } from "@state/days/table";
-import { taskByFlag } from "@state/days/tasks";
+import { deliverableTarget, taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import { chickFedOn } from "@state/chick";
@@ -265,7 +265,7 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     if (e.kind === "give" && e.t !== undefined) {
       const sent = file.items.find((it) => it.done.kind === "flag" && taskByFlag(day, it.done.flag)?.deliverable?.id === e.deliverableId);
       const to = sent && sent.done.kind === "flag" ? taskByFlag(day, sent.done.flag)?.deliverable?.to : undefined;
-      if (sent && !sent.onDone && (to === "boss" || to === "partner" || to === "group") && hasString("task.sent")) {
+      if (sent && !sent.onDone && deliverableTarget(to)?.receives === true && hasString("task.sent")) {
         dialogue = push(dialogue, { key: `d${day}:${sent.id}:sent`, lines: [{ k: "narration", t: t("task.sent") }], ending: { kind: "taskHome", to } });
       }
     }

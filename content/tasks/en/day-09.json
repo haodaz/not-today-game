@@ -297,7 +297,7 @@
       "deliverable": {
         "id": "d9-seats",
         "label": "the meeting-room seats",
-        "to": "boss"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

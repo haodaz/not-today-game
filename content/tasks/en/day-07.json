@@ -368,7 +368,7 @@
       "deliverable": {
         "id": "d7-minutes",
         "label": "the morning meeting minutes",
-        "to": "group"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

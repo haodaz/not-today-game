@@ -3075,3 +3075,24 @@ and wrote this entry (Kiro wrote none for it).
   everything shows at once.
 - tsc clean; vitest 225 files, 2807 passed (one earlier full run had a flaky `replies-table` failure
   that passes alone and on the rerun). A headless walk of day 17 was not run.
+
+## 2026-11-28 · handin-targets (days 7–9 to the fusion group, day 18 to Kuro)
+
+- Spec `.kiro/specs/handin-targets/` (requirements by the author; design.md and tasks.md written here).
+- R1: `DELIVERABLE_TO` gains `merge` and `kuro`. `DELIVERABLE_TARGETS` (next to it) says per target
+  which thread a file card shows in, whose name the 交给 chip shows, and whether they receive a
+  message. The day check (`merge` needs `g_merge` in that day's reply table) is
+  `checkHandinTargets`. **I chose the test over the real content**
+  (`tests/handin-targets.test.ts`): the task loader cannot see the reply tables, because
+  state/replies already reads the days.
+- R2: `transcript.ts`, `shell.ts` (`forWhom`, now exported for the test), `runtime.ts` (`task.sent`)
+  and `game.ts` (the taskHome landing) read the map. In `game.ts` the old values land as before
+  (anything unknown → boss), `merge` lands in g_merge, and `kuro` doesn't land. The spec places that
+  line under "a call that ended", but it is the hand-in's `taskHome` ending, so a day 7–9 hand-in
+  passes through it.
+- R3 / R4: the four strings and the eight `"to"` values, verbatim, by
+  `script/tools/handin-targets-content.mjs` (the task files are edited one line in place). The
+  fonts test is green. Nothing under `content/replies/` was opened.
+- R5: the walk driver presses the send button by `data-action` (no change). No snapshot changed.
+  `tests/handin-lands.test.ts` reads the map. tsc clean; vitest 226 files, 2817 passed. Walks of
+  days 7 and 18 were not run.

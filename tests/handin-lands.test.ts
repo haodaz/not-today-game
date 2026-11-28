@@ -4,7 +4,7 @@
 // now say one plain line (strings `task.sent`) with that ending.
 import { describe, expect, it } from "vitest";
 import { dayFiles } from "@state/days/table";
-import { taskByFlag } from "@state/days/tasks";
+import { deliverableTarget, taskByFlag } from "@state/days/tasks";
 import { createStore } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
@@ -41,7 +41,7 @@ describe("a hand-in lands in its recipient's thread on every day", () => {
       for (const it of file.items) {
         if (it.done.kind !== "flag") continue;
         const to = taskByFlag(day, it.done.flag)?.deliverable?.to;
-        if (to !== "boss" && to !== "partner" && to !== "group") continue;
+        if (deliverableTarget(to)?.receives !== true) continue;
         // an item with its own closing lines goes by them (day 1's 「今天的活交了。」, the call's night task: seen
         // landing in the walk); one without gets the plain line here
         if (it.onDone) continue;

@@ -407,8 +407,39 @@ export interface TaskBoard {
   readonly game?: BoardGame;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
-export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
+export const DELIVERABLE_TO = ["boss", "partner", "group", "merge", "kuro", "workbench", "hand"] as const;
 export type DeliverableTo = (typeof DELIVERABLE_TO)[number];
+/**
+ * handin-targets R2: what each target is, in one place. `conversation`: the thread a sent file card
+ * shows in (null: none); `name`: the string key of who receives it (the header's 交给 chip; null:
+ * nobody named); `receives`: a person or a group that gets a message (the `task.sent` line, the
+ * screen landing in their thread). `merge` is the fusion group (days 7–9); `kuro` is handed to Kuro
+ * and shows in no conversation.
+ */
+export const DELIVERABLE_TARGETS: Readonly<Record<DeliverableTo, { readonly conversation: string | null; readonly name: string | null; readonly receives: boolean }>> = {
+  boss: { conversation: "boss", name: "msgs.boss", receives: true },
+  partner: { conversation: "partner", name: "msgs.partner", receives: true },
+  group: { conversation: "group", name: "msgs.group", receives: true },
+  merge: { conversation: "g_merge", name: "msgs.g_merge", receives: true },
+  kuro: { conversation: null, name: "kuro.name", receives: false },
+  workbench: { conversation: null, name: null, receives: false },
+  hand: { conversation: null, name: null, receives: false },
+};
+/** The target's entry, or null for an absent / unknown `to`. */
+export const deliverableTarget = (to: string | undefined): (typeof DELIVERABLE_TARGETS)[DeliverableTo] | null =>
+  to !== undefined && Object.prototype.hasOwnProperty.call(DELIVERABLE_TARGETS, to) ? DELIVERABLE_TARGETS[to as DeliverableTo] : null;
+/**
+ * handin-targets R1: a day's tasks against the recipients its reply table has. A target whose
+ * conversation is a group that only exists on some days (`g_merge`) must be a recipient that day.
+ * The loader cannot see the reply tables (state/replies reads the days), so the check runs over the
+ * real content in tests/handin-targets.test.ts. Throws at the first miss.
+ */
+export function checkHandinTargets(day: number, tasks: readonly Task[], recipients: ReadonlySet<string>): void {
+  for (const task of tasks) {
+    const to = task.deliverable?.to;
+    if (to === "merge" && !recipients.has("g_merge")) fail(`day ${String(day)} task "${task.id}".deliverable.to`, `"merge" but the day's reply table has no g_merge`);
+  }
+}
 export interface TaskDeliverable {
   readonly id: string;
   readonly label: string;

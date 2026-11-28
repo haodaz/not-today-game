@@ -368,7 +368,7 @@
       "deliverable": {
         "id": "d7-minutes",
         "label": "晨会纪要",
-        "to": "group"
+        "to": "merge"
       },
       "judge": {
         "perfect": 0,

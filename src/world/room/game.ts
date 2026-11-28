@@ -2,7 +2,7 @@
 // and the day-loop's actions. Everything the player does appends one event; the runtime
 // (loop/runtime.ts) reacts after each.
 import { dayFile } from "@state/days/table";
-import { taskByFlag, type Task } from "@state/days/tasks";
+import { deliverableTarget, taskByFlag, type Task } from "@state/days/tasks";
 import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
 import { desktopApps } from "@world/desktop/apps";
@@ -1368,8 +1368,9 @@ export const loopActions: Record<string, ActionHandler> = {
         // author 2026-11-20 / 2026-11-24 (#61 #63): the work was sent, so the screen lands in the thread
         // of whoever it went to (the file sits there; their answer comes there), not on 工作台's home.
         session.wbFull = false;
-        const to = ended.to === "partner" || ended.to === "group" ? ended.to : "boss";
-        showConversation(session, to);
+        // handin-targets R2: boss / partner / group as before (anything else: boss); merge lands in g_merge;
+        // kuro has no thread, so the screen stays where it is
+        if (ended.to !== "kuro") showConversation(session, deliverableTarget(ended.to)?.conversation ?? "boss");
       }
       // the item's own `then`: after a beat in the thread the camera goes there, `after` said on arrival
       const then = ended.then;

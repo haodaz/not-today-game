@@ -192,7 +192,7 @@
       "deliverable": {
         "id": "d18-clear",
         "label": "待办清单",
-        "to": "boss"
+        "to": "kuro"
       },
       "judge": {
         "perfect": 0,
