@@ -3,12 +3,12 @@
 // and their events are untouched. 听听 / TingTalk (DingTalk-like) holds the company's threads; Hi信 /
 // Hichat (WeChat-like, the `msgs` app) holds 家里 and 朋友圈.
 import { recipientsOn } from "@state/replies/resolve";
-import { OUTSIDE_GROUPS } from "@state/replies/table";
+import { CLIENT_GROUPS, PARENT_GROUPS } from "@state/replies/table";
 
 export type ThreadApp = "tingtalk" | "msgs";
 
 /** The company's conversations, in 听听, in this order. */
-export const WORK_THREADS: readonly string[] = ["boss", "partner", "group", "xiaozhang", "laozhou", ...OUTSIDE_GROUPS];
+export const WORK_THREADS: readonly string[] = ["boss", "partner", "group", "xiaozhang", "laozhou", ...PARENT_GROUPS];
 
 /** 朋友圈 in Hi信: not a conversation (no replies, no unread), a feed. */
 export const FEED = "feed";
@@ -20,5 +20,7 @@ export function appOfThread(id: string): ThreadApp {
 
 /** The conversations `app` shows on `day`, in the reply tables' order. */
 export function threadsIn(app: ThreadApp, day: number): string[] {
-  return recipientsOn(day).filter((id) => appOfThread(id) === app);
+  const ids = recipientsOn(day).filter((id) => appOfThread(id) === app);
+  // Hi信: the family first, then the clients' project groups (WeChat groups)
+  return app === "msgs" ? [...ids.filter((id) => !CLIENT_GROUPS.includes(id)), ...ids.filter((id) => CLIENT_GROUPS.includes(id))] : ids;
 }

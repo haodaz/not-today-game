@@ -27,6 +27,9 @@ export const FAMILY_GROUPS: readonly string[] = [FAMILY, CLAN];
  * us (government, university, big enterprise). Group-type threads: a `名字：` prefix says who talks.
  */
 export const OUTSIDE_GROUPS: readonly string[] = ["g_invest", "g_merge", "g_mgmt", "g_gov", "g_uni", "g_corp"];
+/** author 2026-11-27: 「不给钱的 3 个甲方的项目群是微信群。集团的群是钉钉群」: the clients' groups show in Hi信, the parent company's in 汀汀. */
+export const CLIENT_GROUPS: readonly string[] = ["g_gov", "g_uni", "g_corp"];
+export const PARENT_GROUPS: readonly string[] = ["g_invest", "g_merge", "g_mgmt"];
 
 export interface Line {
   readonly who: string;

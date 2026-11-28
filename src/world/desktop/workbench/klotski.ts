@@ -213,11 +213,11 @@ const GOD_MARK: Readonly<Record<string, string>> = {
  * keyhole under an arch with its name; a god the faceless tall figure with its own mark; a person
  * their face, round and grey, with the name; you a light tile with a thin amber ring.
  */
-function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null, look: string | null = null): SafeHtml {
+function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null, look: string | null = null, shove: { x: number; y: number; rot: number; d: number } | null = null): SafeHtml {
   const info = game.blocks[b.id];
   const role = info?.role ?? "nameless";
   const label = info?.label ?? "";
-  const style = `--x:${String(b.x)};--y:${String(b.y)};--w:${String(b.w)};--h:${String(b.h)}`;
+  const style = `--x:${String(b.x)};--y:${String(b.y)};--w:${String(b.w)};--h:${String(b.h)}${shove ? `;--sx:${String(shove.x)};--sy:${String(shove.y)};--sr:${String(shove.rot)}deg;--sd:${String(shove.d)}ms` : ""}`;
   const kind = role === "nameless" ? "big" : role === "god" ? "tall god" : role;
   const name = label ? html`<span class="kl-label">${label}</span>` : null;
   const face =
@@ -228,7 +228,7 @@ function blockHtml(game: Game, b: KBlock, g: KlotskiGame | null, look: string | 
     // author 2026-11-27: 「你，可以用上玩家选的 look，积木看起来颜色要像个活人，唯一的活人」
     : html`${look ? html`<img class="kl-face kl-me" src="${look}" alt="">` : null}${name}<i class="kl-you-ring" aria-hidden="true"></i>`;
   const aria = label ? html` aria-label="${label}"` : null;
-  return html`<button type="button" class="${cls("kl-block", kind, g?.pick === b.id && "picked")}" data-action="klotski-pick" data-block="${b.id}" data-role="${role}" style="${style}"${aria}${g && !g.done ? null : html` disabled`}>${face}</button>`;
+  return html`<button type="button" class="${cls("kl-block", kind, g?.pick === b.id && "picked", shove && "shoved")}" data-action="klotski-pick" data-block="${b.id}" data-role="${role}" style="${style}"${aria}${g && !g.done ? null : html` disabled`}>${face}</button>`;
 }
 
 /** #166: how far the thing at the door has come, 0..1, by the pushes made (drawn only). */
@@ -307,6 +307,31 @@ export function klotskiSurge(g: Pick<KlotskiGame, "trail" | "blocks" | "exit">):
     : [];
   return [...main, ...spill, ...you];
 }
+/**
+ * Shoved aside (author 2026-11-27: 「感觉是盖在上面的，不是从通道过去的」): the surge does not lie on the
+ * blocks, it parts them. Every block standing on the way (the exit block's trail) is pushed off it,
+ * sideways to the way's direction there, as the front reaches it: `x` / `y` in cells, `rot` in degrees,
+ * `d` the delay in ms. The exit block stays.
+ */
+export function klotskiShoves(g: Pick<KlotskiGame, "trail" | "blocks" | "exit">): Record<string, { x: number; y: number; rot: number; d: number }> {
+  const way = [...g.trail].reverse();
+  const out: Record<string, { x: number; y: number; rot: number; d: number }> = {};
+  for (const b of g.blocks) {
+    if (b.id === g.exit) continue;
+    const i = way.findIndex(([x, y]) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+    if (i < 0) continue;
+    const at = way[i]!, prev = way[i - 1] ?? [at[0], at[1] + 1], next = way[i + 1] ?? [at[0] + (at[0] - prev[0]), at[1] + (at[1] - prev[1])];
+    const dx = next[0] - prev[0], dy = next[1] - prev[1], len = Math.hypot(dx, dy) || 1;
+    const px = -dy / len, py = dx / len; // across the way
+    const cx = b.x + b.w / 2 - (at[0] + 0.5), cy = b.y + b.h / 2 - (at[1] + 0.5);
+    let side = Math.sign(cx * px + cy * py);
+    // standing square on the way: toward the nearer wall
+    if (side === 0) side = (b.x + b.w / 2 + px) * (px !== 0 ? 1 : 0) + (b.y + b.h / 2 + py) * (py !== 0 ? 1 : 0) >= (px !== 0 ? KLOTSKI_COLS / 2 : KLOTSKI_ROWS / 2) ? 1 : -1;
+    const far = b.w * b.h >= 4 ? 0.2 : b.w * b.h === 2 ? 0.32 : 0.44;
+    out[b.id] = { x: Math.round(px * side * far * 100) / 100, y: Math.round(py * side * far * 100) / 100, rot: side * (4 + (b.id.charCodeAt(0) % 5)), d: KLOTSKI_SLIDE_MS + Math.round((i / Math.max(1, way.length)) * 1100) };
+  }
+  return out;
+}
 /** The margins (in cells) of the flesh page round the tray: left, top, right, bottom (the door and the path are below). */
 export const KLOTSKI_FLESH_MARGIN = [1, 1, 1, 2] as const;
 
@@ -315,7 +340,8 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   const g: KlotskiGame | null = session.klotski?.key === task.id ? session.klotski : null;
   const lv = g ?? klotskiStart(task.id, game);
   const out = !!g?.out;
-  const blocks = lv.blocks.map((b) => blockHtml(game, b, g, look));
+  const shoves = g && out ? klotskiShoves(g) : {};
+  const blocks = lv.blocks.map((b) => blockHtml(game, b, g, look, shoves[b.id] ?? null));
   // the more pushes, the more of it shows at the door and the redder the tray's grain (drawn only); at the door, all of it
   const rot = (out ? 1 : klotskiRot(g?.moves ?? 0)).toFixed(2);
   // klotski-door R3: the door opens under the exit block; several tentacles come in, cell by cell

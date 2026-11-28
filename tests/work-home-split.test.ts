@@ -53,9 +53,12 @@ describe("which app shows which conversation", () => {
       const home = renderMessages(ctxFor(store)).body.value;
       for (const id of WORK_THREADS) expect(home, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
     }
-    expect(threadsIn("msgs", 1)).toEqual(["family", "clan"]);
-    expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "g_gov", "g_uni", "g_corp"]);
+    // the three clients' project groups are WeChat groups (author 2026-11-27); the parent company's are in 汀汀
+    expect(threadsIn("msgs", 1)).toEqual(["family", "clan", "g_gov", "g_uni", "g_corp"]);
+    expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou"]);
     expect(threadsIn("tingtalk", 4)).toContain("g_invest");
+    expect(threadsIn("tingtalk", 4)).not.toContain("g_gov");
+    expect(threadsIn("tingtalk", 10)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "g_mgmt"]);
     expect(appOfThread("laozhou")).toBe("tingtalk");
     expect(appOfThread("clan")).toBe("msgs");
   });

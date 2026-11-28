@@ -16,7 +16,7 @@ import { initialSession } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workLayer } from "@world/desktop/workbench/compare";
 import { gradeGame } from "@world/desktop/workbench/grades";
-import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS } from "@world/desktop/workbench/klotski";
+import { KLOTSKI_DONE_MS, klotskiCard, klotskiCover, klotskiPath, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiStep, klotskiCall, klotskiSurge, KLOTSKI_SLIDE_MS, klotskiShoves } from "@world/desktop/workbench/klotski";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
@@ -236,6 +236,16 @@ describe("klotski: the stage", () => {
     const last = main.p[main.p.length - 1]!;
     expect(last[0] < 0 || last[0] > 4 || last[1] < 0 || last[1] > 5).toBe(true);
     for (const st of strands) expect(st.d).toBeGreaterThanOrEqual(KLOTSKI_SLIDE_MS);
+    // parted, not covered (「感觉是盖在上面的，不是从通道过去的」): the blocks standing on your way are pushed off it; you are not
+    const shoves = klotskiShoves(g);
+    expect(Object.keys(shoves).length).toBeGreaterThan(0);
+    expect(shoves.U).toBeUndefined();
+    for (const [id, sh] of Object.entries(shoves)) {
+      const b = g.blocks.find((x) => x.id === id)!;
+      expect(g.trail.some(([x, y]) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h), id).toBe(true);
+      expect(Math.hypot(sh.x, sh.y)).toBeGreaterThan(0.1);
+      expect(r.out()).toMatch(new RegExp(`class="kl-block[^"]*shoved"[^>]*data-block="${id}"`));
+    }
     // the page and its script are on disk and in the build's inputs
     expect(fs.readFileSync(new URL("../room3d/flesh.js", import.meta.url), "utf8")).toContain("CatmullRomCurve3");
     expect(fs.readFileSync(new URL("../vite.config.ts", import.meta.url), "utf8")).toContain("flesh: fleshPage");
