@@ -26,7 +26,7 @@
         },
         {
           "t": "09:05",
-          "text": "Launch this afternoon; everyone from the Group will be there. You set the demo and watch the audience.",
+          "text": "The Group's Brand department says the launch is this afternoon and everyone from the Group will be there. You set the demo and watch the audience.",
           "kind": "work"
         }
       ],
@@ -534,12 +534,12 @@
       "incoming": [
         {
           "t": "09:05",
-          "text": "Exec Office：The launch is this afternoon. The whole Group attends. Please watch the audience's reaction live.",
+          "text": "Brand SVP：The launch is this afternoon. The whole Group attends. The one from R&D lays out the deck; please watch the audience's reaction live.",
           "kind": "work"
         },
         {
           "t": "15:00",
-          "text": "Exec Office：[Photo]",
+          "text": "Brand SVP：[Photo]",
           "kind": "work",
           "card": {
             "type": "image",

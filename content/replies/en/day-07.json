@@ -10,7 +10,7 @@
         },
         {
           "t": "09:05",
-          "text": "(Transcript) {bossCalls}, the weekly meeting is a morning meeting from now on, nine every day, Lao Zhou hosts. You do the minutes, by the template.",
+          "text": "(Transcript) {bossCalls}, the weekly meeting is a morning meeting from now on, nine every day, Lao Zhou hosts. The advisers want minutes, on their template. You write them up.",
           "kind": "work"
         },
         {
@@ -584,6 +584,11 @@
         {
           "t": "09:35",
           "text": "The Advisers：One person has not changed theirs. R&D has no matching rank. Leave it empty for now.",
+          "kind": "work"
+        },
+        {
+          "t": "09:40",
+          "text": "Adviser Chen：@all Today's minutes go on the template, all five steps. The one from R&D writes them up and sends them to this group.",
           "kind": "work"
         },
         {

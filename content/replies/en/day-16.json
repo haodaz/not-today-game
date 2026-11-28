@@ -457,12 +457,12 @@
       "incoming": [
         {
           "t": "09:01",
-          "text": "Exec Office：The chairman is here. The chairman does not read material. The report must not stop.",
+          "text": "Chief of Staff：The chairman is here. The chairman does not read material. The one from R&D makes the report. It must not stop.",
           "kind": "work"
         },
         {
           "t": "09:02",
-          "text": "Exec Office：Please do not type the chairman's name. It cannot be typed anyway.",
+          "text": "Chief of Staff：Please do not type the chairman's name. It cannot be typed anyway.",
           "kind": "work"
         }
       ]

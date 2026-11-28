@@ -426,6 +426,11 @@
     "g_mgmt": {
       "incoming": [
         {
+          "t": "08:58",
+          "text": "The Secretary：The chairman wants the one from R&D to return a call.",
+          "kind": "work"
+        },
+        {
           "t": "09:00",
           "text": "Exec Office：Answer me. You should know who I am.",
           "kind": "work"

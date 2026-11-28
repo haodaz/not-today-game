@@ -20,7 +20,7 @@
         },
         {
           "t": "09:40",
-          "text": "(Transcript) The costs must balance, not a cent off. The Group will be looking.",
+          "text": "(Transcript) The Group's Finance says the costs must balance, not a cent off. I'm passing it on to you.",
           "kind": "work"
         },
         {
@@ -563,12 +563,12 @@
       "incoming": [
         {
           "t": "09:00",
-          "text": "Finance：Costs are weighed today. Not a cent off. Do not touch the oil column or the wine column.",
+          "text": "Finance Mgr：Costs are weighed today; the one from R&D fills in the sheet. Not a cent off. Do not touch the oil column or the wine column.",
           "kind": "work"
         },
         {
           "t": "12:00",
-          "text": "Finance：@Vivi When will the sheet balance.",
+          "text": "Finance Mgr：@Vivi When will the sheet balance.",
           "kind": "work"
         },
         {

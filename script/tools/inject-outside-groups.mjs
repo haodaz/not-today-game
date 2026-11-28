@@ -4,7 +4,7 @@
 // Each line: [time, speaker (zh), zh text, en text, card?]. Speakers are mapped to English by NAMES.
 import fs from "node:fs";
 const ROOT = process.env.REPLIES ?? new URL("../../content/replies", import.meta.url).pathname;
-const NAMES = { 孙姐: "Ms Sun", 小吴: "Xiao Wu", 刘处: "Director Liu", 老周: "Lao Zhou", 赵老师: "Ms Zhao", 小林: "Xiao Lin", 陈教授: "Prof. Chen", Lisa: "Lisa", Kevin: "Kevin", Tony: "Tony", "和光·投资部": "Investment", "和光·法务部": "Legal", "和光·顾问组": "The Advisers", "顾问 陈": "Adviser Chen", "顾问 沈": "Adviser Shen", 小张: "Xiao Zhang", "和光·总裁办": "Exec Office", "和光·财务部": "Finance", "和光·人力部": "HR", "和光·行政部": "Admin", "和光·文化部": "Culture", 老板: "Boss", Vivi: "Vivi", member: "member" };
+const NAMES = { 孙姐: "Ms Sun", 小吴: "Xiao Wu", 刘处: "Director Liu", 老周: "Lao Zhou", 赵老师: "Ms Zhao", 小林: "Xiao Lin", 陈教授: "Prof. Chen", Lisa: "Lisa", Kevin: "Kevin", Tony: "Tony", "和光·投资部": "Investment", "和光·法务部": "Legal", "和光·顾问组": "The Advisers", "顾问 陈": "Adviser Chen", "顾问 沈": "Adviser Shen", 小张: "Xiao Zhang", "和光·总裁办": "Exec Office", "顾问组组长": "Lead Adviser", "和光·文化部专员": "Culture Staff", "和光·财务部经理": "Finance Mgr", "和光·行政部高级经理": "Admin Sr Mgr", "和光·行政部总监": "Admin Director", "和光·人力部副总裁": "HR VP", "和光·品牌部高级副总裁": "Brand SVP", "和光·总裁办主任": "Chief of Staff", "董事长秘书": "The Secretary", "和光·财务部": "Finance", "和光·人力部": "HR", "和光·行政部": "Admin", "和光·文化部": "Culture", 老板: "Boss", Vivi: "Vivi", member: "member" };
 const MORNING = ["早上好。很高兴今天也能和各位一起工作。", "Good morning. So glad to be working with all of you again today."];
 // day 6: the same words in all three groups, said by that group's own three people (a = office, b = junior, c = the senior one)
 const same6 = (a, b, c) => [
@@ -220,13 +220,14 @@ G.g_merge = {
     ["09:32", "小张", "伯爵-小张", "Earl-Xiao Zhang"],
     ["09:32", "老板", "王-老王", "King-Lao Wang"],
     ["09:35", "和光·顾问组", "还有一位没改。研发没有对应的职级，先空着就行。", "One person has not changed theirs. R&D has no matching rank. Leave it empty for now."],
+    ["09:40", "顾问 陈", "@所有人 今天的晨会纪要按模板，五步一步别少。研发那位整理，发到这个群。", "@all Today's minutes go on the template, all five steps. The one from R&D writes them up and sends them to this group."],
     ["10:30", "顾问 陈", "六份交接单，今天内交齐，一人一份。", "Six handover forms, all in by the end of today, one each."],
     ["16:00", "顾问 沈", "收到两份。另外四份的人呢。", "Two received. Where are the people of the other four."],
     ["16:01", "顾问 陈", "不急。人会来的。", "No hurry. The people will come."],
   ],
   8: [
-    ["09:10", "和光·顾问组", "@所有人 周五线上团建。祝酒时间按职级排，依据在共享盘《职级与时段》。", "@all Online team night on Friday. Toast hours go by rank; the basis is in the shared drive: Ranks and hours."],
-    ["09:11", "和光·顾问组", "排期的人定了，是研发那位。", "The scheduler has been named: the one from R&D."],
+    ["09:10", "顾问 沈", "@所有人 周五线上团建。祝酒时间按职级排，依据在共享盘《职级与时段》。", "@all Online team night on Friday. Toast hours go by rank; the basis is in the shared drive: Ranks and hours."],
+    ["09:11", "顾问 沈", "祝酒时间研发那位排，排好发到这个群。", "The one from R&D schedules the toasts and sends the schedule to this group."],
     ["10:02", "顾问 陈", "十三份外卖已订，一份不要筷子。", "Thirteen takeaways ordered, one without chopsticks."],
     ["10:03", "小张", "十三份是哪十三个人？我数了，我们没有这么多。", "Thirteen for which thirteen people? I counted. There aren't that many of us."],
     ["10:04", "顾问 沈", "到时候就够了。", "There will be by then."],
@@ -235,7 +236,7 @@ G.g_merge = {
   9: [
     ["09:02", "和光·顾问组", "今天系统接入。各位的账号会自动迁过来，不需要操作。", "The systems are joined today. Your accounts will move over by themselves. Nothing for you to do."],
     ["09:03", "和光·顾问组", "迁移期间如果看到自己的头像变了，属于正常现象。", "If you see your own picture change during the move, that is normal."],
-    ["14:00", "顾问 陈", "明天的会，座位研发那位在排。圈内四席，圈外一席。", "Tomorrow's meeting: the one from R&D is doing the seating. Four seats in the circle, one outside."],
+    ["14:00", "顾问组组长", "明天的会，座位研发那位排，排好发到这个群。圈内四席，圈外一席。", "Tomorrow's meeting: the one from R&D does the seating and sends it to this group. Four seats in the circle, one outside."],
     ["14:01", "顾问 沈", "来宾的名字，请各位不要打在群里。", "Please do not type the guest's name in the group."],
     ["14:02", "小张", "为什么", "Why"],
     ["14:02", "顾问 沈", "打出来，它就听见了。", "Once it is typed, it has heard."],
@@ -254,41 +255,42 @@ G.g_mgmt = {
   10: [
     ["09:00", "和光·总裁办", "早上好。今天她到。请各位把虚拟背景关掉。", "Good morning. She arrives today. Please turn your virtual backgrounds off."],
     ["09:01", "和光·总裁办", "贵司原来的三个项目群已经并入集团。那三笔款不用再催了，都是一家人。", "Your three old project groups have been merged into the Group. No need to chase those three payments any more. We are one family."],
-    ["09:30", "和光·文化部", "剧本第二幕今天校对。校对的人不要整行读。", "Act two of the script is proofread today. Whoever proofreads must not read a whole line."],
+    ["09:30", "和光·文化部专员", "剧本第二幕今天校对，研发那位来。校对的人不要整行读。", "Act two of the script is proofread today, by the one from R&D. Whoever proofreads must not read a whole line."],
     ["17:30", "和光·总裁办", ...NIGHT],
   ],
   11: [
-    ["09:00", "和光·财务部", "今天称成本。一分不能差。油和酒两列不要动。", "Costs are weighed today. Not a cent off. Do not touch the oil column or the wine column."],
-    ["12:00", "和光·财务部", "@Vivi 表几点能平。", "@Vivi When will the sheet balance."],
+    ["09:00", "和光·财务部经理", "今天称成本，研发那位填表。一分不能差。油和酒两列不要动。", "Costs are weighed today; the one from R&D fills in the sheet. Not a cent off. Do not touch the oil column or the wine column."],
+    ["12:00", "和光·财务部经理", "@Vivi 表几点能平。", "@Vivi When will the sheet balance."],
     ["12:01", "Vivi", "下班前。", "Before the end of the day."],
     ["17:30", "和光·总裁办", ...NIGHT],
   ],
   12: [
-    ["03:00", "和光·总裁办", "本周是关键。各位先不睡。", "This week is the one that counts. Nobody sleeps for now."],
+    ["03:00", "和光·行政部高级经理", "本周是关键。各位先不睡。值班表研发那位排。", "This week is the one that counts. Nobody sleeps for now. The one from R&D draws up the rota."],
     ["03:00", "老板", "收到。", "Received."],
     ["03:00", "Vivi", "收到。", "Received."],
-    ["11:31", "和光·财务部", "钱的事，各位不用再问了。", "About money: you need not ask again."],
+    ["11:31", "和光·财务部经理", "钱的事，各位不用再问了。", "About money: you need not ask again."],
   ],
   13: [
     ["09:30", "和光·总裁办", "公司下周升级，全员。", "The company is upgraded next week. All staff."],
-    ["09:31", "和光·行政部", "集团要向三位借几样旧东西，走借阅审批。借期：长期。", "The Group would like to borrow a few old things from the three of you, through a loan approval. Period of loan: long-term."],
-    ["18:00", "和光·行政部", "借阅申请已通过。审批人一栏是空的，属于正常现象。", "The loan request is approved. The approver field is empty. That is normal."],
+    ["09:31", "和光·行政部总监", "集团要向三位借几样旧东西，走借阅审批，单子研发那位填。借期：长期。", "The Group would like to borrow a few old things from the three of you, through a loan approval; the one from R&D fills in the form. Period of loan: long-term."],
+    ["18:00", "和光·行政部总监", "借阅申请已通过。审批人一栏是空的，属于正常现象。", "The loan request is approved. The approver field is empty. That is normal."],
   ],
   14: [
-    ["09:00", "和光·人力部", "今天入职新人一千名。请研发那位排工位，一视同仁。", "A thousand new staff join today. The one from R&D, please give them desks, all treated alike."],
-    ["09:01", "和光·人力部", "研发那位这段时间辛苦了。集团都知道。", "The one from R&D has worked hard lately. The Group knows all of it."],
+    ["09:00", "和光·人力部副总裁", "今天入职新人一千名。请研发那位排工位，一视同仁。", "A thousand new staff join today. The one from R&D, please give them desks, all treated alike."],
+    ["09:01", "和光·人力部副总裁", "研发那位这段时间辛苦了。集团都知道。", "The one from R&D has worked hard lately. The Group knows all of it."],
     ["17:30", "和光·总裁办", ...NIGHT],
   ],
   15: [
-    ["09:05", "和光·总裁办", "下午发布会，集团全员到。观众的反应请实时盯着。", "The launch is this afternoon. The whole Group attends. Please watch the audience's reaction live."],
-    ["15:00", "和光·总裁办", "[图片]", "[Photo]", IMG("观众席。每一张脸都一样。", "The audience. Every face the same.")],
+    ["09:05", "和光·品牌部高级副总裁", "下午发布会，集团全员到。演示稿研发那位排，观众的反应请实时盯着。", "The launch is this afternoon. The whole Group attends. The one from R&D lays out the deck; please watch the audience's reaction live."],
+    ["15:00", "和光·品牌部高级副总裁", "[图片]", "[Photo]", IMG("观众席。每一张脸都一样。", "The audience. Every face the same.")],
     ["17:30", "和光·总裁办", ...NIGHT],
   ],
   16: [
-    ["09:01", "和光·总裁办", "董事长到了。董事长不看材料。汇报不要停。", "The chairman is here. The chairman does not read material. The report must not stop."],
-    ["09:02", "和光·总裁办", "董事长的名字请各位不要打出来。也打不出来。", "Please do not type the chairman's name. It cannot be typed anyway."],
+    ["09:01", "和光·总裁办主任", "董事长到了。董事长不看材料。汇报研发那位做，不要停。", "The chairman is here. The chairman does not read material. The one from R&D makes the report. It must not stop."],
+    ["09:02", "和光·总裁办主任", "董事长的名字请各位不要打出来。也打不出来。", "Please do not type the chairman's name. It cannot be typed anyway."],
   ],
   17: [
+    ["08:58", "董事长秘书", "董事长要研发那位回一个电话。", "The chairman wants the one from R&D to return a call."],
     ["09:00", "和光·总裁办", "回一下我，我是谁你应该知道。", "Answer me. You should know who I am."],
     ["09:00", "老板", "回一下我，我是谁你应该知道。", "Answer me. You should know who I am."],
     ["09:00", "Vivi", "回一下我，我是谁你应该知道。", "Answer me. You should know who I am."],

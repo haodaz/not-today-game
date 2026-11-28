@@ -567,7 +567,7 @@
       "incoming": [
         {
           "t": "03:00",
-          "text": "Exec Office：This week is the one that counts. Nobody sleeps for now.",
+          "text": "Admin Sr Mgr：This week is the one that counts. Nobody sleeps for now. The one from R&D draws up the rota.",
           "kind": "work"
         },
         {
@@ -582,7 +582,7 @@
         },
         {
           "t": "11:31",
-          "text": "Finance：About money: you need not ask again.",
+          "text": "Finance Mgr：About money: you need not ask again.",
           "kind": "work"
         }
       ]
