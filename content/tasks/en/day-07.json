@@ -146,7 +146,7 @@
               },
               {
                 "who": "me",
-                "text": "The minutes. Lao Zhou only checks the format, not what's in it."
+                "text": "The minutes. The adviser only checks the format, not what's in it."
               }
             ]
           },
@@ -200,7 +200,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Sent to the group. Lao Zhou will reply 'very good'."
+                "text": "Sent. The adviser will reply 'very good'."
               }
             ]
           }
