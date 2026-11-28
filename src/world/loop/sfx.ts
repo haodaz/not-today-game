@@ -7,10 +7,12 @@ export const sfxUrl = (id: string): string => `/sfx/${encodeURIComponent(id)}.mp
 /**
  * The doorbell goes out of tune with the days (author 2026-11-28: 「第四天开始，逐渐变了调的门铃」):
  * the same file, played lower and slower, in the steps the voice notes take (content/voice.json).
- * Half-tones down: days 1–3 none, 4–6 one, 7–9 two, 11–12 three, 13–15 five, 16–17 seven, 18 an
- * octave. A calm daytime day (day 10) rings true.
+ * Half-tones down: days 1–3 none, 4–6 two, 7–9 three, 11–12 five, 13–15 seven, 16–17 nine, 18 an
+ * octave. A calm daytime day (day 10) rings true. Day 4's lunch is where the player first says so
+ * (content/delivery.json: 「门铃响了，声音有点怪，尾音拖得很长。你想，这门铃是不是快坏了。」), so the first
+ * step must be heard: two half-tones is also a tail 12 % longer.
  */
-const DOORBELL_DOWN: readonly (readonly [fromDay: number, halfTones: number])[] = [[18, 12], [16, 7], [13, 5], [11, 3], [7, 2], [4, 1]];
+const DOORBELL_DOWN: readonly (readonly [fromDay: number, halfTones: number])[] = [[18, 12], [16, 9], [13, 7], [11, 5], [7, 3], [4, 2]];
 export function doorbellRate(day: number): number {
   if (isCalmDaytime(day)) return 1;
   const down = DOORBELL_DOWN.find(([from]) => day >= from)?.[1] ?? 0;
