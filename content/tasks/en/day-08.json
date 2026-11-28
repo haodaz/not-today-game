@@ -210,9 +210,9 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "adviser_shen",
         "note": [
-          "Lao Wang: the leaders' toast times — you schedule them.",
+          "Adviser Shen: the leaders' toast times — you schedule them.",
           "The rank table is in the files; the ranks on it are not the company's."
         ],
         "call": "Schedule them and send it to the group.",

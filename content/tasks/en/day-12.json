@@ -208,12 +208,12 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "el_admin_sm",
         "note": [
-          "Lao Wang: push through this week; you make the rota; nobody sleeps.",
+          "Evenlight Admin, senior manager: push through this week; you make the rota; nobody sleeps.",
           "The names are in the boss's and the group's chats; the contacts hold one more line."
         ],
-        "call": "Fill it and send it to Lao Wang.",
+        "call": "Fill it and hand it in.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

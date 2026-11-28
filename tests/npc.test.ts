@@ -30,7 +30,8 @@ const clone = () => JSON.parse(JSON.stringify(npcFile)) as Record<string, any>;
 describe("npc.json loader (strict)", () => {
   it("reads the file as-is", () => {
     expect(parseNpc(npcFile)).toEqual(npcData);
-    expect(Object.keys(npcData.npcs)).toEqual(["boss", "partner", "xiaozhang", "laozhou", "teacher", "family", "father", "同桌", "小满", "小满初中", "阿凯", "班长", "小卖部老板", "初一同学", "英语老师", "高中同桌", "高中班长", "boss_young", "partner_young", "laozhou_young", "father_young", "mother_young", "father_mid", "mother_mid"]);
+    // who asks for the work from day 7 (author 2026-11-28): the advisers, the Group's ranks, the chairman, Kuro
+    expect(Object.keys(npcData.npcs)).toEqual(["boss", "partner", "xiaozhang", "laozhou", "adviser_chen", "adviser_shen", "adviser_lead", "el_culture", "el_finance", "el_admin_sm", "el_admin_dir", "el_hr", "el_brand", "el_office", "chairman", "kuro_boss", "teacher", "family", "father", "同桌", "小满", "小满初中", "阿凯", "班长", "小卖部老板", "初一同学", "英语老师", "高中同桌", "高中班长", "boss_young", "partner_young", "laozhou_young", "father_young", "mother_young", "father_mid", "mother_mid"]);
     expect(npcData.silhouettes).toHaveLength(6);
     expect(npcData.npcs.boss).toMatchObject({ name: "msgs.boss", portrait: "/npc/boss.png", avatar: "/npc/boss_av.png", stand: "/npc/stand/boss.webp", idle: true });
     expect(npcData.npcs.boss?.poses).toContain("laugh"); // texture-pass R2: the pose files beside the plain stand

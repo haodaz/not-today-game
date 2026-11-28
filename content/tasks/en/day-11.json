@@ -429,12 +429,12 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "partner",
+        "who": "el_finance",
         "note": [
-          "Vivi: cut costs, fill the sheet, on my desk before you leave.",
-          "The budget is what it is; every required cell gets filled; the oil and wine columns stay as they are, Lao Wang's orders."
+          "Evenlight Finance, manager: cut costs, fill the sheet, hand it in before you leave.",
+          "The budget is what it is; every required cell gets filled; the oil and wine columns stay as they are."
         ],
-        "call": "Fill it, send it to her before you leave.",
+        "call": "Fill it, hand it in before you leave.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",

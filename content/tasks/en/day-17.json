@@ -294,10 +294,11 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "chairman",
         "note": [
-          "Everyone is looking for you, saying the same sentence. Only one call back.",
-          "The numbers are in the call log."
+          "The chairman's secretary: the chairman wants you to return a call.",
+          "Call the chairman? The secretary said nothing.",
+          "The missed calls are in the call log. Only one call back."
         ],
         "call": "Pick one and call.",
         "cta": "Start work",

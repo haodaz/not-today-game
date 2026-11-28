@@ -201,9 +201,9 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "kuro_boss",
         "note": [
-          "Lao Wang: clear everything in hand today.",
+          "Kuro: clear everything in hand today.",
           "Leave nothing for tomorrow."
         ],
         "call": "Five tickets, close them one by one.",

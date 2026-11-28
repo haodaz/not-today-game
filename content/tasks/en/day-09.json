@@ -306,9 +306,9 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "adviser_lead",
         "note": [
-          "Lao Zhou: four seats in the circle, one triangle; send everyone the script.",
+          "The advisers' lead: four seats in the circle, one triangle; send everyone the script.",
           "Who sits where, Lao Zhou said it all at the rehearsal."
         ],
         "call": "Set the seats and send the script.",

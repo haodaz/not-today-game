@@ -377,12 +377,12 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "laozhou",
+        "who": "adviser_chen",
         "note": [
-          "Lao Zhou: by the template, all five steps.",
+          "Adviser Chen: minutes by the template, all five steps.",
           "Who said what is all in the record."
         ],
-        "call": "Fill the template and send it to Lao Zhou.",
+        "call": "Fill the template and send it to the advisers.",
         "cta": "Start work",
         "motif": {
           "kind": "fan",

@@ -211,12 +211,12 @@
         "wrongAt": 2
       },
       "launch": {
-        "who": "boss",
+        "who": "el_hr",
         "note": [
-          "Lao Wang: a lot of new hires this time; run the onboarding.",
+          "Evenlight HR, vice president: a lot of new hires this time; run the onboarding.",
           "The names are in the roster; the welcome recording is to be listened to."
         ],
-        "call": "Run it and report to Lao Wang.",
+        "call": "Run it and report up.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

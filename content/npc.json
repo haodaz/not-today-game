@@ -88,6 +88,18 @@
       ],
       "idle": true
     },
+    "adviser_chen": { "name": "launch.name.adviser_chen", "portrait": "/npc/sil_3.png", "avatar": "/npc/sil_3.png" },
+    "adviser_shen": { "name": "launch.name.adviser_shen", "portrait": "/npc/sil_5.png", "avatar": "/npc/sil_5.png" },
+    "adviser_lead": { "name": "launch.name.adviser_lead", "portrait": "/npc/sil_1.png", "avatar": "/npc/sil_1.png" },
+    "el_culture": { "name": "launch.name.el_culture", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_finance": { "name": "launch.name.el_finance", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_admin_sm": { "name": "launch.name.el_admin_sm", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_admin_dir": { "name": "launch.name.el_admin_dir", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_hr": { "name": "launch.name.el_hr", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_brand": { "name": "launch.name.el_brand", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "el_office": { "name": "launch.name.el_office", "portrait": "/npc/evenlight.svg", "avatar": "/npc/evenlight.svg" },
+    "chairman": { "name": "launch.name.chairman", "portrait": "/npc/chairman.svg", "avatar": "/npc/chairman.svg" },
+    "kuro_boss": { "name": "launch.name.kuro_boss", "portrait": "/npc/kuro_boss.png", "avatar": "/npc/kuro_boss.png" },
     "teacher": {
       "name": "msgs.teacher",
       "portrait": "/npc/teacher.png",
