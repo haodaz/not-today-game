@@ -267,6 +267,10 @@ export interface Session {
   conversation: string;
   /** What 消息 (the personal app) has open: a 家里 conversation, or 朋友圈 (`FEED`). */
   homeConversation: string;
+  /** hichat-polish R2: the picture opened large over Hi信 / 汀汀 (its src); session only, never logged. */
+  photoOpen: string | null;
+  /** hichat-polish R3: the newest 朋友圈 post shown the last time the column was open (null: never). */
+  feedSeen: { readonly day: number; readonly t: string } | null;
   /** The chip chosen in the reply bar, waiting for 发送. */
   selected: string | null;
   /** What the player is typing in a `free` input. */
@@ -671,6 +675,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     door: null,
     conversation: "boss",
     homeConversation: "family",
+    photoOpen: null,
+    feedSeen: null,
     selected: null,
     draft: "",
     inner: null,

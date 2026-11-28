@@ -29,6 +29,7 @@ const SAMPLES: Record<(typeof CARD_TYPES)[number], Record<string, unknown>> = {
   mini: { type: "mini", brand: "拼团", title: "帮我砍一刀", cover: "/msgs/covers/cat.png" },
   voice: { type: "voice", seconds: "41" },
   task: { type: "task", title: "审批：报销", fields: [["金额", "412.50"], ["事由", "打车"]], action: "去审批" },
+  transfer: { type: "transfer", amount: "2000.00" },
 };
 
 describe("the loader accepts each card type and rejects unknown fields", () => {

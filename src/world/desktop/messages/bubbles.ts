@@ -2,6 +2,7 @@
 // tables' conventions ([语音] 41″, （转文字）…, [卡片] …); the text is shown as written.
 
 import type { Card } from "@state/replies/table";
+import { hasString, t } from "@world/i18n";
 
 export type Body =
   | { readonly type: "text"; readonly text: string }
@@ -76,7 +77,10 @@ export function previewOf(body: Body): string {
     case "system":
     case "deliverable":
     case "filecard":
+      return body.raw;
     case "shared":
+      // hichat-polish R1: a transfer previews as [转账] (the text stays the transcript's raw line)
+      return body.card.type === "transfer" && hasString("card.transfer.preview") ? t("card.transfer.preview") : body.raw;
     case "sticker":
       return body.raw;
   }

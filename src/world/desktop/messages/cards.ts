@@ -9,6 +9,9 @@ import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, tr } from "@world/i18n";
 import { faceAttr } from "./face-mark";
 
+/** hichat-polish R1: the transfer's mark, a white circle with two opposed arrows (drawn, no image file). */
+const TRANSFER_ICON = raw('<svg class="tf-ico" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="17" fill="#fff"/><path d="M10 14h15l-4-4M26 22H11l4 4" fill="none" stroke="#f9a23b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+
 /** WeChat (消息) or DingTalk (工作台's 消息 pane). */
 export type Register = "wx" | "ding";
 
@@ -39,7 +42,7 @@ function account(name: SafeHtml | string): SafeHtml {
  * One card's inner markup (without the forwarded tag). `fill` fills {placeholders} in the content
  * text. `register` only tilts a couple of shapes (the task card is DingTalk-flavoured either way).
  */
-function cardInner(card: Card, fill: (s: string) => string, register: Register, voice: VoiceView | null): SafeHtml {
+function cardInner(card: Card, fill: (s: string) => string, register: Register, voice: VoiceView | null, later: boolean): SafeHtml {
   switch (card.type) {
     case "article":
       return html`<div class="c-body"><div class="c-text"><div class="c-title">${fill(card.title)}</div>${card.digest !== undefined ? html`<div class="c-digest">${fill(card.digest)}</div>` : null}</div>${cover("article", card.cover, "sq")}</div>${account(fill(card.account))}`;
@@ -59,9 +62,10 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register, 
     case "link":
       return html`<div class="c-body"><div class="c-text"><div class="c-title two">${fill(card.title)}</div><div class="c-site">${fill(card.site)}</div></div>${card.icon ? html`<span class="cover sq"><img src="${card.icon}" alt="" aria-hidden="true" draggable="false"></span>` : html`<span class="cover sq tile t-link" aria-hidden="true"></span>`}</div>`;
     case "image":
-      // The picture itself; a missing src is a grey placeholder showing the alt text.
+      // The picture itself (hichat-polish R2: a button that opens it large); a missing src is a grey
+      // placeholder showing the alt text, and does not open.
       return card.src
-        ? html`<img class="c-image" src="${card.src}" alt="${fill(card.alt)}" draggable="false">`
+        ? html`<button type="button" class="photo-btn" data-action="photo-open" data-src="${card.src}" data-focus="photo:${card.src}"><img class="c-image" src="${card.src}" alt="${fill(card.alt)}" draggable="false"></button>`
         : html`<div class="c-image ph" role="img" aria-label="${fill(card.alt)}"><span>${fill(card.alt)}</span></div>`;
     case "file":
       return html`<div class="c-file"><span class="${cls("fico", `x-${card.ext.toLowerCase()}`)}" aria-hidden="true">${card.ext.toUpperCase()}</span><div class="c-text"><div class="c-title one">${fill(card.name)}</div><div class="c-size">${card.size}</div></div></div>`;
@@ -70,6 +74,13 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register, 
     case "voice":
       // photos-twin R2: a forwarded voice note plays like a voice bubble when the view gives it a key.
       return voiceNote(card.seconds, null, voice, null);
+    case "transfer": {
+      // hichat-polish R1: WeChat's orange transfer. By time only: on its own day 转账给你; seen from a later
+      // day it went back by itself (paler, 已被退还). Not a button: a click does nothing.
+      const line = label(later ? "card.transfer.returned" : "card.transfer.pending");
+      const foot = label("card.transfer.footer");
+      return html`<div class="${cls("c-transfer", later && "returned")}"><div class="tf-main">${TRANSFER_ICON}<div class="tf-text"><div class="tf-amt">¥${card.amount}</div>${line ? html`<div class="tf-line">${line}</div>` : null}</div></div>${foot ? html`<div class="tf-foot">${foot}</div>` : null}</div>`;
+    }
     case "task": {
       const rows = card.fields.map(([k, v]) => html`<div class="tk-row"><span class="tk-k">${fill(k)}</span><span class="tk-v">${fill(v)}</span></div>`);
       const action = card.action !== undefined ? html`<div class="tk-action">${fill(card.action)}</div>` : null;
@@ -83,8 +94,9 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register, 
  * reads as forwarded even before content writes the label) and, when the label string exists, the
  * 「转发」 tag above it.
  */
-export function renderCard(card: Card, fill: (s: string) => string, register: Register, forwarded: boolean, voice: VoiceView | null = null): SafeHtml {
-  return html`<div class="${cls("sc", `sc-${card.type}`, register, forwarded && "is-fwd")}">${forwardedTag(forwarded)}${cardInner(card, fill, register, voice)}</div>`;
+/** `later`: the card is seen on a day after the one it came on (a transfer then reads as returned). */
+export function renderCard(card: Card, fill: (s: string) => string, register: Register, forwarded: boolean, voice: VoiceView | null = null, later = false): SafeHtml {
+  return html`<div class="${cls("sc", `sc-${card.type}`, register, forwarded && "is-fwd")}">${forwardedTag(forwarded)}${cardInner(card, fill, register, voice, later)}</div>`;
 }
 
 /** voice-babble R4: what a voice note needs to be its own play / stop button. */

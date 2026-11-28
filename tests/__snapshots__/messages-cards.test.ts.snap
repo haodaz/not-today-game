@@ -15,8 +15,8 @@ exports[`each type renders its own markup in both apps > snapshot: every type in
     "wx": "<div class="sc sc-history wx"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div><div class="h-foot">聊天记录</div></div>",
   },
   "image": {
-    "ding": "<div class="sc sc-image ding"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></div>",
-    "wx": "<div class="sc sc-image wx"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></div>",
+    "ding": "<div class="sc sc-image ding"><button type="button" class="photo-btn" data-action="photo-open" data-src="/msgs/photo.png" data-focus="photo:/msgs/photo.png"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></button></div>",
+    "wx": "<div class="sc sc-image wx"><button type="button" class="photo-btn" data-action="photo-open" data-src="/msgs/photo.png" data-focus="photo:/msgs/photo.png"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></button></div>",
   },
   "link": {
     "ding": "<div class="sc sc-link ding"><div class="c-body"><div class="c-text"><div class="c-title two">一个网页标题</div><div class="c-site">example.com</div></div><span class="cover sq"><img src="/msgs/covers/link.png" alt="" aria-hidden="true" draggable="false"></span></div></div>",
@@ -29,6 +29,10 @@ exports[`each type renders its own markup in both apps > snapshot: every type in
   "task": {
     "ding": "<div class="sc sc-task ding"><div class="tk-head">审批：报销</div><div class="tk-fields"><div class="tk-row"><span class="tk-k">金额</span><span class="tk-v">412.50</span></div><div class="tk-row"><span class="tk-k">事由</span><span class="tk-v">打车</span></div></div><div class="tk-action">去审批</div></div>",
     "wx": "<div class="sc sc-task wx"><div class="tk-head">审批：报销</div><div class="tk-fields"><div class="tk-row"><span class="tk-k">金额</span><span class="tk-v">412.50</span></div><div class="tk-row"><span class="tk-k">事由</span><span class="tk-v">打车</span></div></div><div class="tk-action">去审批</div></div>",
+  },
+  "transfer": {
+    "ding": "<div class="sc sc-transfer ding"><div class="c-transfer"><div class="tf-main"><svg class="tf-ico" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="17" fill="#fff"/><path d="M10 14h15l-4-4M26 22H11l4 4" fill="none" stroke="#f9a23b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="tf-text"><div class="tf-amt">¥2000.00</div><div class="tf-line">转账给你</div></div></div><div class="tf-foot">喂信转账</div></div></div>",
+    "wx": "<div class="sc sc-transfer wx"><div class="c-transfer"><div class="tf-main"><svg class="tf-ico" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="17" fill="#fff"/><path d="M10 14h15l-4-4M26 22H11l4 4" fill="none" stroke="#f9a23b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="tf-text"><div class="tf-amt">¥2000.00</div><div class="tf-line">转账给你</div></div></div><div class="tf-foot">喂信转账</div></div></div>",
   },
   "video": {
     "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title bottom">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",

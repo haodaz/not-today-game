@@ -13,7 +13,7 @@ import { MOTION } from "@world/motion/timing";
 import { applyFit, backdropFor } from "@world/fit";
 import { boxArrived } from "@world/room/arrival";
 import { onEmailChange, setEmailDraft } from "@net/email";
-import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
+import { appOn, buildShell, initialSession, shownConversation, type AppRenderers, type Session } from "./model";
 import { bringToFront, closeApp, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
 import { createWindowDrag } from "./windrag";
 import { createClipDrag } from "./workbench/drag";
@@ -534,8 +534,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const handler = actions[el.dataset.action!];
     if (!handler) return;
     e.preventDefault();
+    // hichat-polish R2: an open picture closes when the app or the conversation changes
+    const where = () => `${String(session.focus)}|${String(session.leftApp)}|${String(session.rightApp)}|${String(shownConversation(session))}`;
+    const was = session.photoOpen !== null ? where() : null;
     try {
       handler(ctx, el.dataset, el);
+      if (was !== null && session.photoOpen !== null && where() !== was) { session.photoOpen = null; rerender(); }
     } catch (error) {
       // A rejected event (the store throws) changes nothing; say so in the console only.
       console.warn(error);
@@ -609,6 +613,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (session.view === "desktop" && e.key === "F3") {
       e.preventDefault();
       actions["mc-toggle"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
+    // hichat-polish R2: Esc closes an open picture first
+    if (e.key === "Escape" && session.photoOpen !== null) {
+      e.preventDefault();
+      actions["photo-close"]?.(ctx, {} as DOMStringMap, target);
       return;
     }
     if (e.key === "Escape" && session.mcOpen) {

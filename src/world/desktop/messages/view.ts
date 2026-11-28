@@ -50,7 +50,7 @@ function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtm
 
 export type { VoiceView } from "./cards";
 
-export function renderBody(body: Body, names: State["names"], register: Register, ding = false, voice: VoiceView | null = null): SafeHtml {
+export function renderBody(body: Body, names: State["names"], register: Register, ding = false, voice: VoiceView | null = null, later = false): SafeHtml {
   const fill = (s: string) => fillPlaceholders(s, names);
   switch (body.type) {
     case "voice": {
@@ -81,7 +81,7 @@ export function renderBody(body: Body, names: State["names"], register: Register
     case "shared":
       // A shared thing drawn as what it is (desktop-ui 2026-11-03): WeChat in 消息, DingTalk in 工作台.
       // photos-twin R2: a forwarded voice note card plays like a voice bubble.
-      return renderCard(body.card, fill, register, body.forwarded, body.card.type === "voice" ? voice : null);
+      return renderCard(body.card, fill, register, body.forwarded, body.card.type === "voice" ? voice : null, later);
     case "text":
       return html`<div class="bub">${fill(body.text)}</div>`;
   }
@@ -108,7 +108,7 @@ function dayLabel(day: number, today: number): SafeHtml {
   return day === today ? tr("msgs.today") : day === today - 1 ? tr("msgs.yesterday") : tr("shell.day", { day });
 }
 
-function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null, stamp: string | null, index: number): SafeHtml | null {
+function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null, stamp: string | null, index: number, later = false): SafeHtml | null {
   switch (b.kind) {
     case "day":
       return html`<div class="sysline">${dayLabel(b.day, c.today)}</div>`;
@@ -124,7 +124,7 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
       // WeChat: the time sits centred between gaps, not beside the name.
       const st = c.register === "wx" && stamp !== null ? html`<div class="stamp">${stamp}</div>` : null;
       if (b.side === "me") {
-        const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, c.names, c.register, false, voiceView(b, c, index));
+        const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, c.names, c.register, false, voiceView(b, c, index), later);
         const rc =
           receipt === "read" ? html`<div class="rcpt read">${tr(hasString("wb.msgs.read") ? "wb.msgs.read" : "reply.status.read")}</div>`
           : receipt === "unread" && hasString("wb.msgs.unread") ? html`<div class="rcpt unread">${tr("wb.msgs.unread")}</div>`
@@ -142,7 +142,7 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
         c.register === "ding" ? html`<div class="who">${whoName} ${b.t}</div>`
         : SPEAKER_CONVERSATIONS.has(c.conv) ? html`<div class="who">${whoName}</div>`
         : null;
-      return html`${st}<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div>${who}${renderBody(b.body, c.names, c.register, ding, voiceView(b, c, index))}</div></div>`;
+      return html`${st}<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div>${who}${renderBody(b.body, c.names, c.register, ding, voiceView(b, c, index), later)}</div></div>`;
     }
   }
 }
@@ -167,14 +167,16 @@ function renderBubblesNow(bubbles: readonly Bubble[], c: BubbleCtx): (SafeHtml |
     }
   });
   let lastT: string | null = null;
+  // hichat-polish R1: the day a message came on (the day separators), so a transfer seen later reads as returned
+  let onDay: number | null = null;
   return bubbles.map((b, i) => {
     let stamp: string | null = null;
-    if (b.kind === "day") lastT = null;
+    if (b.kind === "day") { lastT = null; onDay = b.day; }
     if (b.kind === "msg") {
       stamp = b.t !== lastT ? b.t : null;
       lastT = b.t;
     }
-    return renderBubble(b, c, c.register === "ding" ? (receipts.get(i) ?? null) : null, stamp, i);
+    return renderBubble(b, c, c.register === "ding" ? (receipts.get(i) ?? null) : null, stamp, i, onDay !== null && onDay < c.today);
   });
 }
 
@@ -301,7 +303,7 @@ function feedName(who: string): SafeHtml {
 
 /** One post: face, name, words, the photograph (its caption on a tile until there is a picture), where, when, likes and comments. */
 function feedPost(p: FeedPost, today: number): SafeHtml {
-  const photo = p.photo === undefined ? null : p.img !== undefined ? html`<img class="fp-photo" src="${p.img}" alt="${p.photo}" loading="lazy" draggable="false">` : html`<div class="fp-photo" role="img" aria-label="${p.photo}"><span>${p.photo}</span></div>`;
+  const photo = p.photo === undefined ? null : p.img !== undefined ? html`<button type="button" class="photo-btn" data-action="photo-open" data-src="${p.img}" data-focus="photo:${p.img}"><img class="fp-photo" src="${p.img}" alt="${p.photo}" loading="lazy" draggable="false"></button>` : html`<div class="fp-photo" role="img" aria-label="${p.photo}"><span>${p.photo}</span></div>`;
   const place = p.place !== undefined ? html`<small class="fp-place">${p.place}</small>` : null;
   const likes = p.likes.length > 0 ? html`<div class="fp-likes">${p.likes.map((w, i) => html`${i > 0 ? tr("msgs.feed.sep") : ""}<b>${feedName(w)}</b>`)}</div>` : null;
   const comments = p.comments.map((c) => html`<div class="fp-c"><b>${feedName(c.who)}</b>${tr("msgs.feed.colon")}${c.text}</div>`);
@@ -333,6 +335,21 @@ function withWrongFace<T extends { readonly badge: number }>(ctx: AppContext, ap
   }
 }
 
+/** hichat-polish R2: the picture opened large over the app's window (a click anywhere, or Esc, closes it). */
+function photoVeil(ctx: AppContext): SafeHtml | null {
+  const src = ctx.session.photoOpen;
+  return src ? html`<div class="photo-veil" data-action="photo-close"><img class="photo-big" src="${src}" alt="" draggable="false"></div>` : null;
+}
+/**
+ * hichat-polish R3: a post is new when its (day, t) is later than the one last seen; with nothing seen yet,
+ * any post of today is new. `posts` newest first (feedAt). Pure.
+ */
+export function feedHasNew(posts: readonly { readonly day: number; readonly t: string }[], seen: { readonly day: number; readonly t: string } | null, today: number): boolean {
+  const top = posts[0];
+  if (!top) return false;
+  if (seen === null) return posts.some((p) => p.day === today);
+  return top.day > seen.day || (top.day === seen.day && top.t > seen.t);
+}
 function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
   const replies = sentReplies(ctx.startDay, ctx.events);
   const all = conversations(ctx, replies, "msgs");
@@ -342,13 +359,17 @@ function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
   const feedOpen = ctx.session.homeConversation === FEED;
   const active = feedOpen ? undefined : (all.find((c) => c.id === ctx.session.homeConversation) ?? all[0]);
   const search = html`<div class="wx-top"><div class="search"><i class="mag" aria-hidden="true"></i>${tr("msgs.search")}</div><span class="plus" aria-hidden="true"></span></div>`;
-  const feedRow = html`<button type="button" class="${cls("row", "wx-row", "feed-row", feedOpen && "on")}" data-action="feed"><span class="av-wrap"><span class="av feed-av" aria-hidden="true"></span></span><div class="t"><div class="l1"><b>${tr("msgs.feed")}</b></div></div></button>`;
+  // hichat-polish R3: what has been posted so far; open, the newest shown is seen (session only); closed, a
+  // newer post puts an empty red dot on the row (no number, not in the dock badge)
+  const posts = feedAt(today, ctx.session.clock.time, getLocale());
+  if (feedOpen && posts[0]) ctx.session.feedSeen = { day: posts[0].day, t: posts[0].t };
+  const fresh = !feedOpen && feedHasNew(posts, ctx.session.feedSeen, today);
+  const feedRow = html`<button type="button" class="${cls("row", "wx-row", "feed-row", feedOpen && "on")}" data-action="feed"><span class="av-wrap"><span class="av feed-av" aria-hidden="true"></span>${fresh ? html`<span class="dot"></span>` : null}</span><div class="t"><div class="l1"><b>${tr("msgs.feed")}</b></div></div></button>`;
   const list = html`<div class="list wx-list">${search}${all.map((c) => wxRow(c, c.id === active?.id, today, names))}${feedRow}</div>`;
 
   if (feedOpen) {
     // 朋友圈 (author 2026-11-28): what everyone has posted so far, the newest first (content/feed.json).
-    const posts = feedAt(today, ctx.session.clock.time, getLocale());
-    return { body: html`<div class="body wx">${list}<div class="conv feed"><div class="head"><b>${tr("msgs.feed")}</b>${HEAD_GLYPHS}</div><div class="feed-list">${posts.map((p) => feedPost(p, today))}</div></div></div>`, badge };
+    return { body: html`<div class="body wx">${list}<div class="conv feed"><div class="head"><b>${tr("msgs.feed")}</b>${HEAD_GLYPHS}</div><div class="feed-list">${posts.map((p) => feedPost(p, today))}</div></div>${photoVeil(ctx)}</div>`, badge };
   }
   if (!active) return { body: html`<div class="body wx">${list}<div class="conv empty"></div></div>`, badge };
   // 「群名 (N)」: who has spoken so far, and the player; none before anyone has.
@@ -356,7 +377,7 @@ function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
   const count = SPEAKER_CONVERSATIONS.has(active.id) && members > 0 ? html` <small>(${members + 1})</small>` : null;
   const c: BubbleCtx = { today, names, conv: active.id, register: "wx", voice: ctx.session.voice, nowMs: ctx.nowMs };
   const conv = html`<div class="conv"><div class="head"><b>${nameOf(active.id)}</b>${count}${HEAD_GLYPHS}</div><div class="msgs">${renderBubbles(active.bubbles, c)}</div>${replyBar(ctx, active.id, "wx")}</div>`;
-  return { body: html`<div class="body wx">${list}${conv}</div>`, badge };
+  return { body: html`<div class="body wx">${list}${conv}${photoVeil(ctx)}</div>`, badge };
 }
 
 /**
@@ -365,7 +386,7 @@ function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
  */
 export function renderTingTalk(ctx: AppContext): { body: SafeHtml; badge: number } {
   const { pane, badge } = renderWorkMessages(ctx);
-  return { body: html`<div class="body"><div class="wb-msgs">${pane}</div></div>`, badge };
+  return { body: html`<div class="body"><div class="wb-msgs">${pane}</div>${photoVeil(ctx)}</div>`, badge };
 }
 
 /** The work conversations (DingTalk register): the list and the open one (听听's body). */

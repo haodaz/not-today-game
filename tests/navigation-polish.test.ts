@@ -72,7 +72,8 @@ describe("离开屏幕", () => {
     const { resolve } = await import("node:path");
     const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
     const rule = /\.hud-host \.leave-screen\{([^}]*)\}/.exec(css)![1]!;
-    expect(rule).toContain("position:fixed;left:12px;top:50%;transform:translateY(-50%)");
+    // hichat-polish R4: 12 px in from the stage's left edge and centred on it, scaled with the stage
+    expect(rule).toContain("position:fixed;left:calc(var(--stage-l,0px) + 12px * var(--stage-k,1));top:calc(var(--stage-t,0px) + var(--stage-h,100vh) / 2);transform:translateY(-50%) scale(var(--stage-k,1))");
     expect(rule).toContain("width:36px;height:140px");
     expect(Number(/z-index:(\d+)/.exec(rule)![1])).toBeGreaterThan(41); // .dlg-layer is 41
     expect(css).toMatch(/\.leave-screen \.word\{writing-mode:vertical-rl/);

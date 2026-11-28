@@ -1075,8 +1075,10 @@
 
 /* navigation-polish (author 2026-11-16): 离开屏幕 — off the monitor, at the stage's left edge, vertically centred;
    a paper pill like the HUD's cards, a left chevron drawn in CSS, the word written top to bottom (zh and en alike). */
-.hud-host .leave-screen{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:42;width:36px;height:140px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 0;background:rgba(232,228,220,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.45);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.22);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.2em;cursor:pointer;transition:background 160ms,transform 160ms}
-.hud-host .leave-screen:hover,.hud-host .leave-screen:focus-visible{background:rgba(244,240,232,.95);transform:translateY(-50%) translateX(2px);outline:none}
+.hud-host .leave-screen{position:fixed;left:calc(var(--stage-l,0px) + 12px * var(--stage-k,1));top:calc(var(--stage-t,0px) + var(--stage-h,100vh) / 2);transform:translateY(-50%) scale(var(--stage-k,1));transform-origin:0 50%;z-index:42;width:36px;height:140px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 0;background:rgba(232,228,220,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.45);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.22);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.2em;cursor:pointer;transition:background 160ms,transform 160ms}
+.hud-host .leave-screen:hover,.hud-host .leave-screen:focus-visible{background:rgba(244,240,232,.95);transform:translateY(-50%) translateX(2px) scale(var(--stage-k,1));outline:none}
+/* hichat-polish R4: the pill is in the fixed HUD layer, outside the scaled stage; it scales with the stage
+   (--stage-k, from applyFit) so it keeps its size relative to the stage at every window size, guided or not */
 .hud-host .leave-screen .chev{width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:3px;flex:0 0 auto}
 .hud-host .leave-screen .word{writing-mode:vertical-rl;white-space:nowrap;line-height:1}
 

@@ -65,6 +65,9 @@ export function applyFit(root: HTMLElement, stage: HTMLElement, size: { w: numbe
   // Standing NPCs (author 2026-11-18): the stand is drawn in the box's fixed layer, sized and footed by the stage.
   root.style.setProperty("--stage-t", `${fit.top}px`);
   root.style.setProperty("--stage-h", `${size.h * fit.scale}px`);
+  // hichat-polish R4: the stage's scale itself, for the fixed HUD controls that must keep their size
+  // relative to the stage (离开屏幕 was drawn in window px: twice its size in an 800 px window)
+  root.style.setProperty("--stage-k", String(fit.scale));
   // No photo (the day-18 pull-out happens over black): the letterbox is plain black.
   root.style.setProperty("--letterbox", backdrop ? `url(${backdrop})` : "none");
   return fit;

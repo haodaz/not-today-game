@@ -11,7 +11,8 @@
 import fs from "node:fs";
 const ROOT = process.env.REPLIES ?? new URL("../../content/replies", import.meta.url).pathname;
 const MM = [["嗯", "mm"]];
-const TRANSFER = [["21:05", "[转账] 2000 元", "[Transfer] ¥2,000"], ["21:05", "别跟你妈说", "don't tell your mum"]];
+// hichat-polish R1: the first line is a transfer card on both languages (its text stays the fallback and the raw line)
+const TRANSFER = [["21:05", "[转账] 2000 元", "[Transfer] ¥2,000", { type: "transfer", amount: "2000.00" }], ["21:05", "别跟你妈说", "don't tell your mum"]];
 const transferCells = (inner) => ({
   fine: ["read", [], inner],
   received: ["reply", [["21:07", ...MM[0]]]],
@@ -102,7 +103,7 @@ for (const lang of ["zh", "en"]) {
     const f = `${ROOT}/${lang === "en" ? "en/" : ""}day-${String(day).padStart(2, "0")}.json`;
     const j = JSON.parse(fs.readFileSync(f, "utf8"));
     const d = DAYS[day];
-    const rec = { incoming: d.in.map((l) => ({ t: l[0], text: l[i], kind: "private" })) };
+    const rec = { incoming: d.in.map((l) => ({ t: l[0], text: l[i], kind: "private", ...(l[3] ? { card: l[3] } : {}) })) };
     for (const word of ["fine", "received", "thanks"]) {
       const [status, lines, inner] = d[word];
       rec[word] = { status, lines: lines.map((l) => ({ who: "father", t: l[0], text: l[i] })), ...(inner ? { inner: inner[i - 1] } : {}) };

@@ -397,7 +397,11 @@
         {
           "t": "21:05",
           "text": "[转账] 2000 元",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "transfer",
+            "amount": "2000.00"
+          }
         },
         {
           "t": "21:05",

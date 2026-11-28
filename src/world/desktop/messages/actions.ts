@@ -125,7 +125,7 @@ export const messageActions: Record<string, ActionHandler> = {
     if (ctx.session[field] !== id) stopVoice(ctx);
     // guidance R9: the thread being left has shown its 「能说的就这四句。」 hint: once is enough.
     if (ctx.session[field] !== id) ctx.session.replyHintSeen.add(ctx.session[field]);
-    Object.assign(ctx.session, { [field]: id, selected: null, draft: "", inner: null });
+    Object.assign(ctx.session, { [field]: id, selected: null, draft: "", inner: null, photoOpen: null });
     ctx.store.appendEvent({ kind: "open", target: `conv:${id}`, t: ctx.session.clock.time });
     ctx.rerender();
   },
@@ -133,7 +133,21 @@ export const messageActions: Record<string, ActionHandler> = {
   // 朋友圈 in 消息: a feed, not a conversation; nothing is logged.
   feed(ctx) {
     stopVoice(ctx);
-    Object.assign(ctx.session, { homeConversation: FEED, selected: null, draft: "", inner: null });
+    Object.assign(ctx.session, { homeConversation: FEED, selected: null, draft: "", inner: null, photoOpen: null });
+    ctx.rerender();
+  },
+  // hichat-polish R2: a photograph or an image card opened large over the window (session only).
+  "photo-open"(ctx, data) {
+    if (!data.src) return;
+    ctx.session.photoOpen = data.src;
+    ctx.rerender();
+  },
+  // A click anywhere on the veil, or Esc: closed, and the picture takes the focus back.
+  "photo-close"(ctx) {
+    const src = ctx.session.photoOpen;
+    if (src === null) return;
+    ctx.session.photoOpen = null;
+    ctx.session.focusNext = `photo:${src}`;
     ctx.rerender();
   },
 

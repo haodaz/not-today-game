@@ -64,7 +64,7 @@ export interface Entry {
  * work task. The `text` beside it stays as the list preview and the fallback. 消息 draws it the
  * WeChat way, 工作台's message pane the DingTalk way, from this one shape.
  */
-export const CARD_TYPES = ["article", "video", "history", "link", "image", "file", "mini", "voice", "task"] as const;
+export const CARD_TYPES = ["article", "video", "history", "link", "image", "file", "mini", "voice", "task", "transfer"] as const;
 export type CardType = (typeof CARD_TYPES)[number];
 
 export type Card =
@@ -73,6 +73,8 @@ export type Card =
   | { readonly type: "history"; readonly title: string; readonly lines: readonly string[] }
   | { readonly type: "link"; readonly title: string; readonly site: string; readonly icon?: string }
   | { readonly type: "image"; readonly src?: string; readonly alt: string }
+  /** hichat-polish R1: a money transfer, as in WeChat (the amount as "2000.00"); its state follows the day it is seen on. */
+  | { readonly type: "transfer"; readonly amount: string }
   | { readonly type: "file"; readonly name: string; readonly size: string; readonly ext: string }
   | { readonly type: "mini"; readonly brand: string; readonly title: string; readonly cover?: string }
   | { readonly type: "voice"; readonly seconds: string }
@@ -226,6 +228,7 @@ const CARD_KEYS: Record<CardType, readonly string[]> = {
   mini: ["type", "brand", "title", "cover"],
   voice: ["type", "seconds"],
   task: ["type", "title", "fields", "action"],
+  transfer: ["type", "amount"],
 };
 
 /** One card on a message, checked strictly by its `type` (desktop-ui 2026-11-03). */
@@ -280,6 +283,11 @@ function card(value: unknown, where: string): Card {
       };
     case "voice":
       return { type, seconds: str(value.seconds, `${where}.seconds`) };
+    case "transfer": {
+      const amount = str(value.amount, `${where}.amount`);
+      if (!/^\d+\.\d{2}$/.test(amount)) throw new ContentError(`${where}.amount`, "must be digits, a point and two digits (\"2000.00\")");
+      return { type, amount };
+    }
     case "task": {
       if (!Array.isArray(value.fields)) throw new ContentError(`${where}.fields`, "must be a list of [label, value] pairs");
       const fields = value.fields.map((pair, i) => {
@@ -404,6 +412,8 @@ function cardShape(c: Card): unknown {
       return { type: c.type };
     case "task":
       return { type: c.type, fields: c.fields.length, action: c.action !== undefined };
+    case "transfer":
+      return { type: c.type, amount: c.amount };
   }
 }
 
