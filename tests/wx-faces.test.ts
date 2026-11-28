@@ -36,8 +36,8 @@ describe("the pictures people chose (npc.json faces)", () => {
     const paths = new Set(Object.values(npcData.faces));
     expect(paths.size).toBe(16);
     for (const p of paths) expect(fs.existsSync(`public${p}`), p).toBe(true);
-    expect(aliasAvatar("大姨")).toBe("/npc/wx/lotus.svg");
-    expect(aliasAvatar("Big Aunt")).toBe("/npc/wx/lotus.svg");
+    expect(aliasAvatar("大姨")).toBe("/npc/wx/lotus.jpg");
+    expect(aliasAvatar("Big Aunt")).toBe("/npc/wx/lotus.jpg");
     expect(aliasAvatar("刘处")).toBe(aliasAvatar("Director Liu"));
     // six relatives, six different pictures
     expect(new Set(["大姨", "二舅", "小姑", "堂姐", "表弟", "姥姥"].map(aliasAvatar)).size).toBe(6);
@@ -58,10 +58,10 @@ describe("the pictures people chose (npc.json faces)", () => {
 
   it("the loader refuses a name with two pictures, and an NPC id", () => {
     const twice = clone();
-    twice.faces["/npc/wx/fu.svg"].push("大姨");
+    twice.faces["/npc/wx/fu.jpg"].push("大姨");
     expect(() => parseNpc(twice)).toThrow(/already has a picture/);
     const npc = clone();
-    npc.faces["/npc/wx/fu.svg"].push("boss");
+    npc.faces["/npc/wx/fu.jpg"].push("boss");
     expect(() => parseNpc(npc)).toThrow(/NPC id/);
     const none = clone();
     delete none.faces;

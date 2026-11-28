@@ -22,7 +22,7 @@ describe("content/feed.json", () => {
         for (const p of posts) for (const who of [p.who, ...p.likes, ...p.comments.map((c) => c.who)]) expect(hasFace(who), `${lang} day ${day}: ${who}`).toBe(true);
       }
     }
-    expect(feedFace("大姨")).toBe("/npc/wx/lotus.svg");
+    expect(feedFace("大姨")).toBe("/npc/wx/lotus.jpg");
     expect(feedFace("boss")).toBe("/npc/boss_av.png");
     expect(feedFace("和光集团")).toBe("/npc/evenlight.svg");
   });
@@ -62,7 +62,7 @@ describe("the 朋友圈 column in Hi信", () => {
     const out = render(2, "23:00");
     expect(out.match(/<article class="fp"/g)).toHaveLength(6);
     expect(out).toContain('<b class="fp-who">二舅</b>');
-    expect(out).toContain('src="/npc/wx/sunrise.svg"');
+    expect(out).toContain('src="/npc/wx/sunrise.jpg"');
     expect(out).toContain("一张录用名单，一个名字上画了红圈");
     expect(out).toContain('<div class="fp-c"><b>大姨</b>：恭喜恭喜</div>');
     expect(out).toContain('<b class="fp-who">Vivi</b>'); // an NPC by its name
