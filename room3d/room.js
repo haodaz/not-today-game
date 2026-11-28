@@ -1591,6 +1591,21 @@ mount(bin); // room3d/things/bin.js
 const jacketMap = fabricTexture("#6f7068", 61);
 jacketMap.repeat.set(2, 3);
 const jacketMat = M({ map: jacketMap, bumpMap: jacketMap, bumpScale: 1.2, roughness: 1 });
+// 换一件 (author 2026-11-16, built 2026-11-28): the hook holds the grey jacket or one of three plaid shirts; the game says which (`coat`).
+function plaidTexture(base, band, line, seed) {
+  const [c, g] = canvas(256, 256);
+  g.fillStyle = base; g.fillRect(0, 0, 256, 256);
+  g.fillStyle = band; g.globalAlpha = 0.55; for (const o of [0, 128]) { g.fillRect(o, 0, 64, 256); g.fillRect(0, o, 256, 64); } // two bands each way: where they cross is the dark square
+  g.fillStyle = line; g.globalAlpha = 0.8; for (const o of [96, 224]) { g.fillRect(o, 0, 3, 256); g.fillRect(0, o, 256, 3); }
+  g.globalAlpha = 1; speckle(g, 256, 256, 2400, 1.2, 0.05, seed);
+  const t = tex(c); t.repeat.set(3, 4); return t;
+}
+const COAT = { n: 0, shell: null, maps: [jacketMap, plaidTexture("#b3261e", "#161214", "#161214", 71), plaidTexture("#1f4a7a", "#12352a", "#d9c46a", 72), plaidTexture("#c8962a", "#5a3b1c", "#f1e2b0", 73)] };
+function setCoat(n) {
+  COAT.n = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+  if (!COAT.shell) return;
+  COAT.shell.map = COAT.maps[COAT.n]; COAT.shell.bumpMap = COAT.maps[COAT.n]; COAT.shell.needsUpdate = true;
+}
 function drape(w, h, d, x, y, z, o = {}) {
   const g = new THREE.BoxGeometry(w, h, d, 36, 48, 4), p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
@@ -1618,7 +1633,7 @@ G(0.42, 0, Z1, () => {
   cyl(0.024, 0.012, mat.black, 0, 1.8, -0.006, { rx: Math.PI / 2 });
   tube([[0, 1.8, -0.01], [0, 1.8, -0.05], [0, 1.85, -0.075], [0, 1.93, -0.062]], 0.0065, mat.black);
   tube([[0, 1.79, -0.01], [0, 1.76, -0.04], [0, 1.775, -0.065]], 0.0065, mat.black);
-  const shell = M({ map: jacketMap, bumpMap: jacketMap, bumpScale: 1.2, roughness: 1 }); shell.side = THREE.DoubleSide; shell.shadowSide = THREE.DoubleSide;
+  const shell = M({ map: jacketMap, bumpMap: jacketMap, bumpScale: 1.2, roughness: 1 }); shell.side = THREE.DoubleSide; shell.shadowSide = THREE.DoubleSide; COAT.shell = shell;
   const lining = M({ color: 0x34352f, roughness: 1 }); lining.side = THREE.DoubleSide;
   const rib = M({ color: 0x585952, roughness: 1 }); rib.side = THREE.DoubleSide; const HY = 1.775, Y0 = 0.985, H = HY - Y0; // from the hem's top to the hook
   const halfW = (v) => 0.25 - 0.012 * Math.sin(v * 3) - 0.2 * Math.pow(ss(0.8, 1, v), 1.6); // straight, then drawn in to the hook
@@ -3470,6 +3485,7 @@ function command(m) {
   if (m.rain != null) ui("rain", m.rain);
   if (m.outer != null) ui("outer", m.outer);
   if (m.eaten != null) ui("eaten", m.eaten);
+  if (m.coat != null) setCoat(m.coat);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
   if (m.boss != null) { condense(false); home(false); BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; BOSS.eyesAt = m.risen ? performance.now() / 1000 - 3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
@@ -3500,6 +3516,7 @@ function command(m) {
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
 if (q.get("surge") === "1") surge(q.get("at"));
+if (q.get("coat")) setCoat(q.get("coat"));
 window.proto = { CON, U, BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
 
 // ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws

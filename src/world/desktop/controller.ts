@@ -404,7 +404,10 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    applyFit(root, stage, stageSize(session.view), session.pullOut ? null : backdropFor(session.view, boxArrived(deps.store.getState(), deps.store.getEvents())));
+    applyFit(root, stage, stageSize(session.view), session.pullOut ? null : backdropFor(session.view, boxArrived(deps.store.getState(), deps.store.getEvents()), session.coat));
+    // 换一件: the door wall's picture (the stage's and the turning walls') follows the hook's garment (room.css)
+    if (session.coat > 0) root.dataset.coat = String(session.coat);
+    else delete root.dataset.coat;
   };
 
   const render = () => {

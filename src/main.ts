@@ -58,6 +58,7 @@ import type { Json } from "@state/variables";
 import { net, type RunSnapshot } from "@net/supabase";
 import { pushDue } from "@net/sync";
 import { RUN_VERSION as RUN_FORMAT_VERSION } from "@state/saves";
+import { readCoat } from "@world/room/coat";
 
 const search = window.location.search;
 const params = new URLSearchParams(search);
@@ -200,6 +201,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   if (import.meta.env.DEV) (window as unknown as { __nt: unknown }).__nt = { ...game, store };
   // room-3d-desk R6: `?desk=photo` keeps the photo 桌子 (the author's comparison; the replay driver passes it).
   game.session.deskPhoto = new URLSearchParams(search).get("desk") === "photo";
+  // 换一件: the garment left on the hook by the door is the browser's to remember
+  game.session.coat = readCoat(window.localStorage);
   // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that
   // task's page, so its launch page (and the work behind it) can be looked at without the morning.
   const launch = import.meta.env.DEV ? params.get("launch") : null;

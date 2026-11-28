@@ -74,6 +74,10 @@
 .room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
 /* A wall of the turning box (room-turn correction): the same still as its facing. */
 .m-turn-face.door-view{background-color:#0f0e0c;background-image:url(/room/door_wall.png)}
+/* 换一件 (2026-11-28): the same door wall with one of the three plaid shirts on the hook; the root says which (controller) */
+[data-coat="1"] .room.door-view,[data-coat="1"] .m-turn-face.door-view{background-image:url(/room/door_wall_plaid1.jpg)}
+[data-coat="2"] .room.door-view,[data-coat="2"] .m-turn-face.door-view{background-image:url(/room/door_wall_plaid2.jpg)}
+[data-coat="3"] .room.door-view,[data-coat="3"] .m-turn-face.door-view{background-image:url(/room/door_wall_plaid3.jpg)}
 /* A press-and-drag turns the head: it must not select the picture or drag an image. */
 .room{-webkit-user-select:none;user-select:none}
 .room input,.room textarea{-webkit-user-select:text;user-select:text}

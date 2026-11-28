@@ -5,7 +5,7 @@
 // No WebGL2, a failed compile or a lost context: the canvas goes and the stack stays.
 // 30 fps, paused while the tab is hidden; reduced motion draws one still frame and nothing moves.
 import type { ActionContext } from "@world/desktop/controller";
-import { BACKDROPS } from "@world/fit";
+import { backdropFor, BACKDROPS } from "@world/fit";
 import { playSfx } from "@world/loop/sfx";
 import { prefersReducedMotion } from "../splat/gate";
 import { fxPlan, type FxView } from "./index";
@@ -159,14 +159,16 @@ export function createFxLayer(deps: FxLayerDeps = {}): (root: HTMLElement, ctx: 
       }
       if (canvas.parentElement !== host) host.appendChild(canvas);
       // A new day or a new still starts the clock again; a re-render of the same one does not.
-      const next = `${state.day}:${view}:${reduced ? "r" : "m"}`;
+      // 换一件: the door wall is drawn with whatever hangs on the hook
+      const photo = view === "door" ? backdropFor("door", true, ctx.session.coat) : BACKDROPS[view];
+      const next = `${state.day}:${view}:${reduced ? "r" : "m"}:${photo}`;
       if (next !== key) {
         key = next;
         clock = 0;
         frameNo = 0;
         lastBurst = -1;
         drawn = false;
-        renderer!.setScene(plan, BACKDROPS[view]);
+        renderer!.setScene(plan, photo);
       } else if (drawn) {
         host.classList.add("fx-gl");
       }

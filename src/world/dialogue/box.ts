@@ -142,7 +142,7 @@ export function lineScreens(state: State, session: Session, events?: readonly Ga
   const labels = show.choices?.map((c) => (c.text !== null ? fill(c.text) : t(c.labelKey!))) ?? null;
   // bedside-book: the bed and rise asks gained 看书 (three or four choices): they stay on the prompt's screen.
   const ask = session.dialogue.queue[0]?.ending.kind;
-  const all = screens(show.line ? lineText(state, session.dialogue.queue[0], show.line).text : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()), ask === "bedAsk" || ask === "riseAsk" || ask === "mugAsk"); // #104: the mug is already in the hand — the three ways show with 咖啡。, no extra click
+  const all = screens(show.line ? lineText(state, session.dialogue.queue[0], show.line).text : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()), ask === "bedAsk" || ask === "riseAsk" || ask === "mugAsk" || ask === "coatAsk"); // #104: the mug is already in the hand — the three ways show with 咖啡。, no extra click
   return { all, page: Math.min(Math.max(0, session.dialogue.page ?? 0), all.length - 1) };
 }
 

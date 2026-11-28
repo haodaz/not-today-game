@@ -341,6 +341,8 @@ export interface Session {
   worksAnswered: string | null;
   /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
   looks: Partial<Record<"coat" | "bag" | "door" | "lock", number>>;
+  /** 换一件 (author 2026-11-16, built 2026-11-28): what hangs on the hook by the door: 0 the grey jacket, 1–3 the plaid shirts. Kept in the browser (`nt_coat`), not in the run. */
+  coat: 0 | 1 | 2 | 3;
   /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
   deliveryUnitMs: number;
   /** The hinted edge under the pointer (room-turn 2026-11-04: a facing's left / right 8 % turns; 桌子's bottom is back) and since when (ms); set by the nav layer. */
@@ -699,6 +701,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     wbPast: null,
     worksAnswered: null,
     looks: {},
+    coat: 0,
     splatReady: false,
     cam: null,
     turnNext: null,

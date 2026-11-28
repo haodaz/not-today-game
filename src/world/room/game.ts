@@ -32,6 +32,7 @@ import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
+import { writeCoat } from "./coat";
 import { guideNow, withRing } from "@world/loop/guide";
 import { recordedOn } from "@state/sleeptalk";
 import type { State } from "@state/types.gen";
@@ -1004,7 +1005,9 @@ export const loopActions: Record<string, ActionHandler> = {
     const n = nextLook(lines, session.looks[key], Math.random());
     session.looks = { ...session.looks, [key]: n };
     session.kuroSeq += 1;
-    session.dialogue = push(session.dialogue, { key: `d${ctx.store.getState().day}:look:${key}:${session.kuroSeq}`, lines: [{ k: "inner", t: lines[n]! }], ending: { kind: "none" } });
+    // 换一件 (author 2026-11-16): the hook by the door: its line, then 换一件 / 就这件. A shirt says its own line.
+    const line = key === "coat" && session.coat > 0 ? t(`room.coat.swapped.${String(session.coat)}`) : lines[n]!;
+    session.dialogue = push(session.dialogue, { key: `d${ctx.store.getState().day}:look:${key}:${session.kuroSeq}`, lines: [{ k: "inner", t: line }], ending: { kind: key === "coat" ? "coatAsk" : "none" } });
     ctx.rerender();
   },
 
@@ -1460,6 +1463,19 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       const act = data.choice === "sip" ? "sip" : data.choice === "gulp" ? "glug" : "down";
       ctx.session.mug = { act, seq: (ctx.session.mug?.seq ?? 0) + 1 };
+      ctx.rerender();
+      return;
+    }
+    // 换一件: the next of the four (the grey jacket, three plaid shirts), said in one line; kept in the browser, not in the run
+    if (q.ending.kind === "coatAsk") {
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      if (data.choice === "swap") {
+        const next = ((ctx.session.coat + 1) % 4) as 0 | 1 | 2 | 3;
+        ctx.session.coat = next;
+        writeCoat(next);
+        ctx.session.kuroSeq += 1;
+        ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:coat:${String(ctx.session.kuroSeq)}`, lines: [{ k: "inner", t: t(`room.coat.swapped.${String(next)}`) }], ending: { kind: "none" } });
+      }
       ctx.rerender();
       return;
     }

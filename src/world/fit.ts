@@ -43,8 +43,10 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
 };
 
 /** box-arrival R2: a view's backdrop, the box-less still for 房间 / 床 before the case has arrived. */
-export function backdropFor(view: View, arrived: boolean): string {
+export function backdropFor(view: View, arrived: boolean, coat = 0): string {
   if (!arrived && (view === "room" || view === "bed")) return NOBOX_STILLS[view];
+  // 换一件: the door wall with one of the three plaid shirts on the hook (the same photograph, the jacket changed)
+  if (view === "door" && coat >= 1 && coat <= 3) return `/room/door_wall_plaid${String(coat)}.jpg`;
   return BACKDROPS[view];
 }
 

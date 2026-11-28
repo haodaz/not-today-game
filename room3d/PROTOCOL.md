@@ -33,6 +33,7 @@ message is not on this page, `tests/room-protocol.test.ts` fails.
 | `rain` | boolean | rain on the window |
 | `outer` | boolean | the outer world beyond the window (the last day) |
 | `eaten` | boolean | the meal on the table is the eaten version |
+| `coat` | 0–3 | what hangs on the hook by the door: 0 the grey jacket, 1–3 the plaid shirts (red and black, blue and green, yellow and brown); also `?coat=` in the address |
 | `objects` | string[] or `null` | which old objects lie on the desk (`null`: by day) |
 | `prints` | boolean | the prints the hand left lie on the desk |
 | `walkman` | `true`, `"stopped"`, `"playing"`, `false` | the walkman on the desk, its reels turning or not |

@@ -121,6 +121,8 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
     /** Its window once it said `ready`, and what has been posted to it since. */
     let readyWin: Window | null = null;
     let posted: RoomPosted = NOTHING_POSTED;
+    /** 换一件: the garment the loaded frame hangs (a fresh frame hangs the jacket, 0). */
+    let coatSaid = 0;
     let deskShownAt: number | null = null;
     let warned = false;
     let chickTimer: number | null = null;
@@ -184,6 +186,11 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       const plan = roomPosts(posted, want());
       posted = plan.next;
       for (const p of plan.posts) send(p);
+      // 换一件: the hook's garment, said when it is not what the frame hangs
+      if (coatSaid !== ctx.session.coat) {
+        coatSaid = ctx.session.coat;
+        send({ target: "nt-room", coat: coatSaid });
+      }
       // #104: a drink or a set-down is said once; only "hold" is kept (a frame that reloads lifts it again)
       const mugNow = ctx.session.mug;
       if (mugNow && mugNow.act !== "hold" && posted.mug === `${mugNow.act}:${mugNow.seq}`) ctx.session.mug = null;
@@ -218,6 +225,7 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       if (msg.type === "ready") {
         readyWin = shared.contentWindow;
         posted = NOTHING_POSTED;
+        coatSaid = 0; // a frame that has just loaded hangs the jacket
         bossPosted = NO_BOSS_POSTS;
         shared.classList.add("ready");
         if (mode() === "boss" && ctx.session.bossRoom === null) ctx.session.bossRoom = "ready";

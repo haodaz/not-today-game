@@ -345,9 +345,9 @@ export const KLOTSKI_ROOM_MS = 3600;
 /** The day whose room it is (the klotski is day 17's). */
 export const KLOTSKI_ROOM_DAY = 17;
 /** Loaded ahead (author 2026-11-28: 「屋子等素材可以提前加载好吗」): the page waits, facing the door and paused, from the moment the tray is on screen; the door moment starts it by a message (`klRoomCue` in motion/dom.ts) and shows it. One address for the whole stage, so the frame is kept. */
-export const klotskiRoomSrc = (day: number): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=wait`;
+export const klotskiRoomSrc = (day: number, coat = 0): string => `/room3d/index.html?embed=1&day=${String(day)}&low=1&surge=wait${coat > 0 ? `&coat=${String(coat)}` : ""}`;
 
-export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null }, approved: boolean, nowMs: number, look: string | null = null, flesh = true): SafeHtml {
+export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly klotski: KlotskiGame | null; readonly coat?: number }, approved: boolean, nowMs: number, look: string | null = null, flesh = true): SafeHtml {
   // `flesh` false (the photo look: `?desk=photo`, the walk driver's software renderer): no 3D pages at the door moment, the flat tentacles instead
   const game = board.game as Game;
   const g: KlotskiGame | null = session.klotski?.key === task.id ? session.klotski : null;
@@ -393,7 +393,7 @@ export function klotskiStage(task: Task, board: TaskBoard, s: BoardState, sessio
   const since = g && out && g.outAt !== null ? nowMs - g.outAt : -1;
   const cue = g && out && g.outAt !== null ? html` data-at="${String(Math.round(g.outAt + KLOTSKI_ROOM_MS))}" style="--at:${String(Math.max(0, Math.round(KLOTSKI_ROOM_MS - since)))}ms"` : null;
   const room = flesh && !(approved && !out)
-    ? html`<div class="${cls("kl-room-wrap", since >= KLOTSKI_ROOM_MS && "in")}"${cue}><iframe class="kl-room" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY)}" title="" aria-hidden="true" tabindex="-1"></iframe></div>`
+    ? html`<div class="${cls("kl-room-wrap", since >= KLOTSKI_ROOM_MS && "in")}"${cue}><iframe class="kl-room" data-keep="kl-room" src="${klotskiRoomSrc(KLOTSKI_ROOM_DAY, session.coat ?? 0)}" title="" aria-hidden="true" tabindex="-1"></iframe></div>`
     : null;
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="klotski-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
   return html`<div class="${cls("mn kl", out && "done", out && "haunted")}" data-screen="klotski">

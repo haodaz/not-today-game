@@ -42,6 +42,8 @@ export type Ending =
   | { readonly kind: "tuneOffer"; readonly taskId: string; readonly mod: string; readonly path: string }
   /** author 2026-11-24 (#64): the mug lifted: 喝一口 / 一口闷 / 先放着. */
   | { readonly kind: "mugAsk" }
+  /** 换一件: the garment on the hook has been looked at; change it for the next one, or leave it. */
+  | { readonly kind: "coatAsk" }
   /** bedside-book: 你拿起了床头的书。 (and the first time's line) read: the reader opens. */
   | { readonly kind: "openBook" }
   /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
@@ -68,7 +70,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "tuneOffer" || e.kind === "mugAsk" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "tuneOffer" || e.kind === "mugAsk" || e.kind === "coatAsk" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -492,6 +494,11 @@ export const MUG_OPTIONS: readonly ChoiceOption[] = [
   { index: 1, text: null, choice: "gulp", labelKey: "room.mug.gulp" },
   { index: 2, text: null, choice: "leave", labelKey: "room.mug.leave" },
 ];
+/** 换一件 (author 2026-11-16): the hook by the door. */
+export const COAT_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "swap", labelKey: "room.coat.swap" },
+  { index: 1, text: null, choice: "keep", labelKey: "room.coat.keep" },
+];
 export const SETTLE_SEND_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "go", labelKey: "settle.send.go" },
   { index: 1, text: null, choice: "fast", labelKey: "settle.send.fast" },
@@ -525,6 +532,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "settleSend") return [...SETTLE_SEND_OPTIONS];
   if (q.ending.kind === "tuneOffer") return [...TUNE_OFFER_OPTIONS];
   if (q.ending.kind === "mugAsk") return [...MUG_OPTIONS];
+  if (q.ending.kind === "coatAsk") return [...COAT_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);
