@@ -382,6 +382,12 @@ export interface TaskBoard {
   readonly view?: BoardView;
   /** ide R1: the preview (only with `view: "ide"`). */
   readonly ide?: BoardIde;
+  /**
+   * work-doc (author 2026-11-27, #165: the later days' real work looked bare beside v17 and the
+   * training board): the document this work is, for a board that is not an IDE. The workspace shows
+   * it as a page (the 预览 pane), filled with the cards as they go in. `src` and `pages` as an ide's.
+   */
+  readonly doc?: Pick<BoardIde, "src" | "pages">;
   /** ide R1: Kuro's transcript beats. */
   readonly beats?: readonly BoardBeat[];
   /** meeting R1: the meeting (only with `view: "meeting"`). */
@@ -677,7 +683,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare", "stack", "game"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "doc", "beats", "meeting", "tune", "compare", "stack", "game"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -769,6 +775,15 @@ function board(v: unknown, w: string): TaskBoard {
     if (view !== "ide") fail(`${w}.ide`, 'an ide needs view "ide"');
     ide = boardIde(v.ide, `${w}.ide`, slotIds);
   } else if (view === "ide") fail(`${w}.view`, 'view "ide" needs an ide');
+  // work-doc: the page a table or meeting board is shown as (never beside an ide: that has its own preview)
+  let doc: Pick<BoardIde, "src" | "pages"> | undefined;
+  if (v.doc !== undefined) {
+    if (view === "ide") fail(`${w}.doc`, 'a doc is for a board without view "ide"');
+    if (!isRecord(v.doc)) fail(`${w}.doc`, "must be an object");
+    keys(v.doc, ["src", "pages"], `${w}.doc`);
+    const d = boardIde(v.doc, `${w}.doc`, slotIds);
+    doc = { src: d.src, pages: d.pages };
+  }
   // meeting R1: the meeting, only with view "meeting"; its cards come from its lines.
   let meeting: BoardMeeting | undefined;
   if (v.meeting !== undefined) {
@@ -959,6 +974,7 @@ function board(v: unknown, w: string): TaskBoard {
     kuro: { fill, cards: kuroCards, unlock },
     ...(view !== undefined ? { view } : {}),
     ...(ide ? { ide } : {}),
+    ...(doc ? { doc } : {}),
     ...(beats ? { beats } : {}),
     ...(meeting ? { meeting } : {}),
     ...(tune ? { tune } : {}),
@@ -1473,6 +1489,8 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     // /docs/player/en/ — the same page, translated; the path differs by that folder only.
     const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src.replace("/docs/player/en/", "/docs/player/"), pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null, diff: b.ide.diff ? Object.keys(b.ide.diff).sort() : null, api: !!b.ide.api } : null);
     if (zh.board.view !== en.board.view || !sameJson(ideShape(zh.board), ideShape(en.board))) fail(`${w}.board`, "view or ide differs from the Chinese");
+    const docShape = (b: TaskBoard) => (b.doc ? { src: b.doc.src.replace("/docs/player/en/", "/docs/player/"), pages: b.doc.pages } : null);
+    if (!sameJson(docShape(zh.board), docShape(en.board))) fail(`${w}.board`, "doc differs from the Chinese");
     // meeting R1: the people's ids and tiles, the lines' times / speakers / cards, the layout and the
     // seats are shared; only the names and the line text differ.
     const meetingShape = (b: TaskBoard) =>

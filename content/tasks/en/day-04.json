@@ -9,6 +9,7 @@
       "done": "task_d4_1",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/en/dd-material.html?ch=1", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3 } },
         "title": "The AI theory · consciousness",
         "columns": [
           "",

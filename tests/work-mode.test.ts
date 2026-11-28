@@ -240,8 +240,13 @@ describe("§4 the workspace shows the work, read-only", () => {
     store.appendEvent({ kind: "boardStep", taskId: tk.id, op: { t: "fill", slot: b.slots[0]!.id, card: b.slots[0]!.answer } });
     const r = rig(store);
     r.act("wb-nav", { page: `task:${tk.id}` });
-    const app = { state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session: r.session, night: false, nowMs: 1000 };
-    const out = renderShell(app, tk, 4, (x) => fillPlaceholders(x, store.getState().names)).main.value;
+    const app = () => ({ state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session: r.session, night: false, nowMs: 1000 });
+    // work-doc (2026-11-27, #165): day 4's page opens on its document; the table is a toggle away
+    const first = renderShell(app(), tk, 4, (x) => fillPlaceholders(x, store.getState().names)).main.value;
+    expect(first).toContain('<iframe class="ide-frame" data-keep="ide" src="/docs/player/dd-material.html?ch=1');
+    expect(first).not.toContain('<table class="btable">');
+    r.act("shell-pane", { pane: "table" });
+    const out = renderShell(app(), tk, 4, (x) => fillPlaceholders(x, store.getState().names)).main.value;
     for (const action of ["board-slot", "board-card", "board-lock", "board-kuro-lock", "board-assist", "board-print", "board-code", "work-show"]) expect(out, action).not.toContain(`data-action="${action}"`);
     expect(out).toContain('<div class="surface board live">');
     expect(out).toContain('<table class="btable">');

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Due-Diligence Material</title>
+<style>
+  :root{--paper:#FCFBF8;--ink:#1F2024;--ink2:#6B6E78;--line:rgba(31,32,36,.14);--mark:#C77700;--ok:#13A37A;--red:#9c2318}
+  html,body{margin:0;background:#E9E6DF;color:var(--ink);font:15px/1.85 "Songti SC","Noto Serif SC",Georgia,serif}
+  .sheet{max-width:720px;margin:22px auto 40px;background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.10);padding:0 0 26px}
+  .band{display:flex;justify-content:space-between;align-items:center;padding:14px 44px;border-bottom:2px solid var(--ink);font:600 12px/1.4 -apple-system,"PingFang SC","Helvetica Neue",sans-serif;letter-spacing:.14em}
+  .band .secret{color:var(--red);border:1px solid var(--red);padding:2px 8px;letter-spacing:.2em}
+  .head{padding:30px 44px 0}
+  h1{margin:0;font-size:26px;font-weight:600;letter-spacing:.18em}
+  .meta{margin:8px 0 0;color:var(--ink2);font:12px/1.6 -apple-system,"PingFang SC",sans-serif;letter-spacing:.06em}
+  .toc{display:flex;gap:8px;margin:20px 44px 0;padding:0;list-style:none;font:12px/1.4 -apple-system,"PingFang SC",sans-serif}
+  .toc li{flex:1;padding:8px 10px;border:1px solid var(--line);color:var(--ink2);display:flex;flex-direction:column;gap:2px}
+  .toc li b{font-weight:600;color:var(--ink);letter-spacing:.08em}
+  .toc li.cur{border-color:var(--ink);background:#fff}
+  .toc li.sent small{color:var(--ok)}
+  .body{padding:22px 44px 0}
+  h2{margin:0 0 6px;font-size:19px;font-weight:600;letter-spacing:.12em}
+  .lead{margin:0 0 18px;color:var(--ink2);font-size:14px}
+  .item{display:grid;grid-template-columns:1fr 196px;gap:18px;padding:12px 0;border-top:1px solid var(--line)}
+  .item .no{font:600 11px/1 -apple-system,"PingFang SC",sans-serif;letter-spacing:.2em;color:var(--ink2);margin-bottom:6px}
+  .item .text{margin:0;font-size:16px}
+  .item .text.empty{color:#b9b4a8;border-bottom:1px dashed #cfc9bb}
+  .item.cur .text{background:rgba(245,166,35,.16);box-shadow:0 0 0 4px rgba(245,166,35,.16)}
+  .item .text.kuro{color:#3b3f8f}
+  .note{align-self:start;position:relative;padding:8px 10px;border-left:3px solid var(--mark);background:#FFF7E3;font:12px/1.6 -apple-system,"PingFang SC",sans-serif;color:#5b4a1e}
+  .note b{display:block;font-weight:600;letter-spacing:.06em;margin-bottom:2px}
+  .note::before{content:"";position:absolute;left:-21px;top:16px;width:18px;border-top:1px dashed var(--mark)}
+  .close{margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--ink2);font-size:13px}
+  .foot{display:flex;justify-content:space-between;margin:26px 44px 0;padding-top:10px;border-top:1px solid var(--line);color:var(--ink2);font:11px/1.4 -apple-system,"PingFang SC",sans-serif;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="band"><span>Future Intelligence · Funding papers</span><span class="secret">CONFIDENTIAL</span></div>
+  <div class="head"><h1>Due-Diligence Material</h1><p class="meta">Ref. WL-DD-2028 · version <span id="ver"></span> · <span id="date"></span> · Drafted by: head of technology</p></div>
+  <ol class="toc" id="toc"></ol>
+  <div class="body">
+    <h2 id="h2"></h2>
+    <p class="lead" id="lead"></p>
+    <div id="items"></div>
+    <p class="close" id="close"></p>
+  </div>
+  <div class="foot"><span>Future Intelligence · for the investors' due diligence only; do not pass on</span><span id="page"></span></div>
+</div>
+<script>
+const DOC = {
+ "title": "Due-Diligence Material",
+ "chapters": [
+  {
+   "no": "1",
+   "short": "Consciousness",
+   "title": "The AI theory: consciousness",
+   "date": "2028-10-20",
+   "version": "0.1",
+   "page": 3,
+   "lead": "This section answers item 1 of the investors' list of questions: where the company's technical line stands above its like.",
+   "close": "The wording of this section is for the investors' internal review. For the figures see annex 2, which their adviser checks separately.",
+   "cards": {
+    "c1": "It isn't conscious, but it has attention: in brain science, attention is efficiency.",
+    "c2": "Their ontology joins things; our graph joins how people attend to things.",
+    "c3": "It is still processing at 2:40 in the morning, never drifting.",
+    "c4": "It doesn't sleep, but it knows when you do.",
+    "d1": "It is conscious, and more awake than people.",
+    "d2": "Consciousness has nothing to do with us.",
+    "k1": "It's awake, so you can sleep."
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "Say it first",
+     "answer": "c1",
+     "who": "Lao Wang",
+     "ask": "\"Whether AI is conscious, we say it first.\""
+    },
+    {
+     "slot": "r2",
+     "label": "The rival",
+     "answer": "c2",
+     "who": "Lao Wang",
+     "ask": "\"That company talks ontology. We talk consciousness. One level up.\""
+    },
+    {
+     "slot": "r3",
+     "label": "Proof",
+     "answer": "c3",
+     "who": "Lao Wang",
+     "ask": "\"It needs data.\""
+    },
+    {
+     "slot": "r4",
+     "label": "One line",
+     "answer": "c4",
+     "who": "Lao Wang",
+     "ask": "\"One line the investors remember.\""
+    }
+   ]
+  },
+  {
+   "no": "2",
+   "short": "The avatar",
+   "title": "The product: the avatar",
+   "date": "2028-10-21",
+   "version": "0.2",
+   "page": 7,
+   "lead": "This section answers item 2 of the list: what shape the product takes, how far it acts for its user, and where it stops.",
+   "close": "The line on limits has gone to legal. Their opinion is attached to the formal version as comments.",
+   "cards": {
+    "c1": "The avatar: the one of you that lives in digital space.",
+    "c2": "It answers \"OK.\" for you.",
+    "c3": "It remembers what you forgot.",
+    "c4": "It may not sign for you.",
+    "d1": "The avatar is you.",
+    "d2": "The avatar may sign for you.",
+    "k1": "It is more like you than you are."
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "Name",
+     "answer": "c1",
+     "who": "Vivi",
+     "ask": "\"Call it the avatar.\""
+    },
+    {
+     "slot": "r2",
+     "label": "What it does",
+     "answer": "c2",
+     "who": "Vivi",
+     "ask": "\"It sits in meetings for you, answers messages for you.\""
+    },
+    {
+     "slot": "r3",
+     "label": "It and you",
+     "answer": "c3",
+     "who": "Vivi",
+     "ask": "\"Make it warm.\""
+    },
+    {
+     "slot": "r4",
+     "label": "Limits",
+     "answer": "c4",
+     "who": "Vivi",
+     "ask": "\"Legal says spell out the limits.\""
+    }
+   ]
+  },
+  {
+   "no": "3",
+   "short": "The entity",
+   "title": "What the ontology is",
+   "date": "2028-10-22",
+   "version": "0.3",
+   "page": 11,
+   "lead": "This section answers item 3 of the list and doubles as the page for the client: what the thing we call the ontology actually is.",
+   "close": "With this the three sections are in. On receipt their adviser will send a template; later material is laid out to it.",
+   "cards": {
+    "c1": "A graph that joins everything.",
+    "c2": "First the relations, then the things.",
+    "c3": "Before people named things, the relations were already there.",
+    "c4": "To be connected.",
+    "c5": "We connect people to it, for it.",
+    "d1": "We invented the ontology.",
+    "d2": "It wants nothing.",
+    "k1": "We connect you to it, for it."
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "What it is",
+     "answer": "c1",
+     "who": "The client",
+     "ask": "\"Make it sound like a thing.\""
+    },
+    {
+     "slot": "r2",
+     "label": "Where it comes from",
+     "answer": "c2",
+     "who": "The client",
+     "ask": "\"It needs a history.\""
+    },
+    {
+     "slot": "r3",
+     "label": "How old",
+     "answer": "c3",
+     "who": "Lao Wang",
+     "ask": "\"Write that it is older than people.\""
+    },
+    {
+     "slot": "r4",
+     "label": "What it wants",
+     "answer": "c4",
+     "who": "The client",
+     "ask": "\"What does it need?\""
+    },
+    {
+     "slot": "r5",
+     "label": "Us",
+     "answer": "c5",
+     "who": "Lao Wang",
+     "ask": "\"End on us.\""
+    }
+   ]
+  }
+ ],
+ "words": {
+  "now": "today",
+  "sent": "handed in",
+  "later": "to write",
+  "empty": "(this line is still empty)",
+  "page": "page {n}"
+ }
+};
+
+/* 工作文档（work-doc, 2026-11-27）：?ch=1|2|3 是哪一章；?fill=r1:c1,… 是这一章每一句填了哪张卡（没带就显示交出去的那一版）；?c=N 高亮第 N 句。 */
+const q = new URLSearchParams(location.search);
+const ch = Math.min(3, Math.max(1, Number(q.get('ch') || 1)));
+const C = DOC.chapters[ch - 1];
+const FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':').map(decodeURIComponent))) : Object.fromEntries(C.items.map(it => [it.slot, it.answer]));
+const cur = q.has('fill') ? C.items[Number(q.get('c') || 0)]?.slot : null;
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+document.title = DOC.title + ' · ' + C.title;
+document.getElementById('date').textContent = C.date;
+document.getElementById('ver').textContent = C.version;
+const toc = document.getElementById('toc');
+DOC.chapters.forEach((c, i) => { const li = el('li', i + 1 === ch ? 'cur' : i + 1 < ch ? 'sent' : ''); li.append(el('b', '', c.no + ' ' + c.short), el('small', '', i + 1 === ch ? DOC.words.now : i + 1 < ch ? DOC.words.sent : DOC.words.later)); toc.append(li); });
+document.getElementById('h2').textContent = C.no + '. ' + C.title;
+document.getElementById('lead').textContent = C.lead;
+const items = document.getElementById('items');
+C.items.forEach((it, i) => {
+  const row = el('div', 'item' + (it.slot === cur ? ' cur' : ''));
+  const left = el('div');
+  left.append(el('div', 'no', ch + '.' + (i + 1) + '  ' + it.label));
+  const id = FILL[it.slot];
+  const text = id ? (C.cards[id] ?? id) : DOC.words.empty;
+  left.append(el('p', 'text' + (id ? (id.startsWith('k') ? ' kuro' : '') : ' empty'), text));
+  const note = el('div', 'note'); note.append(el('b', '', it.who), document.createTextNode(it.ask));
+  row.append(left, note); items.append(row);
+});
+document.getElementById('close').textContent = C.close;
+document.getElementById('page').textContent = DOC.words.page.replace('{n}', String(C.page));
+
+</script>
+</body>
+</html>

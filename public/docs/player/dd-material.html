@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>尽职调查材料</title>
+<style>
+  :root{--paper:#FCFBF8;--ink:#1F2024;--ink2:#6B6E78;--line:rgba(31,32,36,.14);--mark:#C77700;--ok:#13A37A;--red:#9c2318}
+  html,body{margin:0;background:#E9E6DF;color:var(--ink);font:15px/1.85 "Songti SC","Noto Serif SC",Georgia,serif}
+  .sheet{max-width:720px;margin:22px auto 40px;background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.10);padding:0 0 26px}
+  .band{display:flex;justify-content:space-between;align-items:center;padding:14px 44px;border-bottom:2px solid var(--ink);font:600 12px/1.4 -apple-system,"PingFang SC","Helvetica Neue",sans-serif;letter-spacing:.14em}
+  .band .secret{color:var(--red);border:1px solid var(--red);padding:2px 8px;letter-spacing:.2em}
+  .head{padding:30px 44px 0}
+  h1{margin:0;font-size:26px;font-weight:600;letter-spacing:.18em}
+  .meta{margin:8px 0 0;color:var(--ink2);font:12px/1.6 -apple-system,"PingFang SC",sans-serif;letter-spacing:.06em}
+  .toc{display:flex;gap:8px;margin:20px 44px 0;padding:0;list-style:none;font:12px/1.4 -apple-system,"PingFang SC",sans-serif}
+  .toc li{flex:1;padding:8px 10px;border:1px solid var(--line);color:var(--ink2);display:flex;flex-direction:column;gap:2px}
+  .toc li b{font-weight:600;color:var(--ink);letter-spacing:.08em}
+  .toc li.cur{border-color:var(--ink);background:#fff}
+  .toc li.sent small{color:var(--ok)}
+  .body{padding:22px 44px 0}
+  h2{margin:0 0 6px;font-size:19px;font-weight:600;letter-spacing:.12em}
+  .lead{margin:0 0 18px;color:var(--ink2);font-size:14px}
+  .item{display:grid;grid-template-columns:1fr 196px;gap:18px;padding:12px 0;border-top:1px solid var(--line)}
+  .item .no{font:600 11px/1 -apple-system,"PingFang SC",sans-serif;letter-spacing:.2em;color:var(--ink2);margin-bottom:6px}
+  .item .text{margin:0;font-size:16px}
+  .item .text.empty{color:#b9b4a8;border-bottom:1px dashed #cfc9bb}
+  .item.cur .text{background:rgba(245,166,35,.16);box-shadow:0 0 0 4px rgba(245,166,35,.16)}
+  .item .text.kuro{color:#3b3f8f}
+  .note{align-self:start;position:relative;padding:8px 10px;border-left:3px solid var(--mark);background:#FFF7E3;font:12px/1.6 -apple-system,"PingFang SC",sans-serif;color:#5b4a1e}
+  .note b{display:block;font-weight:600;letter-spacing:.06em;margin-bottom:2px}
+  .note::before{content:"";position:absolute;left:-21px;top:16px;width:18px;border-top:1px dashed var(--mark)}
+  .close{margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--ink2);font-size:13px}
+  .foot{display:flex;justify-content:space-between;margin:26px 44px 0;padding-top:10px;border-top:1px solid var(--line);color:var(--ink2);font:11px/1.4 -apple-system,"PingFang SC",sans-serif;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="band"><span>未来智能 · 融资材料</span><span class="secret">保密</span></div>
+  <div class="head"><h1>尽职调查材料</h1><p class="meta">文号 WL-DD-2028 · 版本 <span id="ver"></span> · <span id="date"></span> · 撰稿：技术负责人</p></div>
+  <ol class="toc" id="toc"></ol>
+  <div class="body">
+    <h2 id="h2"></h2>
+    <p class="lead" id="lead"></p>
+    <div id="items"></div>
+    <p class="close" id="close"></p>
+  </div>
+  <div class="foot"><span>未来智能 · 仅供投资方尽调使用，请勿外传</span><span id="page"></span></div>
+</div>
+<script>
+const DOC = {
+ "title": "尽职调查材料",
+ "chapters": [
+  {
+   "no": "一",
+   "short": "意识",
+   "title": "AI 理论：意识",
+   "date": "2028-10-20",
+   "version": "0.1",
+   "page": 3,
+   "lead": "本节回答投资方问询清单第 1 项：贵司的技术路线，和同类公司比，高在哪里。",
+   "close": "本节表述供投资方内部评审。涉及的数据口径见附件二；附件二由对方顾问另行核对。",
+   "cards": {
+    "c1": "它没有意识，但它有「注意」：人脑科学里，注意力就是效率。",
+    "c2": "他们的本体连的是东西；我们的图连的是人怎么注意东西。",
+    "c3": "它在凌晨两点四十也在处理，从不走神。",
+    "c4": "它不睡觉，但它知道你什么时候睡。",
+    "d1": "它有意识，而且比人清醒。",
+    "d2": "意识跟我们没关系。",
+    "k1": "它醒着，所以你可以睡了。"
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "先说",
+     "answer": "c1",
+     "who": "老王",
+     "ask": "「AI 有没有意识，我们要先说。」"
+    },
+    {
+     "slot": "r2",
+     "label": "对手",
+     "answer": "c2",
+     "who": "老王",
+     "ask": "「那家公司讲本体，我们讲意识，高一层。」"
+    },
+    {
+     "slot": "r3",
+     "label": "证据",
+     "answer": "c3",
+     "who": "老王",
+     "ask": "「要有数据。」"
+    },
+    {
+     "slot": "r4",
+     "label": "一句话",
+     "answer": "c4",
+     "who": "老王",
+     "ask": "「投资人记得住的一句。」"
+    }
+   ]
+  },
+  {
+   "no": "二",
+   "short": "分身",
+   "title": "产品：分身",
+   "date": "2028-10-21",
+   "version": "0.2",
+   "page": 7,
+   "lead": "本节回答问询清单第 2 项：产品是什么形态，替用户做到哪一步，停在哪一步。",
+   "close": "本节的「边界」一条已送法务。法务的意见以批注形式附在正式版里。",
+   "cards": {
+    "c1": "分身：你在数字空间里的那一个。",
+    "c2": "替你回「好的。」",
+    "c3": "它记得你忘了的事。",
+    "c4": "它不能替你签字。",
+    "d1": "分身就是你。",
+    "d2": "分身可以替你签字。",
+    "k1": "它比你更像你。"
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "名字",
+     "answer": "c1",
+     "who": "Vivi",
+     "ask": "「就叫分身。」"
+    },
+    {
+     "slot": "r2",
+     "label": "它能做什么",
+     "answer": "c2",
+     "who": "Vivi",
+     "ask": "「替你开会，替你回消息。」"
+    },
+    {
+     "slot": "r3",
+     "label": "它和你",
+     "answer": "c3",
+     "who": "Vivi",
+     "ask": "「要讲得温暖。」"
+    },
+    {
+     "slot": "r4",
+     "label": "边界",
+     "answer": "c4",
+     "who": "Vivi",
+     "ask": "「法务说要写清楚边界。」"
+    }
+   ]
+  },
+  {
+   "no": "三",
+   "short": "本体",
+   "title": "本体是什么",
+   "date": "2028-10-22",
+   "version": "0.3",
+   "page": 11,
+   "lead": "本节回答问询清单第 3 项，同时作为给甲方的说明页：我们说的「本体」到底是个什么。",
+   "close": "三节至此交齐。对方顾问收到后会给出一份模板，后续材料按模板重排。",
+   "cards": {
+    "c1": "一张把所有东西连起来的图。",
+    "c2": "先有关系，后有东西。",
+    "c3": "人给东西起名字之前，关系就在那儿了。",
+    "c4": "被连上。",
+    "c5": "我们替它把人连上。",
+    "d1": "本体是我们发明的。",
+    "d2": "它什么都不要。",
+    "k1": "我们替它把你连上。"
+   },
+   "items": [
+    {
+     "slot": "r1",
+     "label": "是什么",
+     "answer": "c1",
+     "who": "甲方",
+     "ask": "「讲得像个东西。」"
+    },
+    {
+     "slot": "r2",
+     "label": "从哪来",
+     "answer": "c2",
+     "who": "甲方",
+     "ask": "「要有来历。」"
+    },
+    {
+     "slot": "r3",
+     "label": "多老",
+     "answer": "c3",
+     "who": "老王",
+     "ask": "「写它比人古老。」"
+    },
+    {
+     "slot": "r4",
+     "label": "要什么",
+     "answer": "c4",
+     "who": "甲方",
+     "ask": "「它的需求是什么？」"
+    },
+    {
+     "slot": "r5",
+     "label": "我们",
+     "answer": "c5",
+     "who": "老王",
+     "ask": "「最后落到我们。」"
+    }
+   ]
+  }
+ ],
+ "words": {
+  "now": "今天写",
+  "sent": "已交",
+  "later": "待写",
+  "empty": "（这一句还空着）",
+  "page": "第 {n} 页"
+ }
+};
+
+/* 工作文档（work-doc, 2026-11-27）：?ch=1|2|3 是哪一章；?fill=r1:c1,… 是这一章每一句填了哪张卡（没带就显示交出去的那一版）；?c=N 高亮第 N 句。 */
+const q = new URLSearchParams(location.search);
+const ch = Math.min(3, Math.max(1, Number(q.get('ch') || 1)));
+const C = DOC.chapters[ch - 1];
+const FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':').map(decodeURIComponent))) : Object.fromEntries(C.items.map(it => [it.slot, it.answer]));
+const cur = q.has('fill') ? C.items[Number(q.get('c') || 0)]?.slot : null;
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+document.title = DOC.title + ' · ' + C.title;
+document.getElementById('date').textContent = C.date;
+document.getElementById('ver').textContent = C.version;
+const toc = document.getElementById('toc');
+DOC.chapters.forEach((c, i) => { const li = el('li', i + 1 === ch ? 'cur' : i + 1 < ch ? 'sent' : ''); li.append(el('b', '', c.no + ' ' + c.short), el('small', '', i + 1 === ch ? DOC.words.now : i + 1 < ch ? DOC.words.sent : DOC.words.later)); toc.append(li); });
+document.getElementById('h2').textContent = C.no + '、' + C.title;
+document.getElementById('lead').textContent = C.lead;
+const items = document.getElementById('items');
+C.items.forEach((it, i) => {
+  const row = el('div', 'item' + (it.slot === cur ? ' cur' : ''));
+  const left = el('div');
+  left.append(el('div', 'no', ch + '.' + (i + 1) + '  ' + it.label));
+  const id = FILL[it.slot];
+  const text = id ? (C.cards[id] ?? id) : DOC.words.empty;
+  left.append(el('p', 'text' + (id ? (id.startsWith('k') ? ' kuro' : '') : ' empty'), text));
+  const note = el('div', 'note'); note.append(el('b', '', it.who), document.createTextNode(it.ask));
+  row.append(left, note); items.append(row);
+});
+document.getElementById('close').textContent = C.close;
+document.getElementById('page').textContent = DOC.words.page.replace('{n}', String(C.page));
+
+</script>
+</body>
+</html>

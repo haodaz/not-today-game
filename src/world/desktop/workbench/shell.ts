@@ -56,7 +56,8 @@ export function panesOf(task: Task, live: boolean): PaneId[] {
   // tune (2026-11-08): the 代码 pane of a tuning board is its bars and switches.
   // compare (author 2026-11-11): 老王的话 first, then the preview (and the code when the pages have files); no 文件.
   if (isCompare(task)) return PANE_ORDER.filter((p) => p === "preview" || (p === "code" && !!task.board!.ide?.files));
-  const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files || task.board!.tune ? ["preview", "code"] : ["preview"]) : [surface];
+  // work-doc (#165): a table or meeting board with a document shows it as its page, beside its table
+  const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files || task.board!.tune ? ["preview", "code"] : ["preview"]) : task.board!.doc ? ["preview", surface] : [surface];
   return PANE_ORDER.filter((p) => p === "files" || own.includes(p));
 }
 
@@ -67,6 +68,8 @@ export function shellDefaults(task: Task, live: boolean): ShellState {
   if (task.board?.tune) panes = [...panes].sort((a, b) => (a === "code" ? -1 : b === "code" ? 1 : 0));
   // compare: 老王的话 and the preview open; nothing else.
   if (isCompare(task)) panes = panes.filter((p) => p === "preview");
+  // work-doc (#165): the document is what opens; the table stays a toggle away
+  else if (task.board?.doc && task.board.view !== "ide") panes = panes.filter((p) => p === "preview");
   // A tuning board has no pages and no sources to list: no explorer. A compare board neither.
   return { explorer: !!task.board && !task.board.tune && !isCompare(task) && live, panes, max: null, slot: null, slotAt: 0, source: null };
 }
@@ -172,8 +175,9 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
   // tune: a handed-in page opened again on a later day carries today's number (the page misplays from day 4);
   // while Kuro executes a choice the previous page is held (then it changes, then Kuro speaks).
   const src = held ?? ideSrc(board, s, ops, selected, carried, today);
-  const page = board.ide?.pages[selected] ?? 0;
-  const file = (board.ide?.src ?? "").split("/").pop() ?? "";
+  const pageOf = board.ide ?? board.doc;
+  const page = pageOf?.pages[selected] ?? 0;
+  const file = ((pageOf?.src ?? "").split("/").pop() ?? "").split("?")[0]!;
   const title = task.deliverable?.label ?? board.title;
   return html`<div class="sh-browser"><div class="sh-tabs"><span class="sh-tab on">${title}</span></div><div class="sh-addr">…/${file}#${page}</div><iframe class="ide-frame" data-keep="ide" src="${src}" title="${title}" sandbox="allow-scripts"></iframe></div>`;
 }

@@ -101,8 +101,10 @@ function tuneQuery(board: TaskBoard, s: BoardState, carried: Readonly<Record<str
  * (`fill=` while nothing is filled); `c` is the page of the selected slot (`selectedSlot`). Pure.
  */
 export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], chosen: string | null = null, carried: Readonly<Record<string, string>> = {}, haunt: number | null = null): string {
-  const src = board.ide?.src ?? "";
-  const page = board.ide?.pages[selectedSlot(board, ops, chosen)] ?? 0;
+  // work-doc: a table or meeting board's page is addressed the same way
+  const pageOf = board.ide ?? board.doc;
+  const src = pageOf?.src ?? "";
+  const page = pageOf?.pages[selectedSlot(board, ops, chosen)] ?? 0;
   if (board.tune) {
     const sep = src.includes("?") ? "&" : "?";
     // The foreshadowing (author 2026-11-08): the file stays on the player's computer; opened again from
