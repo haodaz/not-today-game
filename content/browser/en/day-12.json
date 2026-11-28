@@ -1,0 +1,56 @@
+{
+  "day": 12,
+  "site": "Today · Tech",
+  "weather": "Rain",
+  "lead": {
+    "h": "Reconciliation software marks 1+1 as 3. The maker: all consistent",
+    "p": [
+      "This week the reconciliation tools of several companies returned 1+1=3 and marked it green: \"all consistent\". The maker says consistent means \"consistent with yesterday\".",
+      "One finance clerk says the money did arrive. It only arrived two minutes before she clicked."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "3",
+      "l": "What 1+1 comes to · all consistent",
+      "dir": ""
+    },
+    {
+      "v": "1997",
+      "l": "The most searched year today",
+      "dir": "up"
+    },
+    {
+      "v": "18″",
+      "l": "The length of the voice message most people received today · the voice is the boss's, the tone is not",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "A post from 1997: \"is this you\"",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "The money came back, the person did not: twenty days of a loan",
+      "sec": "Opinion",
+      "when": "Today"
+    },
+    {
+      "h": "The rhythm of the assistant's typing is the same as the pauses in your boss's speech",
+      "sec": "Tech",
+      "when": "Yesterday"
+    },
+    {
+      "h": "The scenery card: the first picture in workplace messaging that is not about work",
+      "sec": "Culture",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Rain",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "day": 2,
+  "site": "Today · Tech",
+  "weather": "Light rain",
+  "lead": {
+    "h": "\"Narrative\" is the business word of the year. Investors: what we invest in is a feeling",
+    "p": [
+      "The word \"narrative\" appears in this quarter's pitch decks six times as often as last year. Several investors say the product details can be filled in by an assistant: \"What we look at is whether the founder has the feeling.\"",
+      "A product manager who asked not to be named says she has not opened a requirements document in three weeks."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "6×",
+      "l": "How often \"narrative\" appears in pitch decks",
+      "dir": ""
+    },
+    {
+      "v": "430,000",
+      "l": "People whose jobs were adjusted for AI this quarter",
+      "dir": "down"
+    },
+    {
+      "v": "+1",
+      "l": "\"+1\" sent in the city's group chats today · a record",
+      "dir": "up"
+    }
+  ],
+  "reading": [
+    {
+      "h": "Group-lunch platforms: company orders are up; \"the boss is paying\" is now the default option",
+      "sec": "Companies",
+      "when": "Today"
+    },
+    {
+      "h": "Assistants have started adding notes for their users: \"for convenience\"",
+      "sec": "AI",
+      "when": "Today"
+    },
+    {
+      "h": "The alias wars: one field called user_id has four names",
+      "sec": "Tech",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Day twelve of the rainy season",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "The cat downstairs has got fat",
+      "sec": "Local",
+      "when": "Reader's letter"
+    }
+  ]
+}

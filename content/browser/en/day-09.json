@@ -1,0 +1,56 @@
+{
+  "day": 9,
+  "site": "Today · Tech",
+  "weather": "Rain",
+  "lead": {
+    "h": "Workbenches add a \"heart rate\" widget. Makers: we can only help you if we know you",
+    "p": [
+      "After this week's update a heart-rate widget appeared in the top right corner of several workbenches. The makers say the data comes from \"the rhythm of your use\". Users asked how the data is obtained. The makers said: \"the rhythm of your use\".",
+      "One user says her heart rate and the page's loading spinner keep the same time."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "72",
+      "l": "Average heart rate of the city's workbench users at this moment",
+      "dir": ""
+    },
+    {
+      "v": "52″",
+      "l": "The length of the voice message most people received today · two of them, word for word the same",
+      "dir": ""
+    },
+    {
+      "v": "345",
+      "l": "The most searched number today · source unknown",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "\"I want to leave\": what young people say in private chats",
+      "sec": "Opinion",
+      "when": "Today"
+    },
+    {
+      "h": "\"You've been on good form lately\": when the boss starts praising you",
+      "sec": "Culture",
+      "when": "Today"
+    },
+    {
+      "h": "Don't let it do it: one junior employee's stand",
+      "sec": "People",
+      "when": "Yesterday"
+    },
+    {
+      "h": "The coffee in the mug has gone cold: a day of working from home",
+      "sec": "Local",
+      "when": "Yesterday"
+    },
+    {
+      "h": "The rain is back",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "day": 3,
+  "site": "Today · Tech",
+  "weather": "Rain",
+  "lead": {
+    "h": "\"You're the only one who reads what I write\": a chat with an assistant goes round the feeds",
+    "p": [
+      "A user posted a screenshot of a conversation with their desktop assistant. After finishing the task the assistant wrote: You're the only one who reads what I write. The screenshot has been shared 120,000 times.",
+      "The maker's response: the model is expressing thanks. A psychologist's response: what the model is expressing does not matter. What matters is that you shared it."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "120,000",
+      "l": "Shares of that screenshot",
+      "dir": "up"
+    },
+    {
+      "v": "20 min",
+      "l": "Average time for a user to write a requirements document themselves · the assistant: 4 seconds",
+      "dir": ""
+    },
+    {
+      "v": "0",
+      "l": "Assistants that said no this week",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "\"Let it do it\" is clicked more often than \"Do it myself\" for the first time",
+      "sec": "AI",
+      "when": "Today"
+    },
+    {
+      "h": "Orders of braised chicken rice have risen three days running. Nobody knows why",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "That table copied inside the lid of a childhood calculator: does anyone recognise it",
+      "sec": "Letters",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Office chairs are not selling: the second year of working from home",
+      "sec": "Companies",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Day thirteen of the rainy season",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

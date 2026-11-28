@@ -1,0 +1,56 @@
+{
+  "day": 6,
+  "site": "Today · Tech",
+  "weather": "Rain",
+  "lead": {
+    "h": "Workplace messaging launches \"polite mode\": every reply gets a full stop",
+    "p": [
+      "The new version turns \"polite mode\" on by default: before sending, it adds the full stop and changes \"ok\" to \"Okay.\" The maker says conflict in teams fell by 70% during testing.",
+      "What teams said to each other also fell by 70% during testing. The maker did not mention that."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "70%",
+      "l": "Conflict down · talk down",
+      "dir": ""
+    },
+    {
+      "v": "505",
+      "l": "The most searched number today · source unknown",
+      "dir": ""
+    },
+    {
+      "v": "Good",
+      "l": "The most common word in workplace messages today",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Bosses have started to talk like the assistant: a new management language is forming",
+      "sec": "Culture",
+      "when": "Today"
+    },
+    {
+      "h": "Where typos come from: words nobody typed are appearing in documents",
+      "sec": "Tech",
+      "when": "Today"
+    },
+    {
+      "h": "The sound of chewing: a three-second voice message turns up in several groups",
+      "sec": "Local",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Colleagues whose profile pictures went grey: where did they go",
+      "sec": "Opinion",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Day sixteen of the rainy season",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

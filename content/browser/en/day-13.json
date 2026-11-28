@@ -1,0 +1,56 @@
+{
+  "day": 13,
+  "site": "Today · Tech",
+  "weather": "The rain has stopped",
+  "lead": {
+    "h": "From this paper to all readers: notice of upgrade",
+    "p": [
+      "As arranged, this paper upgrades next week. After the upgrade everything will be fine.",
+      "Please start packing up your old things."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "All",
+      "l": "Scope of the upgrade",
+      "dir": ""
+    },
+    {
+      "v": "pores",
+      "l": "The word most people used today to describe their screen",
+      "dir": ""
+    },
+    {
+      "v": "—",
+      "l": "People whose jobs were adjusted for AI this quarter",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Xiao Zhang has gone",
+      "sec": "People",
+      "when": "Today"
+    },
+    {
+      "h": "\"Toys will be the ruin of you\": thirty years of one teacher",
+      "sec": "Education",
+      "when": "Today"
+    },
+    {
+      "h": "A patch of light the shape of a palm on the wall. Property management: normal",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "What the electronic dictionary turned up: the body hidden in idioms",
+      "sec": "Culture",
+      "when": "Yesterday"
+    },
+    {
+      "h": "The rain has stopped",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

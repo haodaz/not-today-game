@@ -9,11 +9,15 @@ import { closerSlot } from "@world/late/closer-view";
 import { overlayRing } from "@world/late/rings";
 import { tentacleParams } from "./tentacles";
 
-/** The footer date is always today (cosmetic clock, injected as ms). */
-export function footerDate(ms: number): string {
-  const d = new Date(ms);
+/**
+ * The footer date is always today: the story's today, never the real one (author's rule: the game's
+ * present is 2028; a dated surface takes its year from content). Day 1 is 2028-10-16, as on the
+ * work documents and the files; until 2026-11-28 this printed the real clock's date.
+ */
+export function footerDate(day: number): string {
+  const d = new Date(Date.UTC(2028, 9, 16 + Math.max(1, Math.round(day)) - 1));
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
 const joinNonEmpty = (parts: readonly string[]): string => parts.filter((p) => p !== "").join(" · ");
@@ -48,7 +52,7 @@ export function renderBrowser(ctx: AppContext): { body: SafeHtml; bar: SafeHtml;
       : html`<div>${r.h}<small>${joinNonEmpty([r.sec, r.when])}</small></div>`,
   );
   const mastSub = joinNonEmpty([t("browser.section"), t("shell.day", { day: ctx.state.day }), page.weather]);
-  const body = html`<div class="body" style="flex-direction:column"><div class="site"><div class="mast"><b>${tr("browser.title")}</b><small>${mastSub}</small></div><div class="nav">${nav}</div><div class="grid"><div class="lead"><h2>${page.lead.h}</h2>${page.lead.p.map((p) => html`<p>${p}</p>`)}</div><div>${numbers}</div><div class="list"><h3>${tr("browser.reading")}</h3>${reading}</div></div><div class="foot">${footerDate(ctx.nowMs)}</div>${openPage(ctx, page)}</div>${tentacleCanvas(ctx)}</div>`;
+  const body = html`<div class="body" style="flex-direction:column"><div class="site"><div class="mast"><b>${tr("browser.title")}</b><small>${mastSub}</small></div><div class="nav">${nav}</div><div class="grid"><div class="lead"><h2>${page.lead.h}</h2>${page.lead.p.map((p) => html`<p>${p}</p>`)}</div><div>${numbers}</div><div class="list"><h3>${tr("browser.reading")}</h3>${reading}</div></div><div class="foot">${footerDate(ctx.state.day)}</div>${openPage(ctx, page)}</div>${tentacleCanvas(ctx)}</div>`;
   return { body, bar, badge: 0 };
 }
 

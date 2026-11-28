@@ -1,0 +1,56 @@
+{
+  "day": 10,
+  "site": "Today · Tech",
+  "weather": "Overcast, rain",
+  "lead": {
+    "h": "\"It knows me better than I do\": one month in, the desktop assistant keeps 97% of its users",
+    "p": [
+      "The new desktop assistant puts messages, documents, spreadsheets and code in one workbench. Users interviewed say it remembers when they drink water and when they get up, \"like a colleague who never gets tired\". The maker says that in the past thirty days the assistant has not once said no.",
+      "The most-liked comment: \"At last I don't have to take a look myself.\""
+    ]
+  },
+  "numbers": [
+    {
+      "v": "410,000",
+      "l": "People whose jobs were adjusted for AI this quarter · up 18% on last quarter",
+      "dir": "down"
+    },
+    {
+      "v": "97%",
+      "l": "Monthly retention of the desktop assistant · a record",
+      "dir": "up"
+    },
+    {
+      "v": "12",
+      "l": "Entries in this week's changelog",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Company-wide letter: the \"AI-native reform\" is complete; the office lease will not be renewed",
+      "sec": "Companies",
+      "when": "2 hours ago"
+    },
+    {
+      "h": "\"We did not lay anyone off. We changed the way.\" A CEO's three-hour dinner",
+      "sec": "People",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Requirement documents written by the assistant pass review 100% of the time; the review step is cancelled",
+      "sec": "AI",
+      "when": "Yesterday"
+    },
+    {
+      "h": "A knock-off virtual pet from 1997 is going up in price at flea markets",
+      "sec": "Local",
+      "when": "3 days ago"
+    },
+    {
+      "h": "Day eleven of the rainy season: the city's rainfall equals 1997's",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

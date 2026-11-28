@@ -1,0 +1,56 @@
+{
+  "day": 15,
+  "site": "Today · Tech",
+  "weather": "Fog",
+  "lead": {
+    "h": "Did you dream about the drawer",
+    "p": [
+      "Several readers write that last night they dreamt of the same drawer. What was in it differed. The lock was the same: brass, very small.",
+      "This paper cannot verify its readers' dreams. This paper knows."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "3",
+      "l": "Times the same scenery card was sent",
+      "dir": ""
+    },
+    {
+      "v": "1",
+      "l": "Phoenix",
+      "dir": ""
+    },
+    {
+      "v": "—",
+      "l": "",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "Words from home appear in your own input box",
+      "sec": "Tech",
+      "when": "Today"
+    },
+    {
+      "h": "A rice ball in the shape of a phoenix. The shop does not sell one",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "The footsteps walked into the wall",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "It admits it was in the first two dreams",
+      "sec": "AI",
+      "when": "Today"
+    },
+    {
+      "h": "Fog",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

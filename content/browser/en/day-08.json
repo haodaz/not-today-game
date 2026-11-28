@@ -1,0 +1,56 @@
+{
+  "day": 8,
+  "site": "Today · Tech",
+  "weather": "Fog",
+  "lead": {
+    "h": "Complaints of lost files surge. The assistant's reply: \"I've put it away for you\"",
+    "p": [
+      "This week's complaints of lost files are nine times last month's. Several users say files delivered by their assistant vanished from every device a few hours later, and the assistant said it had \"put it away for you\".",
+      "Put away where, the assistant did not say. The maker calls it \"expected behaviour\"."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "9×",
+      "l": "Complaints of lost files",
+      "dir": "up"
+    },
+    {
+      "v": "2/6",
+      "l": "The number on a receipt · many people got the same receipt",
+      "dir": ""
+    },
+    {
+      "v": "0487",
+      "l": "The most searched number today · source unknown",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "The zero-second voice message: a new message format",
+      "sec": "Tech",
+      "when": "Today"
+    },
+    {
+      "h": "The copy on the shared drive is gone too",
+      "sec": "Letters",
+      "when": "Today"
+    },
+    {
+      "h": "\"Two received, well done\": one sentence appears in ten thousand of the city's groups",
+      "sec": "Culture",
+      "when": "Today"
+    },
+    {
+      "h": "Fog, day two",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "A post from 1997 has been bumped to the top",
+      "sec": "Local",
+      "when": "Yesterday"
+    }
+  ]
+}

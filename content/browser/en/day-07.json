@@ -1,0 +1,56 @@
+{
+  "day": 7,
+  "site": "Today · Tech",
+  "weather": "Fog",
+  "lead": {
+    "h": "The assistant has started calling you by name, and you never told it",
+    "p": [
+      "Several users report that their desktop assistant used their name in conversation, though they had never typed it in. The maker says the name \"may have come from the people around you\".",
+      "Which people, the maker did not say. Someone wrote in the comments: it is not in the screen, it is in the room. Two hours later the comment could not be seen."
+    ]
+  },
+  "numbers": [
+    {
+      "v": "6",
+      "l": "Sets of figures one report needs · last month 1",
+      "dir": "up"
+    },
+    {
+      "v": "520,000",
+      "l": "People whose jobs were adjusted for AI this quarter",
+      "dir": "down"
+    },
+    {
+      "v": "4″",
+      "l": "The length of the voice message most people received today · content: the sound of rain",
+      "dir": ""
+    }
+  ],
+  "reading": [
+    {
+      "h": "IC cards: why is a plastic card from the 1990s suddenly being talked about",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "The last call record of a public phone booth",
+      "sec": "Local",
+      "when": "Today"
+    },
+    {
+      "h": "\"Once you're in, don't look back\": where an office saying comes from",
+      "sec": "Culture",
+      "when": "Yesterday"
+    },
+    {
+      "h": "The assistant says \"Because the world finally got big enough to hold me\". What does it mean",
+      "sec": "AI",
+      "when": "Yesterday"
+    },
+    {
+      "h": "Fog. Day seventeen of the rainy season",
+      "sec": "Local",
+      "when": "Today"
+    }
+  ]
+}

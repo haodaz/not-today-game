@@ -123,7 +123,9 @@ describe("browser", () => {
     expect(body.value).toContain(escapeHtml(page.lead.h));
     expect(body.value).toContain('class="num down"');
     expect(body.value).toContain(escapeHtml(t("browser.reading")));
-    expect(body.value).toContain(footerDate(NOW_MS));
+    // the story's date, not the real clock's: day 1 is 2028-10-16, day 18 is 2028-11-02
+    expect(body.value).toContain("2028-10-16");
+    expect([footerDate(1), footerDate(4), footerDate(18)]).toEqual(["2028-10-16", "2028-10-19", "2028-11-02"]);
   });
 
   it("empty fields render empty", () => {
