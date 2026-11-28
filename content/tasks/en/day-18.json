@@ -9,6 +9,7 @@
       "done": "task_d18_work",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/en/day-18-todo.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3, "r5": 4 } },
         "title": "To-do list · 2028-11-02",
         "columns": [
           "",

@@ -9,6 +9,7 @@
       "done": "task_d13_work",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/en/day-13-approval.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3, "r5": 4 } },
         "title": "Loan request · the Latin Necronomicon",
         "columns": [
           "",

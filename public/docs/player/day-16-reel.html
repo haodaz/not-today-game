@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>董事长汇报</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "skin": "grp",
+ "rot": 0.75,
+ "head": {
+  "mark": "sun",
+  "org": "和光集团",
+  "sub": "汇报剪辑单 · 集团表单",
+  "code": [
+   "表单 HG-16",
+   "和其光，同其尘"
+  ]
+ },
+ "title": "董事长汇报",
+ "sub": "汇报录音 · 剪辑单",
+ "meta": [
+  [
+   "汇报对象",
+   "董事长"
+  ],
+  [
+   "形式",
+   "录音"
+  ],
+  [
+   "剪辑",
+   "你"
+  ],
+  [
+   "要求",
+   "不要停"
+  ],
+  [
+   "素材",
+   "语音和笛声"
+  ],
+  [
+   "时长",
+   "不限"
+  ]
+ ],
+ "rules": [
+  "董事长不看材料，听个响就行。",
+  "语音在老板和群的聊天里，笛声在文件里。"
+ ],
+ "sign": [
+  [
+   "经办",
+   "你"
+  ],
+  [
+   "审核",
+   "和光·总裁办"
+  ]
+ ],
+ "words": {
+  "reel": "时间线",
+  "reelNote": "从左到右",
+  "empty": "（待剪）",
+  "foot": "和光集团 · 和其光，同其尘",
+  "page": "第 1 页 / 共 1 页"
+ },
+ "cards": {
+  "c1": "老王 09:00 那条语音",
+  "c2": "群里的语音，一条接一条",
+  "c3": "跟着笛声，一拍一条",
+  "c4": "没有结尾，接回开头",
+  "d1": "加个开场白",
+  "d2": "最后说一句谢谢大家",
+  "k1": "节拍：换成你的心跳"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "开头",
+   "answer": "c1",
+   "row": "开头",
+   "part": "open"
+  },
+  {
+   "slot": "r2",
+   "label": "中间",
+   "answer": "c2",
+   "row": "中间",
+   "part": "mid"
+  },
+  {
+   "slot": "r3",
+   "label": "节拍",
+   "answer": "c3",
+   "row": "节拍",
+   "part": "beat"
+  },
+  {
+   "slot": "r4",
+   "label": "结尾",
+   "answer": "c4",
+   "row": "结尾",
+   "part": "end"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/reel.js"></script>
+</body>
+</html>

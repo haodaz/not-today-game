@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cost sheet</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "skin": "grp",
+ "rot": 0.1,
+ "head": {
+  "mark": "sun",
+  "org": "EVENLIGHT GROUP",
+  "sub": "Cost sheet · Group form",
+  "code": [
+   "Form EL-11",
+   "Soften the light. Be one with the dust."
+  ]
+ },
+ "title": "Cost sheet",
+ "sub": "Balanced · costs down, output up",
+ "meta": [
+  [
+   "Sheet",
+   "Cost sheet"
+  ],
+  [
+   "Basis",
+   "By weight"
+  ],
+  [
+   "Filled in by",
+   "You"
+  ],
+  [
+   "Reviewed by",
+   "Evenlight Finance"
+  ],
+  [
+   "Due",
+   "End of day"
+  ],
+  [
+   "Note",
+   "Oil and wine untouched"
+  ]
+ ],
+ "cols": [
+  "Item",
+  "Unit price",
+  "Note"
+ ],
+ "rules": [
+  "The budget is what it is, and no cell that was asked for may stay empty.",
+  "The oil column and the wine column are not to be touched.",
+  "It is handed in only when it weighs level."
+ ],
+ "sign": [
+  [
+   "Handled by",
+   "You"
+  ],
+  [
+   "Reviewed by",
+   "Evenlight Finance"
+  ]
+ ],
+ "words": {
+  "sheet": "COSTS",
+  "sheetNote": "unit: a penny",
+  "pans": [
+   "asked",
+   "budget"
+  ],
+  "level": "level",
+  "off": "not level",
+  "empty": "(to fill in)",
+  "foot": "Evenlight Group · Soften the light. Be one with the dust.",
+  "page": "Page 1 of 1"
+ },
+ "cards": {
+  "c1": "A measure for a penny",
+  "c2": "Three measures for a penny",
+  "c3": "Untouched (original price)",
+  "c4": "Untouched (original price)",
+  "c5": "Exactly balanced, not a cent out",
+  "d1": "Oil and wine down 10% each",
+  "d2": "Wheat at yesterday's price",
+  "k1": "Oil and wine down 10% each (optimised)"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "Wheat",
+   "answer": "c1",
+   "row": "Wheat",
+   "note": "by the measure"
+  },
+  {
+   "slot": "r2",
+   "label": "Barley",
+   "answer": "c2",
+   "row": "Barley",
+   "note": "by the measure"
+  },
+  {
+   "slot": "r3",
+   "label": "Oil",
+   "answer": "c3",
+   "row": "Oil",
+   "note": "not to be touched"
+  },
+  {
+   "slot": "r4",
+   "label": "Wine",
+   "answer": "c4",
+   "row": "Wine",
+   "note": "not to be touched"
+  },
+  {
+   "slot": "r5",
+   "label": "Total",
+   "answer": "c5",
+   "row": "Total",
+   "note": "not a cent out"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/ledger.js"></script>
+</body>
+</html>

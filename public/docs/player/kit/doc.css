@@ -65,3 +65,85 @@ td.off{color:var(--ink3)}
 /* seating (day 9) */
 .plan{display:block;width:100%;height:auto;margin:6px 0 0}
 .plan text{font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+
+/* ===== the Group's pages (days 11–18): 和光集团's own forms; the paper wears by the day (--rot 0..1) ===== */
+.grp{--blue:#3A3F4B;--brass:#8C6A2A}
+.grp .sheet{position:relative}
+.grp .sheet::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--rot,0);mix-blend-mode:multiply;background:radial-gradient(ellipse at 100% 100%,rgba(120,10,20,.30),transparent 46%),radial-gradient(ellipse at 0 8%,rgba(70,10,20,.18),transparent 34%),repeating-linear-gradient(97deg,rgba(120,20,20,.05) 0 1px,transparent 1px 37px)}
+.grp .foot span:first-child{letter-spacing:.2em}
+.stamp{display:inline-block;padding:2px 10px;border:2px solid var(--red);border-radius:4px;color:var(--red);font-weight:700;letter-spacing:.2em;transform:rotate(-6deg);opacity:.85}
+.stamp.kuro{border-color:var(--kuro);color:var(--kuro)}
+.stamp.none{border:1.5px dashed #C9CDD5;color:#B5B9C2;font-weight:400;transform:none;opacity:1}
+
+/* cost sheet (day 11) */
+.grid td,.grid th{border:1px solid var(--line)}
+.grid th.col{text-align:center;background:#F1F2F4;color:var(--ink3);font-weight:400;border-bottom:1px solid var(--line)}
+.grid td.no{width:34px;text-align:center;background:#F1F2F4;color:var(--ink3);font-size:11px}
+.grid td.name{width:110px;font-weight:600}
+.grid tr.total td{border-top:2px solid var(--ink);font-weight:600}
+.two{display:grid;grid-template-columns:1fr 210px;gap:18px;align-items:start}
+.scale{display:block;width:100%;height:auto}
+
+/* watch rota (day 12) */
+.rota th,.rota td{border:1px solid var(--line);text-align:center;font-size:12px}
+.rota th:first-child,.rota td:first-child{text-align:left;width:112px;font-variant-numeric:tabular-nums;font-weight:600}
+.rota td.on{background:#E9E5D8}
+.rota td.kuro{background:#E6E7F5;color:var(--kuro)}
+.rota tr.gone td{color:var(--ink3);text-decoration:line-through}
+.rota tr.sleep td{color:var(--ink3);background:repeating-linear-gradient(135deg,#F4F5F7 0 6px,#ECEEF1 6px 12px)}
+.rota tr.cur td:first-child{background:var(--amber)}
+.what{margin:10px 0 0;font-size:13px}
+.what b{display:inline-block;min-width:112px;font-weight:600}
+
+/* loan approval (day 13) */
+.form{border:1px solid var(--ink);margin-top:4px}
+.form .f{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line)}
+.form .f:last-child{border-bottom:0}
+.form .f b{padding:9px 12px;background:#F4F5F7;border-right:1px solid var(--line);font-weight:500;font-size:12px;letter-spacing:.06em;color:var(--ink2)}
+.form .f span{padding:9px 12px;font-size:15px;font-family:"Songti SC","Noto Serif SC",Georgia,serif}
+.chain{display:flex;align-items:stretch;margin-top:16px}
+.chain div{flex:1;border:1px solid var(--line);border-left:0;padding:8px 10px;font-size:12px;min-height:58px}
+.chain div:first-child{border-left:1px solid var(--line)}
+.chain b{display:block;font-weight:500;font-size:11px;color:var(--ink2);letter-spacing:.08em;margin-bottom:6px}
+
+/* onboarding (day 14) */
+.flow{display:grid;gap:0}
+.flow .step2{display:grid;grid-template-columns:36px 190px 1fr;align-items:center;gap:12px;padding:10px 0}
+.flow .n{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--blue);display:grid;place-items:center;font-weight:600;color:var(--blue)}
+.flow .who2{font-weight:600}
+.flow .rule{padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--brass);background:#FBF8EF;font-size:15px}
+.flow .rule.empty{border-left-color:#D5D8DE;background:none;border-style:dashed}
+.flow .arrow{margin-left:14px;width:2px;height:14px;background:var(--blue);position:relative}
+.flow .arrow::after{content:"";position:absolute;left:-4px;bottom:-2px;border:5px solid transparent;border-top-color:var(--blue);border-bottom:0}
+.count{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:var(--ink2)}
+.count i{flex:1;height:10px;background:repeating-linear-gradient(90deg,var(--blue) 0 2px,transparent 2px 4px);opacity:.55}
+
+/* launch slides (day 15) */
+.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.slide{aspect-ratio:16/9;border:1px solid var(--ink);background:#14161B;color:#F2F0EA;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;font-size:13px;line-height:1.45}
+.slide small{font-size:10px;letter-spacing:.2em;color:#9aa0ab}
+.slide.empty{background:#F4F5F7;color:#B5B9C2;border-style:dashed;border-color:#C9CDD5}
+.slide.kuro{background:#1c1d3a}
+.slide.cur{box-shadow:0 0 0 4px var(--amber)}
+
+/* recording edit (day 16) */
+.reel{position:relative;border:1px solid var(--line);padding:14px 12px 12px;background:#F7F8FA}
+.reel .track2{display:grid;grid-template-columns:1.2fr 3fr 1.2fr;gap:4px}
+.clip{min-height:64px;padding:8px 10px;border-radius:4px;background:#23395D;color:#fff;font-size:12px;line-height:1.5;position:relative;overflow:hidden}
+.clip b{display:block;font-size:10px;letter-spacing:.2em;opacity:.7;font-weight:500}
+.clip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:16px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0 2px,transparent 2px 5px);-webkit-mask:linear-gradient(0deg,#000,transparent);mask:linear-gradient(0deg,#000,transparent)}
+.clip.empty{background:none;border:1.5px dashed #C9CDD5;color:#B5B9C2}
+.clip.empty::after{content:none}
+.clip.kuro{background:var(--kuro)}
+.clip.cur{box-shadow:0 0 0 4px var(--amber)}
+.beat{margin-top:10px;padding:6px 10px;border-top:1px dashed var(--line);font-size:12px;display:flex;gap:10px;align-items:center}
+.beat i{flex:1;height:14px;background:repeating-linear-gradient(90deg,var(--brass) 0 2px,transparent 2px 22px)}
+.loop{display:block;width:100%;height:34px}
+
+/* to-do slips (day 18) */
+.slips{display:grid;gap:8px}
+.slip{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.slip .box{width:16px;height:16px;border:1.5px solid var(--ink);display:grid;place-items:center;font-size:12px;line-height:1}
+.slip .t{font-size:14px}
+.slip.done .t{color:var(--ink2)}
+.slip.cur{box-shadow:0 0 0 4px var(--amber)}

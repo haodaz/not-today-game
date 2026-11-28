@@ -58,7 +58,12 @@ describe("work-doc: the due-diligence material (days 4–6)", () => {
 });
 
 // days 7–9 (author 2026-11-27: 「尽调材料这个方向可以，其他天也照这样铺」): the advisers' template, one page a day
-const KIT = [[7, "task_d7_4", "day-07-minutes.html", "minutes"], [8, "task_d8_1", "day-08-schedule.html", "schedule"], [9, "task_d9_3", "day-09-seating.html", "seating"]] as const;
+const KIT = [
+  [7, "task_d7_4", "day-07-minutes.html", "minutes"], [8, "task_d8_1", "day-08-schedule.html", "schedule"], [9, "task_d9_3", "day-09-seating.html", "seating"],
+  // the Group's forms (author 2026-11-27: 「请你继续」): days 11–16 and 18, on 和光集团's letterhead
+  [11, "task_d11_work", "day-11-ledger.html", "ledger"], [12, "task_d12_work", "day-12-rota.html", "rota"], [13, "task_d13_work", "day-13-approval.html", "approval"], [14, "task_d14_work", "day-14-onboard.html", "onboard"],
+  [15, "task_d15_work", "day-15-slides.html", "slides"], [16, "task_d16_work", "day-16-reel.html", "reel"], [18, "task_d18_work", "day-18-todo.html", "todo"],
+] as const;
 describe("work-doc: the advisers' template (days 7–9)", () => {
   it.each(["zh", "en"] as const)("%s: each board names its page; the page has every slot, every card word for word, and its form", (lang) => {
     setLocale(lang);
@@ -69,20 +74,22 @@ describe("work-doc: the advisers' template (days 7–9)", () => {
       expect(board.doc!.pages).toEqual(Object.fromEntries(board.slots.map((s, i) => [s.id, i])));
       const html = readFileSync(resolve(__dirname, `../public/docs/player/${dir}${file}`), "utf8");
       expect(html).toContain(`/docs/player/kit/${form}.js`);
-      const doc = JSON.parse(/const DOC = (\{[\s\S]*?\n\});/.exec(html)![1]!) as { cards: Record<string, string>; items: { slot: string; label: string; answer: string }[]; bars?: Record<string, unknown>; names?: Record<string, string>; end?: { values: Record<string, string> } };
+      const doc = JSON.parse(/const DOC = (\{[\s\S]*?\n\});/.exec(html)![1]!) as { cards: Record<string, string>; items: { slot: string; label: string; answer: string }[]; bars?: Record<string, unknown>; names?: Record<string, string>; short?: Record<string, string>; skin?: string; rot?: number; head?: { mark?: string }; end?: { values: Record<string, string> } };
       expect(doc.items.map((i) => [i.slot, i.label, i.answer])).toEqual(board.slots.map((s) => [s.id, s.label, s.answer]));
       const cards = [...board.cards, ...(board.kuro?.cards ?? [])];
       expect(Object.keys(doc.cards).sort()).toEqual(cards.map((c) => c.id).sort());
       for (const c of cards) expect(doc.cards[c.id]).toBe(c.text);
       // what the form draws from a card (a bar, a name on the plan) exists for every card
-      for (const extra of [doc.bars, doc.names]) if (extra) expect(Object.keys(extra).sort()).toEqual(cards.map((c) => c.id).sort());
+      for (const extra of [doc.bars, doc.names, doc.short]) if (extra) expect(Object.keys(extra).sort()).toEqual(cards.map((c) => c.id).sort());
+      // the Group's pages carry its mark and wear a little more each day
+      if (day >= 11) { expect(doc.skin).toBe("grp"); expect(doc.head!.mark).toBe("sun"); expect(doc.rot!).toBeGreaterThan(0); expect(html).toContain(lang === "zh" ? "和光集团" : "EVENLIGHT GROUP"); }
     }
     setLocale("zh");
   });
 
   it("the three forms and the kit are on disk; a meeting day opens the call above its minutes, a table day the page alone", () => {
     setLocale("zh");
-    for (const f of ["doc.css", "doc.js", "minutes.js", "schedule.js", "seating.js"]) expect(readFileSync(resolve(__dirname, `../public/docs/player/kit/${f}`), "utf8").length).toBeGreaterThan(200);
+    for (const f of ["doc.css", "doc.js", "minutes.js", "schedule.js", "seating.js", "ledger.js", "rota.js", "approval.js", "onboard.js", "slides.js", "reel.js", "todo.js"]) expect(readFileSync(resolve(__dirname, `../public/docs/player/kit/${f}`), "utf8").length).toBeGreaterThan(200);
     expect(shellDefaults(taskByFlag(7, "task_d7_4")!, true).panes).toEqual(["meeting", "preview"]);
     expect(shellDefaults(taskByFlag(9, "task_d9_3")!, true).panes).toEqual(["meeting", "preview"]);
     expect(shellDefaults(taskByFlag(8, "task_d8_1")!, true).panes).toEqual(["preview"]);

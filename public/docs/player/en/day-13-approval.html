@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loan request</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "skin": "grp",
+ "rot": 0.35,
+ "head": {
+  "mark": "sun",
+  "org": "EVENLIGHT GROUP",
+  "sub": "Loan request · Group form",
+  "code": [
+   "Form EL-13",
+   "Soften the light. Be one with the dust."
+  ]
+ },
+ "title": "Loan request",
+ "sub": "Borrowed by the Group · the Latin Necronomicon",
+ "meta": [
+  [
+   "Form",
+   "Loan request"
+  ],
+  [
+   "Borrower",
+   "Evenlight Group"
+  ],
+  [
+   "Handled by",
+   "Vivi"
+  ],
+  [
+   "Filled in by",
+   "You"
+  ],
+  [
+   "Period",
+   "Long-term"
+  ],
+  [
+   "Return",
+   "Not stated"
+  ]
+ ],
+ "chain": [
+  [
+   "Applicant",
+   "You"
+  ],
+  [
+   "Department",
+   "Vivi"
+  ],
+  [
+   "Admin",
+   "Evenlight Admin"
+  ],
+  [
+   "Approver",
+   ""
+  ]
+ ],
+ "rules": [
+  "Everything to fill in is in the scan.",
+  "Do not ask why it is borrowed."
+ ],
+ "sign": [
+  [
+   "Handled by",
+   "You"
+  ],
+  [
+   "Reviewed by",
+   "Evenlight Admin"
+  ]
+ ],
+ "words": {
+  "form": "WHAT IS BORROWED",
+  "formNote": "as in the scan",
+  "chain": "APPROVALS",
+  "waiting": "pending",
+  "passed": "APPROVED",
+  "nobody": "Approver: none",
+  "empty": "(to fill in)",
+  "foot": "Evenlight Group · Soften the light. Be one with the dust.",
+  "page": "Page 1 of 1"
+ },
+ "cards": {
+  "c1": "Olaus Wormius's Latin text",
+  "c2": "Page 751 (the page missing from Dee's English)",
+  "c3": "Yog-Sothoth is the key to the gate",
+  "c4": "and the guardian of the gate",
+  "c5": "November 1st",
+  "d1": "Reason: study and exchange",
+  "d2": "Gate day: May 1st",
+  "k1": "Loan period: permanent"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "Book",
+   "answer": "c1",
+   "row": "Which book"
+  },
+  {
+   "slot": "r2",
+   "label": "Page",
+   "answer": "c2",
+   "row": "Which page to compare"
+  },
+  {
+   "slot": "r3",
+   "label": "Line one",
+   "answer": "c3",
+   "row": "This page, first line"
+  },
+  {
+   "slot": "r4",
+   "label": "Line two",
+   "answer": "c4",
+   "row": "This page, second line"
+  },
+  {
+   "slot": "r5",
+   "label": "Date",
+   "answer": "c5",
+   "row": "The day the gate opens"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/approval.js"></script>
+</body>
+</html>

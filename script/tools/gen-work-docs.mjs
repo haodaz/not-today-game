@@ -1,6 +1,7 @@
-// Writes the work-document pages of days 7–9 (zh + en) from the tasks' own cards plus the page's own words.
+// Writes the work-document pages (zh + en) from the tasks' own cards plus the page's own words:
+// days 7–9 on the advisers' template, days 11–16 and 18 on the Group's forms. Run: node script/tools/gen-work-docs.mjs
 import fs from "node:fs";
-const ROOT = "/Users/aisandbox/Documents/holloween/not-today-game";
+const ROOT = new URL("../..", import.meta.url).pathname.replace(/\/$/, "");
 const board = (day, lang) => { const t = JSON.parse(fs.readFileSync(`${ROOT}/content/tasks/${lang === "en" ? "en/" : ""}day-${String(day).padStart(2, "0")}.json`, "utf8")); return (t.tasks ?? t).find((k) => k.board).board; };
 const page = (file, form, lang, doc) => {
   const html = `<!doctype html>
@@ -26,7 +27,7 @@ const DOC = ${JSON.stringify(doc, null, 1)};
 const base = (day, lang, extra) => {
   const b = board(day, lang);
   const cards = Object.fromEntries([...b.cards, ...(b.kuro?.cards ?? [])].map((c) => [c.id, c.text]));
-  const items = b.slots.map((s, i) => ({ slot: s.id, label: s.label, answer: s.answer, ...(extra.items?.[i] ?? {}) }));
+  const items = b.slots.map((s, i) => ({ slot: s.id, label: s.label, answer: s.answer, row: b.given.rows[s.id] ?? s.label, ...(extra.items?.[i] ?? {}) }));
   const { items: _i, ...rest } = extra;
   return { ...rest, cards, items };
 };
@@ -116,4 +117,122 @@ page("day-09-seating.html", "seating", "en", base(9, "en", {
   sign: [["Seated by", "You"], ["Reviewed by", "The advisers"]],
   words: { plan: "FLOOR PLAN", planNote: "circle + triangle", circle: "CIRCLE", gap: "apart", vacant: "empty", list: "LIST", empty: "(not seated yet)", foot: "The advisers' template · set the day before", page: "Page 1 of 1" },
 }));
+
+// ================= the Group's forms (days 11–16, 18): 和光集团 / Evenlight Group =================
+const grp = (lang, n, kind, rot) => ({
+  skin: "grp", rot,
+  head: lang === "zh" ? { mark: "sun", org: "和光集团", sub: `${kind} · 集团表单`, code: [`表单 HG-${n}`, "和其光，同其尘"] } : { mark: "sun", org: "EVENLIGHT GROUP", sub: `${kind} · Group form`, code: [`Form EL-${n}`, "Soften the light. Be one with the dust."] },
+});
+const tail = (lang, dept, words) => ({
+  sign: lang === "zh" ? [["经办", "你"], ["审核", dept]] : [["Handled by", "You"], ["Reviewed by", dept]],
+  words: { ...words, ...(lang === "zh" ? { foot: "和光集团 · 和其光，同其尘", page: "第 1 页 / 共 1 页" } : { foot: "Evenlight Group · Soften the light. Be one with the dust.", page: "Page 1 of 1" }) },
+});
+const both = (file, form, day, zh, en) => { page(file, form, "zh", base(day, "zh", zh)); page(file, form, "en", base(day, "en", en)); };
+
+// ---- day 11: 成本表
+both("day-11-ledger.html", "ledger", 11, {
+  ...grp("zh", 11, "成本表", 0.1), title: "成本表", sub: "称平 · 降本增效",
+  meta: [["表名", "成本表"], ["口径", "称重"], ["填表", "你"], ["审核", "和光·财务部"], ["限期", "下班前"], ["备注", "油、酒两列不动"]],
+  cols: ["成本项", "单价", "备注"],
+  items: [{ note: "按升计" }, { note: "按升计" }, { note: "不许动" }, { note: "不许动" }, { note: "一分不能差" }],
+  rules: ["预算就这么多，要求的格子一个都不能空。", "油和酒两列不许碰。", "称平了才能交。"],
+  ...tail("zh", "和光·财务部", { sheet: "成本明细", sheetNote: "单位：钱", pans: ["要求的", "预算"], level: "平了", off: "不平", empty: "（待填）" }),
+}, {
+  ...grp("en", 11, "Cost sheet", 0.1), title: "Cost sheet", sub: "Balanced · costs down, output up",
+  meta: [["Sheet", "Cost sheet"], ["Basis", "By weight"], ["Filled in by", "You"], ["Reviewed by", "Evenlight Finance"], ["Due", "End of day"], ["Note", "Oil and wine untouched"]],
+  cols: ["Item", "Unit price", "Note"],
+  items: [{ note: "by the measure" }, { note: "by the measure" }, { note: "not to be touched" }, { note: "not to be touched" }, { note: "not a cent out" }],
+  rules: ["The budget is what it is, and no cell that was asked for may stay empty.", "The oil column and the wine column are not to be touched.", "It is handed in only when it weighs level."],
+  ...tail("en", "Evenlight Finance", { sheet: "COSTS", sheetNote: "unit: a penny", pans: ["asked", "budget"], level: "level", off: "not level", empty: "(to fill in)" }),
+});
+
+// ---- day 12: 值班表
+both("day-12-rota.html", "rota", 12, {
+  ...grp("zh", 12, "值班表", 0.2), title: "值班表", sub: "这一周 · 全员",
+  meta: [["表名", "本周值班表"], ["周期", "这一周"], ["排班", "你"], ["审核", "和光·总裁办"], ["名单来源", "通讯录"], ["睡眠", "不安排"]],
+  days: ["一", "二", "三", "四", "五", "六", "日"],
+  short: { c1: "全员", c2: "全员", c3: "全员", c4: "删", d1: "轮班", d2: "ΥΠΝΟΣ", k1: "你休" },
+  items: [{}, {}, {}, { name: true }],
+  rules: ["这周大家克服一下，谁都不睡。", "名单以通讯录为准。"],
+  ...tail("zh", "和光·总裁办", { grid: "排班", gridNote: "每晚相同", slot: "时段", sleep: "睡眠", empty: "（还没排）" }),
+}, {
+  ...grp("en", 12, "Watch rota", 0.2), title: "Watch rota", sub: "This week · everyone",
+  meta: [["Rota", "This week's watch"], ["Period", "This week"], ["Drawn up by", "You"], ["Reviewed by", "Exec Office"], ["Names from", "The directory"], ["Sleep", "Not scheduled"]],
+  days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  short: { c1: "All", c2: "All", c3: "All", c4: "Del", d1: "Shift", d2: "ΥΠΝΟΣ", k1: "You off" },
+  items: [{}, {}, {}, { name: true }],
+  rules: ["Everyone bears with it this week. Nobody sleeps.", "Names go by the directory."],
+  ...tail("en", "Exec Office", { grid: "ROTA", gridNote: "the same every night", slot: "Hours", sleep: "Sleep", empty: "(not set yet)" }),
+});
+
+// ---- day 13: 借阅审批单
+both("day-13-approval.html", "approval", 13, {
+  ...grp("zh", 13, "借阅审批单", 0.35), title: "借阅审批单", sub: "集团借阅 · 《死灵之书》拉丁文本",
+  meta: [["单据", "借阅审批单"], ["借阅方", "和光集团"], ["经办", "Vivi"], ["填单", "你"], ["借期", "长期"], ["归还", "未注明"]],
+  chain: [["申请人", "你"], ["部门", "Vivi"], ["行政部", "和光·行政部"], ["审批人", ""]],
+  rules: ["要填的东西全在那份扫描件里。", "别问为什么借。"],
+  ...tail("zh", "和光·行政部", { form: "借阅内容", formNote: "照扫描件填", chain: "审批链", waiting: "待审", passed: "已通过", nobody: "审批人：无", empty: "（待填）" }),
+}, {
+  ...grp("en", 13, "Loan request", 0.35), title: "Loan request", sub: "Borrowed by the Group · the Latin Necronomicon",
+  meta: [["Form", "Loan request"], ["Borrower", "Evenlight Group"], ["Handled by", "Vivi"], ["Filled in by", "You"], ["Period", "Long-term"], ["Return", "Not stated"]],
+  chain: [["Applicant", "You"], ["Department", "Vivi"], ["Admin", "Evenlight Admin"], ["Approver", ""]],
+  rules: ["Everything to fill in is in the scan.", "Do not ask why it is borrowed."],
+  ...tail("en", "Evenlight Admin", { form: "WHAT IS BORROWED", formNote: "as in the scan", chain: "APPROVALS", waiting: "pending", passed: "APPROVED", nobody: "Approver: none", empty: "(to fill in)" }),
+});
+
+// ---- day 14: 新员工入职流程
+both("day-14-onboard.html", "onboard", 14, {
+  ...grp("zh", 14, "入职流程", 0.45), title: "新员工入职流程", sub: "第一批 · 1000 人",
+  meta: [["流程", "入职"], ["批次", "第一批"], ["人数", "1000"], ["经办", "你"], ["审核", "和光·人力部"], ["名单", "花名册"]],
+  rules: ["名单在花名册里，欢迎录音也要听。", "这批新人有点多。"],
+  ...tail("zh", "和光·人力部", { flow: "入职流程", flowNote: "名单里的四类", count: "第一批", total: "1000 人", empty: "（待定）" }),
+}, {
+  ...grp("en", 14, "Onboarding", 0.45), title: "Onboarding", sub: "First batch · 1,000 people",
+  meta: [["Process", "Onboarding"], ["Batch", "First"], ["Headcount", "1,000"], ["Handled by", "You"], ["Reviewed by", "Evenlight HR"], ["List", "The staff roll"]],
+  rules: ["The names are in the staff roll. Listen to the welcome recording too.", "This batch is rather large."],
+  ...tail("en", "Evenlight HR", { flow: "PROCESS", flowNote: "the four kinds on the roll", count: "First batch", total: "1,000 people", empty: "(to decide)" }),
+});
+
+// ---- day 15: 发布会演示稿
+both("day-15-slides.html", "slides", 15, {
+  ...grp("zh", 15, "演示稿", 0.6), title: "发布会演示稿", sub: "下午发布会 · 集团全员到",
+  meta: [["会议", "发布会"], ["时间", "今天下午"], ["排稿", "你"], ["主讲", "Vivi"], ["观众", "集团全员"], ["素材", "会议记录"]],
+  items: [{ slide: true }, { slide: true }, { slide: true }, {}, {}],
+  rules: ["素材在会议记录里，观众的截图在文件里。", "观众的反应实时盯着，照实写。"],
+  ...tail("zh", "和光·总裁办", { deck: "演示稿", deckNote: "三页", room: "现场", empty: "（待排）" }),
+}, {
+  ...grp("en", 15, "Launch slides", 0.6), title: "Launch slides", sub: "This afternoon's launch · the whole Group attends",
+  meta: [["Event", "Launch"], ["Time", "This afternoon"], ["Slides by", "You"], ["Speaker", "Vivi"], ["Audience", "The whole Group"], ["Material", "The meeting record"]],
+  items: [{ slide: true }, { slide: true }, { slide: true }, {}, {}],
+  rules: ["The material is in the meeting record; the audience screenshots are in the files.", "Watch the audience live. Write down what it does, as it is."],
+  ...tail("en", "Exec Office", { deck: "SLIDES", deckNote: "three", room: "THE ROOM", empty: "(to place)" }),
+});
+
+// ---- day 16: 董事长汇报
+both("day-16-reel.html", "reel", 16, {
+  ...grp("zh", 16, "汇报剪辑单", 0.75), title: "董事长汇报", sub: "汇报录音 · 剪辑单",
+  meta: [["汇报对象", "董事长"], ["形式", "录音"], ["剪辑", "你"], ["要求", "不要停"], ["素材", "语音和笛声"], ["时长", "不限"]],
+  items: [{ part: "open" }, { part: "mid" }, { part: "beat" }, { part: "end" }],
+  rules: ["董事长不看材料，听个响就行。", "语音在老板和群的聊天里，笛声在文件里。"],
+  ...tail("zh", "和光·总裁办", { reel: "时间线", reelNote: "从左到右", empty: "（待剪）" }),
+}, {
+  ...grp("en", 16, "Briefing edit sheet", 0.75), title: "Report to the chairman", sub: "The briefing as a recording · edit sheet",
+  meta: [["For", "The chairman"], ["Form", "Recording"], ["Edited by", "You"], ["Asked", "Do not stop"], ["Material", "Voice notes and the flute"], ["Length", "No limit"]],
+  items: [{ part: "open" }, { part: "mid" }, { part: "beat" }, { part: "end" }],
+  rules: ["The chairman does not read material. A sound will do.", "The voice notes are in the boss's chat and the group's; the flute is in the files."],
+  ...tail("en", "Exec Office", { reel: "TIMELINE", reelNote: "left to right", empty: "(to cut)" }),
+});
+
+// ---- day 18: 待办清单
+both("day-18-todo.html", "todo", 18, {
+  ...grp("zh", 18, "待办清单", 1), title: "待办清单", sub: "2028-11-02 · 把手上的活清掉",
+  meta: [["清单", "待办"], ["日期", "2028-11-02"], ["经办", "你"], ["要求", "今天清完"], ["张数", "5"], ["明天", "不留"]],
+  rules: ["今天把手上的都清了。", "一张都别留到明天。"],
+  ...tail("zh", "老王", { list: "五张单子", listNote: "一张一张结", empty: "未结" }),
+}, {
+  ...grp("en", 18, "To-do list", 1), title: "To-do list", sub: "2028-11-02 · clear what is on your hands",
+  meta: [["List", "To do"], ["Date", "2028-11-02"], ["Handled by", "You"], ["Asked", "All cleared today"], ["Slips", "5"], ["Tomorrow", "Nothing left"]],
+  rules: ["Clear everything on your hands today.", "Leave not one for tomorrow."],
+  ...tail("en", "Lao Wang", { list: "FIVE SLIPS", listNote: "closed one by one", empty: "open" }),
+});
 console.log("written");

@@ -17,12 +17,20 @@ function ringMark() {
   s.append(svg('circle', { cx: 20, cy: 20, r: 1.6, fill: '#23395D' }));
   return s;
 }
+/* the Group's mark (和光: the light evened out): a disc, half of it dimmed */
+function sunMark() {
+  const s = svg('svg', { viewBox: '0 0 40 40' });
+  s.append(svg('circle', { cx: 20, cy: 20, r: 17.5, fill: 'none', stroke: '#3A3F4B', 'stroke-width': 1 }), svg('circle', { cx: 20, cy: 20, r: 11, fill: '#3A3F4B' }), svg('path', { d: 'M20 9 A11 11 0 0 1 20 31 Z', fill: '#B9BCC4' }));
+  return s;
+}
 function sheetOf() {
   document.title = DOC.title;
+  if (DOC.skin) document.body.classList.add(DOC.skin);
+  document.body.style.setProperty('--rot', String(DOC.rot || 0));
   const sheet = el('div', 'sheet');
   const lh = el('div', 'lh'); const org = el('div', 'org', DOC.head.org); org.append(el('small', '', DOC.head.sub));
   const code = el('div', 'code'); DOC.head.code.forEach((c) => code.append(el('div', '', c)));
-  lh.append(ringMark(), org, code);
+  lh.append(DOC.head.mark === 'sun' ? sunMark() : ringMark(), org, code);
   const head = el('div', 'head'); head.append(el('h1', '', DOC.title), el('p', 'sub', DOC.sub));
   const meta = el('div', 'meta'); DOC.meta.forEach(([k, v]) => { const d = el('div'); d.append(el('b', '', k), document.createTextNode(v)); meta.append(d); });
   const body = el('div', 'body');

@@ -9,6 +9,7 @@
       "done": "task_d14_work",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/en/day-14-onboard.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3 } },
         "title": "Onboarding · first batch (1,000 people)",
         "columns": [
           "",

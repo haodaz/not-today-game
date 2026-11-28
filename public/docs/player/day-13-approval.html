@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>借阅审批单</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "skin": "grp",
+ "rot": 0.35,
+ "head": {
+  "mark": "sun",
+  "org": "和光集团",
+  "sub": "借阅审批单 · 集团表单",
+  "code": [
+   "表单 HG-13",
+   "和其光，同其尘"
+  ]
+ },
+ "title": "借阅审批单",
+ "sub": "集团借阅 · 《死灵之书》拉丁文本",
+ "meta": [
+  [
+   "单据",
+   "借阅审批单"
+  ],
+  [
+   "借阅方",
+   "和光集团"
+  ],
+  [
+   "经办",
+   "Vivi"
+  ],
+  [
+   "填单",
+   "你"
+  ],
+  [
+   "借期",
+   "长期"
+  ],
+  [
+   "归还",
+   "未注明"
+  ]
+ ],
+ "chain": [
+  [
+   "申请人",
+   "你"
+  ],
+  [
+   "部门",
+   "Vivi"
+  ],
+  [
+   "行政部",
+   "和光·行政部"
+  ],
+  [
+   "审批人",
+   ""
+  ]
+ ],
+ "rules": [
+  "要填的东西全在那份扫描件里。",
+  "别问为什么借。"
+ ],
+ "sign": [
+  [
+   "经办",
+   "你"
+  ],
+  [
+   "审核",
+   "和光·行政部"
+  ]
+ ],
+ "words": {
+  "form": "借阅内容",
+  "formNote": "照扫描件填",
+  "chain": "审批链",
+  "waiting": "待审",
+  "passed": "已通过",
+  "nobody": "审批人：无",
+  "empty": "（待填）",
+  "foot": "和光集团 · 和其光，同其尘",
+  "page": "第 1 页 / 共 1 页"
+ },
+ "cards": {
+  "c1": "奥劳斯·沃米乌斯的拉丁文本",
+  "c2": "第 751 页（迪伊英译本缺的那一页）",
+  "c3": "犹格·索托斯是门的钥匙",
+  "c4": "也是门的守卫",
+  "c5": "11 月 1 日",
+  "d1": "借阅理由：学习交流",
+  "d2": "门开的日子：5 月 1 日",
+  "k1": "借阅期限：永久"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "书",
+   "answer": "c1",
+   "row": "借哪本"
+  },
+  {
+   "slot": "r2",
+   "label": "页",
+   "answer": "c2",
+   "row": "要对哪一页"
+  },
+  {
+   "slot": "r3",
+   "label": "第一行",
+   "answer": "c3",
+   "row": "这一页第一行"
+  },
+  {
+   "slot": "r4",
+   "label": "第二行",
+   "answer": "c4",
+   "row": "这一页第二行"
+  },
+  {
+   "slot": "r5",
+   "label": "日子",
+   "answer": "c5",
+   "row": "门开的那一天"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/approval.js"></script>
+</body>
+</html>

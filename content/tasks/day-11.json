@@ -9,6 +9,7 @@
       "done": "task_d11_work",
       "board": {
         "kind": "table",
+        "doc": { "src": "/docs/player/day-11-ledger.html", "pages": { "r1": 0, "r2": 1, "r3": 2, "r4": 3, "r5": 4 } },
         "title": "成本表 · 称平",
         "columns": [
           "",

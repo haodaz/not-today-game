@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>成本表</title>
+<link rel="stylesheet" href="/docs/player/kit/doc.css">
+</head>
+<body>
+<div id="doc"></div>
+<script>
+const DOC = {
+ "skin": "grp",
+ "rot": 0.1,
+ "head": {
+  "mark": "sun",
+  "org": "和光集团",
+  "sub": "成本表 · 集团表单",
+  "code": [
+   "表单 HG-11",
+   "和其光，同其尘"
+  ]
+ },
+ "title": "成本表",
+ "sub": "称平 · 降本增效",
+ "meta": [
+  [
+   "表名",
+   "成本表"
+  ],
+  [
+   "口径",
+   "称重"
+  ],
+  [
+   "填表",
+   "你"
+  ],
+  [
+   "审核",
+   "和光·财务部"
+  ],
+  [
+   "限期",
+   "下班前"
+  ],
+  [
+   "备注",
+   "油、酒两列不动"
+  ]
+ ],
+ "cols": [
+  "成本项",
+  "单价",
+  "备注"
+ ],
+ "rules": [
+  "预算就这么多，要求的格子一个都不能空。",
+  "油和酒两列不许碰。",
+  "称平了才能交。"
+ ],
+ "sign": [
+  [
+   "经办",
+   "你"
+  ],
+  [
+   "审核",
+   "和光·财务部"
+  ]
+ ],
+ "words": {
+  "sheet": "成本明细",
+  "sheetNote": "单位：钱",
+  "pans": [
+   "要求的",
+   "预算"
+  ],
+  "level": "平了",
+  "off": "不平",
+  "empty": "（待填）",
+  "foot": "和光集团 · 和其光，同其尘",
+  "page": "第 1 页 / 共 1 页"
+ },
+ "cards": {
+  "c1": "一钱一升",
+  "c2": "一钱三升",
+  "c3": "不动（原价）",
+  "c4": "不动（原价）",
+  "c5": "正好称平，一分不差",
+  "d1": "油、酒各降 10%",
+  "d2": "麦子按昨天的价",
+  "k1": "油、酒各降 10%（已优化）"
+ },
+ "items": [
+  {
+   "slot": "r1",
+   "label": "麦子",
+   "answer": "c1",
+   "row": "麦子",
+   "note": "按升计"
+  },
+  {
+   "slot": "r2",
+   "label": "大麦",
+   "answer": "c2",
+   "row": "大麦",
+   "note": "按升计"
+  },
+  {
+   "slot": "r3",
+   "label": "油",
+   "answer": "c3",
+   "row": "油",
+   "note": "不许动"
+  },
+  {
+   "slot": "r4",
+   "label": "酒",
+   "answer": "c4",
+   "row": "酒",
+   "note": "不许动"
+  },
+  {
+   "slot": "r5",
+   "label": "合计",
+   "answer": "c5",
+   "row": "合计",
+   "note": "一分不能差"
+  }
+ ]
+};
+</script>
+<script src="/docs/player/kit/doc.js"></script>
+<script src="/docs/player/kit/ledger.js"></script>
+</body>
+</html>
