@@ -2733,6 +2733,77 @@ function buildFar() {
   FAR.rest = () => { if (!FAR.light) return; FAR.light = false; put(lay(1500, 70, 139, 0.75).concat(lay(2300, 120, 285, 0.9))); }; // the far side, out to the world's edge, before the eye leaves // the far side, for when the eye leaves the fight
 
   FAR.dome = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.MeshBasicMaterial({ color: 0x1d1d1f, side: THREE.BackSide, fog: false, transparent: true, opacity: 0, depthWrite: false })); FAR.dome.renderOrder = -2; FAR.g.add(FAR.dome);
+  { // Space (author 2026-11-28: 「克总远景目前也没有宇宙的感觉」). Until now the far view ended in a plain dark-grey dome: smoke, and
+    // nothing behind it. Behind the smoke there is now the sky he lives under: three depths of stars that do not twinkle
+    // together, a river of dust across it in his own colours (wine, violet, a cold green at its edges), two far lights that
+    // are the size of worlds, and all of it turning very slowly. One sphere, one draw call; drawn over the dome, under him.
+    // (The sky dome as one shader on a sphere is the Caelune lookdev lab's way: github.com/bigdrum/caelune2.)
+    const mat = new THREE.ShaderMaterial({
+      side: THREE.BackSide, transparent: true, depthWrite: false, fog: false, toneMapped: false, blending: THREE.AdditiveBlending, // depth-tested: he and the plain are in front of it
+      uniforms: { uK: { value: 0 }, uTime: { value: 0 }, uHor: { value: 1 }, uAxis: { value: new THREE.Vector3(0.35, 0.86, -0.36) }, uW1: { value: new THREE.Vector3(-0.62, 0.52, -0.58) } },
+      vertexShader: /* glsl */ `varying vec3 vDir; void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: /* glsl */ `
+        uniform float uK, uTime, uHor; uniform vec3 uAxis, uW1; varying vec3 vDir;
+        float h31(vec3 p) { p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.x + p.y) * p.z); }
+        float vn(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(mix(h31(i), h31(i + vec3(1,0,0)), f.x), mix(h31(i + vec3(0,1,0)), h31(i + vec3(1,1,0)), f.x), f.y),
+                     mix(mix(h31(i + vec3(0,0,1)), h31(i + vec3(1,0,1)), f.x), mix(h31(i + vec3(0,1,1)), h31(i + vec3(1,1,1)), f.x), f.y), f.z); }
+        float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * vn(p); p = p * 2.02 + 11.3; a *= 0.5; } return s; }
+        // stars of one depth: the sphere of directions cut into cells, a star in a few of them, each a small soft disc
+        vec3 stars(vec3 d, float cells, float keep, float size, float seed) {
+          vec3 p = d * cells, id = floor(p); float r = h31(id + seed);
+          if (r < keep) return vec3(0.0);
+          vec3 off = vec3(h31(id + seed + 1.7), h31(id + seed + 5.3), h31(id + seed + 9.1)) - 0.5;
+          float dist = length(fract(p) - 0.5 - off * 0.6);
+          float b = smoothstep(size, 0.0, dist) * (0.35 + 0.65 * h31(id + seed + 3.1));
+          float tw = 0.78 + 0.22 * sin(uTime * (0.6 + 2.2 * h31(id + 7.7)) + r * 60.0);
+          vec3 tint = mix(vec3(1.0, 0.82, 0.74), vec3(0.74, 0.84, 1.0), h31(id + seed + 4.4)); // some warm, some cold
+          return tint * b * tw;
+        }
+        // a far island of stars: a small tilted smudge with a bright middle
+        float isle(vec3 d, vec3 at, float size, float tilt, float flat_) {
+          vec3 u = normalize(cross(at, vec3(0.0, 1.0, 0.0))), v = cross(u, at);
+          vec2 q = vec2(dot(d, u), dot(d, v)) / size; float c = cos(tilt), sn = sin(tilt);
+          q = vec2(q.x * c - q.y * sn, (q.x * sn + q.y * c) * flat_);
+          float r2 = dot(q, q);
+          return step(0.0, dot(d, at)) * (exp(-r2 * 2.2) * 0.5 + exp(-r2 * 30.0) * 0.9);
+        }
+        void main() {
+          float ca = cos(uTime * 0.004), sa = sin(uTime * 0.004);
+          vec3 d = normalize(vDir); d = vec3(d.x * ca - d.z * sa, d.y, d.x * sa + d.z * ca); // the whole sky turns, slowly
+          vec3 col = stars(d, 70.0, 0.90, 0.11, 0.0) * 1.0 + stars(d, 150.0, 0.93, 0.13, 20.0) * 0.6 + stars(d, 300.0, 0.955, 0.16, 40.0) * 0.32;
+          col += stars(d, 26.0, 0.965, 0.07, 80.0) * 2.2 + stars(d, 26.0, 0.965, 0.3, 80.0) * 0.16; // a few near ones, each with a little light round it
+          // the river of dust: a band round a tilted great circle, torn by noise
+          vec3 axis = normalize(uAxis);
+          float lat = dot(d, axis), band = exp(-lat * lat * 9.0);
+          float n = fbm(d * 3.1 + 4.0), n2 = fbm(d * 7.3 - 2.0);
+          float dust = band * smoothstep(0.34, 0.78, n * 0.75 + n2 * 0.35);
+          vec3 wine = vec3(0.44, 0.04, 0.09), violet = vec3(0.15, 0.07, 0.3), cold = vec3(0.05, 0.2, 0.19);
+          vec3 neb = mix(wine, violet, smoothstep(0.42, 0.9, n2)); neb = mix(neb, cold, smoothstep(0.55, 1.0, abs(lat) * 3.0) * 0.6);
+          col += neb * dust * 0.8;
+          col += mix(violet, wine, n) * smoothstep(0.42, 0.8, fbm(d * 1.6 - 7.0)) * 0.07; // and thin cloud over the rest of the sky: it is not empty anywhere
+          col *= 1.0 - 0.75 * dust * smoothstep(0.62, 0.9, n2); // dark lanes in it hide the stars behind
+          col += stars(d, 110.0, 0.80, 0.09, 60.0) * band * 0.55; // it is crowded along the river
+          col += vec3(1.0, 0.86, 0.8) * exp(-lat * lat * 260.0) * (0.035 + 0.05 * n); // the river's bright middle, too far to be stars
+          // far islands of stars, each a smudge: other skies
+          col += vec3(0.9, 0.8, 0.95) * isle(d, normalize(uAxis.zxy * vec3(1.0, 0.4, -1.0) + vec3(0.2, 0.5, 0.1)), 0.045, 0.6, 2.6) * 0.5;
+          col += vec3(0.95, 0.7, 0.6) * isle(d, normalize(vec3(-0.5, -0.45, 0.74)), 0.03, -0.9, 3.2) * 0.45;
+          col += vec3(0.7, 0.8, 1.0) * isle(d, normalize(vec3(0.82, -0.2, -0.53)), 0.022, 0.2, 1.6) * 0.4;
+          // two far lights the size of worlds: one red and near enough to have a disc, one pale
+          vec3 w1 = normalize(uW1), w2 = normalize(vec3(0.7, 0.33, 0.63));
+          float a1 = acos(clamp(dot(d, w1), -1.0, 1.0)), a2 = acos(clamp(dot(d, w2), -1.0, 1.0));
+          col += vec3(0.9, 0.12, 0.08) * (smoothstep(0.028, 0.022, a1) * 0.9 + exp(-a1 * 22.0) * 0.35);
+          col += vec3(0.75, 0.8, 0.95) * (smoothstep(0.012, 0.008, a2) * 0.8 + exp(-a2 * 40.0) * 0.2);
+          // over the plain it sinks into the smoke: nothing shines through near the horizon, nothing below it. Once the world
+          // has been left (uHor 0, the condensing) there is no horizon: the sky goes all the way round.
+          col *= mix(1.0, smoothstep(0.0, 0.3, d.y + 0.03), uHor);
+          gl_FragColor = vec4(col * uK, 1.0);
+        }`,
+    });
+    FAR.space = new THREE.Mesh(new THREE.SphereGeometry(196, 48, 24), mat);
+    FAR.space.renderOrder = -1.5; FAR.space.frustumCulled = false; FAR.space.userData.noEdge = true;
+    FAR.dome.add(FAR.space); // it is scaled with the dome (the condensing at the end)
+  }
   FAR.glow = new THREE.PointLight(0xffd9a8, 0, 70, 1.2); FAR.glow.position.set(0.1, 2.4, 0.1); FAR.g.add(FAR.glow);
   { const [oc, og] = canvas(256, 256), gr = og.createRadialGradient(128, 128, 0, 128, 128, 128);
     gr.addColorStop(0, "rgba(255,250,235,1)"); gr.addColorStop(0.12, "rgba(255,226,170,.95)"); gr.addColorStop(0.4, "rgba(255,170,90,.28)"); gr.addColorStop(1, "rgba(255,140,60,0)");
@@ -2765,6 +2836,7 @@ function bossTentacles() {
     const t = tentacles[before]; t.boss = true; t.outer = false; t.mesh.material = BOSS.mat; FAR.g.add(t.mesh); // out of the room's group: the room is hidden here
   }
 }
+const SKY0 = { axis: new THREE.Vector3(0.35, 0.86, -0.36), w1: new THREE.Vector3(-0.62, 0.52, -0.58) }; // the sky over the plain: where its river and its red world are before the eye leaves
 const CON = { at: 0, t: 0, told: false, S: 11, Z1: 0.0036, z: 1, zoom: 1, px: 0, py: 0, rx: 0, ry: 0 }; // zoom, px, py: the looking-round of ?great=1 (wheel and drag); 1, 0, 0 in the game
 // The greater one (author 2026-11-17). Not the fight's head again (对位置和大小关系会混淆), not a painted side face (像鸟), not a
 // thin thing of bones either: 「你对比一下龙的模型，可以是海龙或者堕落的龙，没这么细。而且身上也有眼睛。我觉得这个星球缩小了之后只是身上的
@@ -2935,6 +3007,11 @@ function updateCondense(s) {
   const z = Math.exp(Math.log(CON.Z1) * e) * Math.exp(-0.01 * after) * (1 + (CON.zoom - 1) * e); // and it goes on drawing away, very slowly
   FAR.dome.scale.setScalar((1 + 24 * smooth(0.1, 0.4, t)) / z); /* out past the whole of him: at its own size it was drawn over the far half of his body (a black lump where the vines should trail) */
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= Math.sqrt(z);
+  { // the sky out here: no horizon any more (the plain is an eye now), the river of dust swung round to run behind him
+    // from corner to corner, the red world up to the right of him, and all of it brighter than it was through the smoke
+    const SU = FAR.space.material.uniforms, o = smooth(0.05, 0.4, t);
+    SU.uHor.value = 1 - o; SU.uK.value *= 1 + 0.3 * o;
+    SU.uAxis.value.copy(SKY0.axis).lerp(CON.axis, o); SU.uW1.value.copy(SKY0.w1).lerp(CON.w1, o); }
   FAR.card.material.opacity *= 1 - smooth(0, 0.22, t); // the first face goes back into the dark
   if (FAR.eyes) for (const m of FAR.eyes) m.material.opacity *= 1 - smooth(0, 0.15, t);
   camera.updateMatrixWorld();
@@ -2974,8 +3051,9 @@ function condense(on) {
     camera.updateMatrixWorld();
     CON.q = camera.quaternion.clone(); CON.left = new THREE.Vector3(-1, 0, 0).applyQuaternion(CON.q); CON.fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(CON.q); CON.up = new THREE.Vector3(0, 1, 0).applyQuaternion(CON.q);
     CON.Z1 = (2 * camera.position.length() * Math.tan((camera.fov * Math.PI) / 360) * camera.aspect) / ((CON.look === "head" ? 75 : CON.look === "body" ? 130 : 340) * FAR.RP); /* so that at the end the frame is 340 of his eyes wide, wherever the eye was left */
+    CON.axis = CON.up.clone().multiplyScalar(0.9).addScaledVector(CON.left, 0.42).addScaledVector(CON.fwd, 0.1).normalize(); CON.w1 = CON.fwd.clone().addScaledVector(CON.left, -0.44).addScaledVector(CON.up, 0.27).normalize();
     CON.at = performance.now() / 1000; CON.told = false; CON.rush = 0; CON.out = false;
-  } else { CON.at = 0; CON.want = false; CON.rush = 0; CON.out = false; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
+  } else { { const SU = FAR.space.material.uniforms; SU.uHor.value = 1; SU.uAxis.value.copy(SKY0.axis); SU.uW1.value.copy(SKY0.w1); } CON.at = 0; CON.want = false; CON.rush = 0; CON.out = false; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
 }
 function updateBoss(s, dt) {
   if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); if (FAR.eyes && FAR.eyes[0].visible) for (const m of FAR.eyes) m.visible = false; return; } // outside the fight he has the one pair
@@ -3091,6 +3169,8 @@ function updateFar(s, dt) {
   FAR.glow.intensity = BOSS.on ? 0 : e * 10;
   if (!k) return;
   FAR.dome.material.opacity = Math.min(1, e * 1.6);
+  // space opens as the eye clears the room: nothing at first, all of it by the time the plain shows its curve
+  FAR.space.material.uniforms.uK.value = smooth(0.18, 0.7, e) * (BOSS.on ? 0.75 : 1); FAR.space.material.uniforms.uTime.value = s;
   FAR.card.material.opacity = Math.min(1, Math.max(0, e * 9 - 0.25)) * (HOMEWARD.at ? 1 - smooth(3.6, 5.6, s - HOMEWARD.at) : 1); // he is there almost as soon as the ceiling is gone
   if (HOMEWARD.at) { const q = 1 - 0.9 * smooth(3, 9, s - HOMEWARD.at); for (const l of FAR.reds) l.intensity *= q; }
   FAR.rim.intensity = e * 0.35; FAR.fill.intensity = e * 30;
