@@ -12,8 +12,10 @@ export interface FeedPost {
   readonly t: string;
   readonly who: string;
   readonly text: string;
-  /** What the photograph shows (drawn as a caption tile until there is a picture). */
+  /** What the photograph shows: the picture's alt text (and the tile's caption when there is no picture). */
   readonly photo?: string;
+  /** The photograph itself (public/msgs/feed/…); only beside `photo`. */
+  readonly img?: string;
   readonly place?: string;
   readonly likes: readonly string[];
   readonly comments: readonly { readonly who: string; readonly text: string }[];
@@ -22,7 +24,7 @@ export interface FeedPost {
 type Raw = Record<string, unknown>;
 const isObj = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
 const isStr = (v: unknown): v is string => typeof v === "string" && v.length > 0;
-const POST_KEYS = ["t", "who", "text", "photo", "place", "likes", "comments"];
+const POST_KEYS = ["t", "who", "text", "photo", "img", "place", "likes", "comments"];
 
 /** Whether `who` can be drawn: an NPC, or a written name with a picture. */
 export const hasFace = (who: string): boolean => Object.hasOwn(npcData.npcs, who) || Object.hasOwn(npcData.faces, who);
@@ -50,13 +52,14 @@ export function parseFeed(raw: unknown, file = "content/feed.json"): ReadonlyMap
       if (!isStr(p.who) || !hasFace(p.who)) fail(`${w}.who`, `${JSON.stringify(p.who)} is not an NPC id or a name with a picture (npc.json faces)`);
       if (!isStr(p.text)) fail(`${w}.text`, "must be text");
       for (const key of ["photo", "place"] as const) if (p[key] !== undefined && !isStr(p[key])) fail(`${w}.${key}`, "must be text");
+      if (p.img !== undefined && !(isStr(p.img) && /^\/msgs\/feed\/[a-z0-9]+\.jpg$/.test(p.img) && isStr(p.photo))) fail(`${w}.img`, "must be /msgs/feed/<id>.jpg beside a photo");
       const likes = p.likes ?? [];
       if (!Array.isArray(likes) || !likes.every((l) => isStr(l) && hasFace(l))) fail(`${w}.likes`, "must be people with a face");
       const comments = p.comments ?? [];
       if (!Array.isArray(comments) || !comments.every((c) => isObj(c) && isStr(c.who) && hasFace(c.who) && isStr(c.text) && Object.keys(c).length === 2)) fail(`${w}.comments`, "must be { who, text } by people with a face");
       return Object.freeze({
         day, t: p.t as string, who: p.who as string, text: p.text as string,
-        ...(isStr(p.photo) ? { photo: p.photo } : {}), ...(isStr(p.place) ? { place: p.place } : {}),
+        ...(isStr(p.photo) ? { photo: p.photo } : {}), ...(isStr(p.img) ? { img: p.img } : {}), ...(isStr(p.place) ? { place: p.place } : {}),
         likes: Object.freeze([...(likes as string[])]), comments: Object.freeze((comments as { who: string; text: string }[]).map((c) => Object.freeze({ who: c.who, text: c.text }))),
       });
     });
@@ -69,7 +72,7 @@ export function parseFeed(raw: unknown, file = "content/feed.json"): ReadonlyMap
 export function checkFeedTwins(zh: ReadonlyMap<number, readonly FeedPost[]>, en: ReadonlyMap<number, readonly FeedPost[]>): void {
   const face = (who: string): string => (Object.hasOwn(npcData.npcs, who) ? `npc:${who}` : npcData.faces[who]!);
   const shape = (m: ReadonlyMap<number, readonly FeedPost[]>): string =>
-    JSON.stringify([...m].map(([d, ps]) => [d, ps.map((p) => [p.t, face(p.who), p.photo !== undefined, p.place !== undefined, p.likes.map(face), p.comments.map((c) => face(c.who))])]));
+    JSON.stringify([...m].map(([d, ps]) => [d, ps.map((p) => [p.t, face(p.who), p.photo !== undefined, p.img ?? null, p.place !== undefined, p.likes.map(face), p.comments.map((c) => face(c.who))])]));
   if (shape(zh) !== shape(en)) throw new Error("content/en/feed.json does not match content/feed.json (days, times, people, photographs, likes, comments)");
 }
 

@@ -301,7 +301,7 @@ function feedName(who: string): SafeHtml {
 
 /** One post: face, name, words, the photograph (its caption on a tile until there is a picture), where, when, likes and comments. */
 function feedPost(p: FeedPost, today: number): SafeHtml {
-  const photo = p.photo !== undefined ? html`<div class="fp-photo" role="img" aria-label="${p.photo}"><span>${p.photo}</span></div>` : null;
+  const photo = p.photo === undefined ? null : p.img !== undefined ? html`<img class="fp-photo" src="${p.img}" alt="${p.photo}" loading="lazy" draggable="false">` : html`<div class="fp-photo" role="img" aria-label="${p.photo}"><span>${p.photo}</span></div>`;
   const place = p.place !== undefined ? html`<small class="fp-place">${p.place}</small>` : null;
   const likes = p.likes.length > 0 ? html`<div class="fp-likes">${p.likes.map((w, i) => html`${i > 0 ? tr("msgs.feed.sep") : ""}<b>${feedName(w)}</b>`)}</div>` : null;
   const comments = p.comments.map((c) => html`<div class="fp-c"><b>${feedName(c.who)}</b>${tr("msgs.feed.colon")}${c.text}</div>`);

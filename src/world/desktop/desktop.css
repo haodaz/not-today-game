@@ -478,6 +478,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .fp-who{font-size:15px;font-weight:600;color:#576b95}
 .fp-text{margin:0;font-size:15px;line-height:1.5;color:var(--ink)}
 .fp-photo{width:190px;height:190px;display:flex;align-items:flex-end;background:linear-gradient(160deg,#e9edf1,#cfd6de);border-radius:3px;overflow:hidden}
+img.fp-photo{display:block;object-fit:cover;background:#e9edf1}
 .fp-photo span{width:100%;padding:8px 10px;background:rgba(40,46,56,.5);color:#fff;font-size:12px;line-height:1.4}
 .fp-place{font-size:12px;color:#576b95}
 .fp-when{font-size:12px;color:var(--ink-3)}

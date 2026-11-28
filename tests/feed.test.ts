@@ -1,5 +1,6 @@
 // 朋友圈 / Moments (author 2026-11-28, ledger #189): posts from content/feed.json, zh + en twins,
 // everyone who posts, likes or comments has a face; the column shows what has been posted so far.
+import fs from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 import zhRaw from "@content/feed.json";
 import { createStore } from "@state/store";
@@ -27,6 +28,25 @@ describe("content/feed.json", () => {
     expect(feedFace("和光集团")).toBe("/npc/evenlight.svg");
   });
 
+  it("every photograph is a picture in the game, the same one in both languages", () => {
+    const seen = new Set<string>();
+    for (let day = 1; day <= 18; day++) {
+      const zh = feedTable.zh.get(day) ?? [];
+      const en = feedTable.en.get(day) ?? [];
+      zh.forEach((p, i) => {
+        expect(p.img !== undefined, `day ${day}: ${p.photo ?? "(no photograph)"}`).toBe(p.photo !== undefined);
+        expect(en[i]!.img).toBe(p.img);
+        if (p.img !== undefined) {
+          expect(fs.existsSync(`public${p.img}`), p.img).toBe(true);
+          seen.add(p.img);
+        }
+      });
+    }
+    expect(seen.size).toBe(35);
+    // day 6: three clients, one sentence, one photograph
+    expect(new Set((feedTable.zh.get(6) ?? []).slice(0, 3).map((p) => p.img)).size).toBe(1);
+  });
+
   it("the loader is strict", () => {
     const unknown = clone(); unknown.days["1"]![0].mood = "x";
     expect(() => parseFeed(unknown)).toThrow(/unknown key "mood"/);
@@ -34,6 +54,8 @@ describe("content/feed.json", () => {
     expect(() => parseFeed(nobody)).toThrow(/not an NPC id or a name with a picture/);
     const order = clone(); order.days["1"]![1].t = "06:00";
     expect(() => parseFeed(order)).toThrow(/time order/);
+    const stray = clone(); stray.days["1"]![0].img = "/elsewhere/x.png";
+    expect(() => parseFeed(stray)).toThrow(/must be \/msgs\/feed/);
     const twin = clone(); twin.days["1"]!.pop();
     expect(() => checkFeedTwins(parseFeed(twin), feedTable.zh)).toThrow(/does not match/);
   });
@@ -63,7 +85,7 @@ describe("the 朋友圈 column in Hi信", () => {
     expect(out.match(/<article class="fp"/g)).toHaveLength(6);
     expect(out).toContain('<b class="fp-who">二舅</b>');
     expect(out).toContain('src="/npc/wx/sunrise.jpg"');
-    expect(out).toContain("一张录用名单，一个名字上画了红圈");
+    expect(out).toContain('<img class="fp-photo" src="/msgs/feed/hirelist.jpg" alt="一张录用名单，一个名字上画了红圈"');
     expect(out).toContain('<div class="fp-c"><b>大姨</b>：恭喜恭喜</div>');
     expect(out).toContain('<b class="fp-who">Vivi</b>'); // an NPC by its name
     expect(out).toContain('<div class="fp-likes"><b>老板</b></div>');

@@ -13,6 +13,20 @@ import fs from "node:fs";
 const ROOT = new URL("../../content", import.meta.url).pathname;
 const NAMES = { 小姑: "Little Aunt", 大姨: "Big Aunt", 二舅: "Uncle Two", 堂姐: "Cousin Jie", 表弟: "Cousin Bo", 姥姥: "Grandma", 孙姐: "Ms Sun", 小吴: "Xiao Wu", 刘处: "Director Liu", 赵老师: "Ms Zhao", 小林: "Xiao Lin", 陈教授: "Prof. Chen", Lisa: "Lisa", Kevin: "Kevin", Tony: "Tony", 和光集团: "Evenlight Group" };
 const NPC = ["boss", "partner", "xiaozhang", "laozhou", "family"];
+// The photographs (2026-11-28, her words 「朋友圈配图也用gemini生成吧」): the caption → the picture in public/msgs/feed/<id>.jpg.
+// Made with Gemini from these captions (holloween/script/tools/make-feed-photo-manifest.mjs); 一片白 is a plain white frame.
+const IMG = {
+  "一杯水，窗外是朝阳": "water", "餐盘：三菜一汤，一个橘子": "tray", "落地窗前的一杯冰美式": "americano", "一张录用名单，一个名字上画了红圈": "hirelist",
+  "草坪上坐着一圈人，中间一袋橘子": "lawn", "屏幕上一页方案，右下角的时间是 02:14": "slide", "一盆小龙虾": "crayfish", "前台站满了人，每人胸前一张临时卡": "lobby",
+  "机场的夜景，一架飞机": "airport", "一个小女孩的背影，坐在钢琴前": "piano2", "一条新闻的截图": "news", "三杯生椰拿铁，一模一样": "lattes",
+  "会议室里三个人，没有人看镜头": "meeting", "一间办公室，椅子都推进去了，没有人": "emptyoffice", "一排穿红裙子的人，都在笑": "dance",
+  "晨会的截图，九个格子，背景都是同一张": "grid", "一条小鱼，旁边放了一只鞋比大小": "fish", "一排外卖袋，有一份上面没有名字": "bags", "空的地铁车厢": "metro",
+  "一个纸箱，里面一盆绿萝、一个工牌": "box", "一张合影，每个人头顶有一圈光": "groupphoto", "一条走廊，尽头有光": "corridor", "一盆花，开了一朵": "clivia",
+  "一张表，最后一行是 0.00": "sheet", "一张卷子，右上角 96": "exam", "一张值班表，每一格都是同一个名字": "rota", "一张旧照片：一只小孩的手，攥着什么": "oldphoto",
+  "一排工位，一模一样": "desks", "一千个工位，一张脸": "thousand", "一张全家福，每个人笑得一样": "family", "一杯水，窗外没有太阳": "water2",
+  "观众席，所有人看着同一个方向，不是台上": "audience", "一桌菜，三副碗筷": "dinner", "一扇门，从外面拍的": "doorout", "一片白": "white",
+};
+const imgOf = (zh) => { if (!IMG[zh]) throw new Error(`no picture for the photograph 「${zh}」`); return `/msgs/feed/${IMG[zh]}.jpg`; };
 
 const WATER = ["一杯水，窗外是朝阳", "A glass of water, the sunrise behind it"];
 const TRAY = ["餐盘：三菜一汤，一个橘子", "A canteen tray: three dishes, a soup, a tangerine"];
@@ -115,7 +129,7 @@ for (const lang of ["zh", "en"]) {
   for (const [day, posts] of Object.entries(DAYS)) {
     days[day] = posts.map(([t, w, zh, en, x = {}]) => ({
       t, who: who(lang, w), text: lang === "zh" ? zh : en,
-      ...(x.photo ? { photo: x.photo[i] } : {}), ...(x.place ? { place: x.place[i] } : {}),
+      ...(x.photo ? { photo: x.photo[i], img: imgOf(x.photo[0]) } : {}), ...(x.place ? { place: x.place[i] } : {}),
       ...(x.likes ? { likes: x.likes.map((l) => who(lang, l)) } : {}),
       ...(x.comments ? { comments: x.comments.map(([c, z, e]) => ({ who: who(lang, c), text: lang === "zh" ? z : e })) } : {}),
     }));

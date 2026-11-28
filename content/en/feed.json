@@ -7,6 +7,7 @@
         "who": "Little Aunt",
         "text": "Good morning. A new day starts with a glass of warm water.",
         "photo": "A glass of water, the sunrise behind it",
+        "img": "/msgs/feed/water.jpg",
         "likes": [
           "Big Aunt",
           "Uncle Two"
@@ -17,6 +18,7 @@
         "who": "Ms Sun",
         "text": "Braised pork in the canteen today. Work is good.",
         "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "img": "/msgs/feed/tray.jpg",
         "likes": [
           "Xiao Wu",
           "Director Liu"
@@ -27,6 +29,7 @@
         "who": "Kevin",
         "text": "Another day of efficient alignment.",
         "photo": "An iced americano at a floor-to-ceiling window",
+        "img": "/msgs/feed/americano.jpg",
         "place": "NVIBIG Group · 28F",
         "likes": [
           "Lisa",
@@ -40,6 +43,7 @@
         "who": "Uncle Two",
         "text": "The boy has done well. A father can hold his head up.",
         "photo": "A list of the people hired, one name circled in red",
+        "img": "/msgs/feed/hirelist.jpg",
         "comments": [
           {
             "who": "Big Aunt",
@@ -56,6 +60,7 @@
         "who": "Prof. Chen",
         "text": "Afternoon. Discussing the Way with my students.",
         "photo": "A ring of people sitting on a lawn, a bag of tangerines in the middle",
+        "img": "/msgs/feed/lawn.jpg",
         "likes": [
           "Ms Zhao",
           "Xiao Lin"
@@ -66,6 +71,7 @@
         "who": "partner",
         "text": "Still revising.",
         "photo": "A page of the proposal on a screen; the clock in the corner says 02:14",
+        "img": "/msgs/feed/slide.jpg",
         "likes": [
           "boss"
         ]
@@ -77,6 +83,7 @@
         "who": "Xiao Wu",
         "text": "Wednesday. Crayfish. On time.",
         "photo": "A basin of crayfish",
+        "img": "/msgs/feed/crayfish.jpg",
         "likes": [
           "Ms Sun",
           "Director Liu"
@@ -87,6 +94,7 @@
         "who": "Lisa",
         "text": "Welcome, new colleagues. 312 interns reported today. The future is bright.",
         "photo": "The lobby full of people, a visitor badge on every chest",
+        "img": "/msgs/feed/lobby.jpg",
         "likes": [
           "Kevin",
           "Tony"
@@ -97,6 +105,7 @@
         "who": "boss",
         "text": "A startup is jumping off a cliff and building the plane on the way down.",
         "photo": "An airport at night, one plane",
+        "img": "/msgs/feed/airport.jpg",
         "likes": [
           "partner",
           "laozhou"
@@ -115,6 +124,7 @@
         "who": "Ms Sun",
         "text": "Braised pork in the canteen today. Work is good.",
         "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "img": "/msgs/feed/tray.jpg",
         "likes": [
           "Xiao Wu",
           "Director Liu",
@@ -126,6 +136,7 @@
         "who": "Xiao Wu",
         "text": "Braised pork in the canteen today. Work is good.",
         "photo": "A canteen tray: three dishes, a soup, a tangerine",
+        "img": "/msgs/feed/tray.jpg",
         "likes": [
           "Ms Sun",
           "Director Liu",
@@ -137,6 +148,7 @@
         "who": "Cousin Jie",
         "text": "Dot practised for two hours today, without being told.",
         "photo": "A little girl from behind, at a piano",
+        "img": "/msgs/feed/piano2.jpg",
         "likes": [
           "Big Aunt",
           "Little Aunt"
@@ -149,6 +161,7 @@
         "who": "Cousin Bo",
         "text": "The company is in the news. Proud to be part of it.",
         "photo": "A screenshot of a news story",
+        "img": "/msgs/feed/news.jpg",
         "likes": [
           "Uncle Two"
         ],
@@ -164,6 +177,7 @@
         "who": "Kevin",
         "text": "The afternoon tea was very good.",
         "photo": "Three coconut lattes, exactly alike",
+        "img": "/msgs/feed/lattes.jpg",
         "likes": [
           "Lisa",
           "Tony"
@@ -174,6 +188,7 @@
         "who": "Prof. Chen",
         "text": "Sitting together is good.",
         "photo": "Three people in a meeting room; nobody looks at the camera",
+        "img": "/msgs/feed/meeting.jpg",
         "likes": [
           "Ms Zhao",
           "Xiao Lin"
@@ -185,25 +200,29 @@
         "t": "09:00",
         "who": "Ms Sun",
         "text": "So glad to be working with all of you again today.",
-        "photo": "An office, every chair pushed in, nobody there"
+        "photo": "An office, every chair pushed in, nobody there",
+        "img": "/msgs/feed/emptyoffice.jpg"
       },
       {
         "t": "09:00",
         "who": "Ms Zhao",
         "text": "So glad to be working with all of you again today.",
-        "photo": "An office, every chair pushed in, nobody there"
+        "photo": "An office, every chair pushed in, nobody there",
+        "img": "/msgs/feed/emptyoffice.jpg"
       },
       {
         "t": "09:00",
         "who": "Lisa",
         "text": "So glad to be working with all of you again today.",
-        "photo": "An office, every chair pushed in, nobody there"
+        "photo": "An office, every chair pushed in, nobody there",
+        "img": "/msgs/feed/emptyoffice.jpg"
       },
       {
         "t": "19:00",
         "who": "Big Aunt",
         "text": "Square-dance contest. Second prize.",
         "photo": "A row of people in red dresses, all smiling",
+        "img": "/msgs/feed/dance.jpg",
         "likes": [
           "Little Aunt",
           "Uncle Two",
@@ -217,6 +236,7 @@
         "who": "boss",
         "text": "A new start. Thank you, Evenlight.",
         "photo": "A screenshot of the morning meeting: nine tiles, one background",
+        "img": "/msgs/feed/grid.jpg",
         "likes": [
           "partner",
           "laozhou",
@@ -228,6 +248,7 @@
         "who": "partner",
         "text": "A new start. Thank you, Evenlight.",
         "photo": "A screenshot of the morning meeting: nine tiles, one background",
+        "img": "/msgs/feed/grid.jpg",
         "likes": [
           "boss",
           "laozhou",
@@ -239,6 +260,7 @@
         "who": "Uncle Two",
         "text": "Fished all afternoon. One.",
         "photo": "A small fish, a shoe beside it for scale",
+        "img": "/msgs/feed/fish.jpg",
         "likes": [
           "Big Aunt"
         ]
@@ -249,13 +271,15 @@
         "t": "12:40",
         "who": "xiaozhang",
         "text": "Thirteen takeaways. I counted three times.",
-        "photo": "A row of takeaway bags, one with no name on it"
+        "photo": "A row of takeaway bags, one with no name on it",
+        "img": "/msgs/feed/bags.jpg"
       },
       {
         "t": "23:10",
         "who": "Cousin Bo",
         "text": "The last train again.",
         "photo": "An empty metro carriage",
+        "img": "/msgs/feed/metro.jpg",
         "likes": [
           "Cousin Jie"
         ]
@@ -267,6 +291,7 @@
         "who": "Cousin Bo",
         "text": "Graduated. Thank you, company.",
         "photo": "A cardboard box: a pot plant and a staff badge",
+        "img": "/msgs/feed/box.jpg",
         "comments": [
           {
             "who": "Little Aunt",
@@ -283,6 +308,7 @@
         "who": "Evenlight Group",
         "text": "Welcome to the family, Future Intelligence.",
         "photo": "A group photo, a ring of light over every head",
+        "img": "/msgs/feed/groupphoto.jpg",
         "likes": [
           "boss",
           "partner",
@@ -296,6 +322,7 @@
         "who": "Little Aunt",
         "text": "Good morning. A new day starts with a glass of warm water.",
         "photo": "A glass of water, the sunrise behind it",
+        "img": "/msgs/feed/water.jpg",
         "likes": [
           "Big Aunt",
           "Uncle Two"
@@ -305,7 +332,8 @@
         "t": "09:00",
         "who": "Evenlight Group",
         "text": "She arrives today.",
-        "photo": "A corridor, light at the far end"
+        "photo": "A corridor, light at the far end",
+        "img": "/msgs/feed/corridor.jpg"
       }
     ],
     "11": [
@@ -314,6 +342,7 @@
         "who": "Big Aunt",
         "text": "The clivia at home has flowered.",
         "photo": "A pot plant with one flower open",
+        "img": "/msgs/feed/clivia.jpg",
         "likes": [
           "Little Aunt",
           "Cousin Jie"
@@ -324,6 +353,7 @@
         "who": "partner",
         "text": "The sheet balances.",
         "photo": "A spreadsheet; the last row reads 0.00",
+        "img": "/msgs/feed/sheet.jpg",
         "likes": [
           "Evenlight Group"
         ]
@@ -335,6 +365,7 @@
         "who": "Cousin Jie",
         "text": "Dot came first in the midterms. 96 in maths.",
         "photo": "An exam paper, 96 in the top right corner",
+        "img": "/msgs/feed/exam.jpg",
         "comments": [
           {
             "who": "Big Aunt",
@@ -350,7 +381,8 @@
         "t": "22:00",
         "who": "laozhou",
         "text": "On duty.",
-        "photo": "A duty rota, the same name in every cell"
+        "photo": "A duty rota, the same name in every cell",
+        "img": "/msgs/feed/rota.jpg"
       }
     ],
     "13": [
@@ -358,13 +390,15 @@
         "t": "12:05",
         "who": "Big Aunt",
         "text": "Our child used to hold on to a thing and never let go. The time the teacher took it away, there were no tears.",
-        "photo": "An old photograph: a child's hand, closed around something"
+        "photo": "An old photograph: a child's hand, closed around something",
+        "img": "/msgs/feed/oldphoto.jpg"
       },
       {
         "t": "15:00",
         "who": "boss",
         "text": "The upgrade.",
         "photo": "A row of desks, all alike",
+        "img": "/msgs/feed/desks.jpg",
         "likes": [
           "Evenlight Group"
         ]
@@ -375,13 +409,15 @@
         "t": "09:00",
         "who": "Evenlight Group",
         "text": "A thousand new staff join today. All treated alike.",
-        "photo": "A thousand desks, one face"
+        "photo": "A thousand desks, one face",
+        "img": "/msgs/feed/thousand.jpg"
       },
       {
         "t": "18:30",
         "who": "Uncle Two",
         "text": "All fine here.",
-        "photo": "A family portrait, everyone smiling the same smile"
+        "photo": "A family portrait, everyone smiling the same smile",
+        "img": "/msgs/feed/family.jpg"
       }
     ],
     "15": [
@@ -389,13 +425,15 @@
         "t": "07:50",
         "who": "Little Aunt",
         "text": "Good morning. A new day. No need to reply.",
-        "photo": "A glass of water; no sun in the window"
+        "photo": "A glass of water; no sun in the window",
+        "img": "/msgs/feed/water2.jpg"
       },
       {
         "t": "14:00",
         "who": "Evenlight Group",
         "text": "The launch. The whole Group attends.",
-        "photo": "The audience, every face turned the same way, and not at the stage"
+        "photo": "The audience, every face turned the same way, and not at the stage",
+        "img": "/msgs/feed/audience.jpg"
       }
     ],
     "16": [
@@ -403,7 +441,8 @@
         "t": "08:00",
         "who": "family",
         "text": "All well.",
-        "photo": "A table of dishes, three sets of bowls and chopsticks"
+        "photo": "A table of dishes, three sets of bowls and chopsticks",
+        "img": "/msgs/feed/dinner.jpg"
       },
       {
         "t": "08:00",
@@ -423,19 +462,22 @@
         "t": "08:00",
         "who": "Big Aunt",
         "text": "You look lovely today.",
-        "photo": "A door, photographed from outside"
+        "photo": "A door, photographed from outside",
+        "img": "/msgs/feed/doorout.jpg"
       },
       {
         "t": "08:00",
         "who": "boss",
         "text": "You look lovely today.",
-        "photo": "A door, photographed from outside"
+        "photo": "A door, photographed from outside",
+        "img": "/msgs/feed/doorout.jpg"
       },
       {
         "t": "08:00",
         "who": "partner",
         "text": "You look lovely today.",
-        "photo": "A door, photographed from outside"
+        "photo": "A door, photographed from outside",
+        "img": "/msgs/feed/doorout.jpg"
       }
     ],
     "18": [
@@ -444,6 +486,7 @@
         "who": "Evenlight Group",
         "text": "Soften the light. Be one with the dust.",
         "photo": "White, all of it",
+        "img": "/msgs/feed/white.jpg",
         "likes": [
           "Big Aunt",
           "Uncle Two",
