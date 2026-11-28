@@ -398,6 +398,20 @@
         "status": "silence",
         "lines": []
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Exec Office：Clear everything on your hands today. From tomorrow, none of you will need to work any more.",
+          "kind": "work"
+        },
+        {
+          "t": "17:00",
+          "text": "Exec Office：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

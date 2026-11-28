@@ -541,6 +541,25 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "HR：A thousand new staff join today. The one from R&D, please give them desks, all treated alike.",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "HR：The one from R&D has worked hard lately. The Group knows all of it.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Exec Office：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

@@ -557,6 +557,99 @@
         }
       ]
     },
+    "g_merge": {
+      "incoming": [
+        {
+          "t": "09:02",
+          "text": "The Advisers：The systems are joined today. Your accounts will move over by themselves. Nothing for you to do.",
+          "kind": "work"
+        },
+        {
+          "t": "09:03",
+          "text": "The Advisers：If you see your own picture change during the move, that is normal.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "Adviser Chen：Tomorrow's meeting: the one from R&D is doing the seating. Four seats in the circle, one outside.",
+          "kind": "work"
+        },
+        {
+          "t": "14:01",
+          "text": "Adviser Shen：Please do not type the guest's name in the group.",
+          "kind": "work"
+        },
+        {
+          "t": "14:02",
+          "text": "Xiao Zhang：Why",
+          "kind": "work"
+        },
+        {
+          "t": "14:02",
+          "text": "Adviser Shen：Once it is typed, it has heard.",
+          "kind": "work"
+        },
+        {
+          "t": "18:40",
+          "text": "The Advisers：The integration ends today. This group is dissolved tomorrow. The three founders have other arrangements. Everyone else, stay where you are and wait to be told.",
+          "kind": "work"
+        },
+        {
+          "t": "18:41",
+          "text": "member：Received.",
+          "kind": "work"
+        },
+        {
+          "t": "18:41",
+          "text": "member：Received.",
+          "kind": "work"
+        },
+        {
+          "t": "18:41",
+          "text": "member：Received.",
+          "kind": "work"
+        }
+      ]
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "18:45",
+          "text": "Exec Office：Welcome to the Group's management group, all three.",
+          "kind": "work"
+        },
+        {
+          "t": "18:45",
+          "text": "Exec Office：From tomorrow, the three of you belong to the Group.",
+          "kind": "work"
+        },
+        {
+          "t": "18:46",
+          "text": "Boss：Thank you for the Group's trust!",
+          "kind": "work"
+        },
+        {
+          "t": "18:46",
+          "text": "Vivi：[rose][rose]",
+          "kind": "work"
+        },
+        {
+          "t": "18:47",
+          "text": "Exec Office：This group cannot be left.",
+          "kind": "work"
+        }
+      ],
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "18:48",
+            "text": "Exec Office：No need to reply. When you have read it, we know."
+          }
+        ]
+      }
+    },
     "g_gov": {
       "incoming": [
         {

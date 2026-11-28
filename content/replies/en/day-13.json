@@ -560,6 +560,25 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Exec Office：The company is upgraded next week. All staff.",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Admin：The Group would like to borrow a few old things from the three of you, through a loan approval. Period of loan: long-term.",
+          "kind": "work"
+        },
+        {
+          "t": "18:00",
+          "text": "Admin：The loan request is approved. The approver field is empty. That is normal.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

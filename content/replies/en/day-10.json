@@ -535,6 +535,30 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Exec Office：Good morning. She arrives today. Please turn your virtual backgrounds off.",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "Exec Office：Your three old project groups have been merged into the Group. No need to chase those three payments any more. We are one family.",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "Culture：Act two of the script is proofread today. Whoever proofreads must not read a whole line.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Exec Office：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

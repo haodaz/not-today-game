@@ -15,7 +15,7 @@
         },
         {
           "t": "09:06",
-          "text": "(Transcript) They've sent two advisors; from today they sit in the morning meeting. Send them the minutes once they're tidy.",
+          "text": "(Transcript) They've sent two advisers; from today they sit in the morning meeting. Send them the minutes once they're tidy.",
           "kind": "work"
         },
         {
@@ -191,12 +191,12 @@
         },
         {
           "t": "09:03",
-          "text": "Advisor Chen: Morning, all. Chen, from their side. We'll handle the materials from here on.",
+          "text": "Adviser Chen: Morning, all. Chen, from their side. We'll handle the materials from here on.",
           "kind": "work"
         },
         {
           "t": "09:03",
-          "text": "Advisor Shen: Morning.",
+          "text": "Adviser Shen: Morning.",
           "kind": "work"
         },
         {
@@ -545,6 +545,60 @@
         {
           "t": "17:30",
           "text": "Investment：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
+    },
+    "g_merge": {
+      "incoming": [
+        {
+          "t": "08:50",
+          "text": "The Advisers：Good morning. Day-to-day matters of the integration go in this group. Group notice: soften the light, be one with the dust.",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "The Advisers：@all Please change your group name to \"rank-name\". The rank is the one you stated in the meeting just now.",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Lao Zhou：Prince-Lao Zhou",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Vivi：Duke-Vivi",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "Xiao Zhang：Earl-Xiao Zhang",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "Boss：King-Lao Wang",
+          "kind": "work"
+        },
+        {
+          "t": "09:35",
+          "text": "The Advisers：One person has not changed theirs. R&D has no matching rank. Leave it empty for now.",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Adviser Chen：Six handover forms, all in by the end of today, one each.",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "Adviser Shen：Two received. Where are the people of the other four.",
+          "kind": "work"
+        },
+        {
+          "t": "16:01",
+          "text": "Adviser Chen：No hurry. The people will come.",
           "kind": "work"
         }
       ]

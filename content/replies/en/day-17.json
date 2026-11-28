@@ -422,6 +422,25 @@
         "status": "silence",
         "lines": []
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Exec Office：Answer me. You should know who I am.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Boss：Answer me. You should know who I am.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "Vivi：Answer me. You should know who I am.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

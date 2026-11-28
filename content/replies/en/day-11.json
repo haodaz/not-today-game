@@ -558,6 +558,30 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Finance：Costs are weighed today. Not a cent off. Do not touch the oil column or the wine column.",
+          "kind": "work"
+        },
+        {
+          "t": "12:00",
+          "text": "Finance：@Vivi When will the sheet balance.",
+          "kind": "work"
+        },
+        {
+          "t": "12:01",
+          "text": "Vivi：Before the end of the day.",
+          "kind": "work"
+        },
+        {
+          "t": "17:30",
+          "text": "Exec Office：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

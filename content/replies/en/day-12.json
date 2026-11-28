@@ -562,6 +562,30 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "03:00",
+          "text": "Exec Office：This week is the one that counts. Nobody sleeps for now.",
+          "kind": "work"
+        },
+        {
+          "t": "03:00",
+          "text": "Boss：Received.",
+          "kind": "work"
+        },
+        {
+          "t": "03:00",
+          "text": "Vivi：Received.",
+          "kind": "work"
+        },
+        {
+          "t": "11:31",
+          "text": "Finance：About money: you need not ask again.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }

@@ -529,6 +529,29 @@
           }
         ]
       }
+    },
+    "g_mgmt": {
+      "incoming": [
+        {
+          "t": "09:05",
+          "text": "Exec Office：The launch is this afternoon. The whole Group attends. Please watch the audience's reaction live.",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Exec Office：[Photo]",
+          "kind": "work",
+          "card": {
+            "type": "image",
+            "alt": "The audience. Every face the same."
+          }
+        },
+        {
+          "t": "17:30",
+          "text": "Exec Office：Soften the light. Be one with the dust. Good night.",
+          "kind": "work"
+        }
+      ]
     }
   }
 }
