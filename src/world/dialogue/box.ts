@@ -102,6 +102,11 @@ export interface LineBoxModel {
   readonly face?: KuroFace;
   /** guidance R4: on 屏幕 the pet in the monitor is the body that reacts; the box shows a still portrait. */
   readonly stillPortrait?: boolean;
+  /**
+   * A talk with Kuro is on (its ask, its turn, its wait): the portrait is its body large, standing on
+   * the box (author 2026-11-28: 「每次要和克总聊天的时候，能不能放个3d大立绘…克总也是一动一动的，它表情可丰富了」).
+   */
+  readonly chat?: boolean;
 }
 
 /** lying-view R1: a day file's line said by the player (`speaker`, `who: "me"`). */
@@ -189,6 +194,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     red: lateRing(state.day),
     face: line && kind === "line" ? lineText(state, head, line).face : null,
     ...(session.view === "desktop" ? { stillPortrait: true } : {}),
+    ...(head.voice === "kuro" && (head.ending.kind === "kuroAsk" || head.ending.kind === "kuroTurn" || head.ending.kind === "kuroWait") ? { chat: true } : {}),
   };
 }
 
@@ -233,7 +239,7 @@ export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0, ref
   const me = !m.portrait && m.playerPortrait !== null;
   const hasNpc = !m.portrait && !me && m.npcPortrait !== null;
   // `reflow`: the line's own choices sit in the box's flow; on the player's turn with Kuro (#40) the text stays put
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", reflow && "has-choices");
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.chat === true && "chat", me && "me", hasNpc && "npc", reflow && "has-choices");
   // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
   const portrait = m.portrait
     ? portraitOf(m.portrait, m.red, m.stillPortrait === true)

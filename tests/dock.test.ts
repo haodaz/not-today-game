@@ -158,19 +158,21 @@ describe("decoys on the dock", () => {
     expect(dockOf(shown(13))).toContain('data-decoy="claude" data-gone="1"');
   });
 
-  it("a click with a window and a line: opens the window, Kuro says the line, one history entry", () => {
-    const { store, session, press, later } = click(10);
+  // author 2026-11-28: the line is the floating Kuro's, in the dialogue box with his portrait; the pill of the
+  // Kuro inside the screen is not used for it any more.
+  it("a click with a window and a line: opens the window, Kuro says the line in the box, once", () => {
+    const { store, session, press } = click(10);
     const before = { events: [...store.getEvents()], state: structuredClone(store.getState()) };
     press("files");
     const files = dockFor(10, "zh").find((d) => d.id === "files")!;
     expect(session.decoyWindow).toBe("files");
-    expect(session.dockSay).toEqual({ text: files.kuro, until: NOW_MS + DECOY_SAY_MS });
+    expect(session.dockSay).toBeNull();
+    expect(session.dialogue.queue).toHaveLength(1);
+    expect(session.dialogue.queue[0]).toMatchObject({ key: "d10:decoy:files", voice: "kuro", lines: [{ k: "speaker", who: "kuro", t: files.kuro }], ending: { kind: "none" } });
     expect(DECOY_SAY_MS).toBe(6000);
-    expect(later.some((ms) => ms >= DECOY_SAY_MS)).toBe(true);
-    expect(session.dlgLog).toEqual([{ day: 10, who: t("kuro.name"), kind: "kuro", text: files.kuro }]);
-    // Again: the bubble is renewed, the history keeps one entry.
+    // Again while it is still in the box: not queued twice.
     press("files");
-    expect(session.dlgLog).toHaveLength(1);
+    expect(session.dialogue.queue).toHaveLength(1);
     // No event, no state change, no turn used.
     expect(store.getEvents()).toEqual(before.events);
     expect(store.getState()).toEqual(before.state);
@@ -181,7 +183,9 @@ describe("decoys on the dock", () => {
     const { session, press } = click(1);
     press("claude");
     expect(session.decoyWindow).toBeNull();
-    expect(session.dockSay?.text).toBe(dockFor(1, "zh")[0]!.kuro);
+    expect(session.dockSay).toBeNull();
+    expect(session.dialogue.queue[0]).toMatchObject({ voice: "kuro", lines: [{ who: "kuro", t: dockFor(1, "zh")[0]!.kuro }] });
+    expect(dockFor(1, "zh")[0]!.kuro).toBe("那个？用起来不顺手吧。我在这儿呢。");
   });
 
   it("a click with only a window (settings): no line, no history", () => {
@@ -189,7 +193,7 @@ describe("decoys on the dock", () => {
     press("settings");
     expect(session.decoyWindow).toBe("settings");
     expect(session.dockSay).toBeNull();
-    expect(session.dlgLog).toEqual([]);
+    expect(session.dialogue.queue).toEqual([]);
   });
 
   it("a click on a removed app opens the admin notice and Kuro says nothing", () => {
@@ -197,7 +201,7 @@ describe("decoys on the dock", () => {
     press("claude");
     expect(session.decoyWindow).toBe("claude");
     expect(session.dockSay).toBeNull();
-    expect(session.dlgLog).toEqual([]);
+    expect(session.dialogue.queue).toEqual([]);
     expect(store.getEvents()).toEqual([]);
     const page = shown(13, { decoyWindow: "claude" });
     expect(page).toContain(dockApps[0]!.gone!.text.zh);

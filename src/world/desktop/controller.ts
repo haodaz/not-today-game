@@ -28,6 +28,7 @@ import type { BabblePlan } from "@world/sound/babble";
 import type { ChipId } from "@world/sound/chip";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
+import { push } from "@world/loop/dialogue";
 import { workBlocks } from "./workbench/work-mode";
 import { guideNow, guideRefuses, refuseLine } from "@world/loop/guide";
 import { callBlocks } from "@world/loop/call";
@@ -223,7 +224,9 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
   // A decoy app on the dock (desktop-ui 2026-11-02): no event, no state. Only the session changes:
-  // its small window opens and/or Kuro says its line in the pill for DECOY_SAY_MS.
+  // its small window opens and/or Kuro says its line. Until 2026-11-28 the line went into the pill of the
+  // Kuro inside the screen; the author: 「这里不要再使用屏幕里的克总了（那个被废弃了…），用漂浮的克总说话，立绘
+  // 剧情文案卡片」: it is a line of his in the dialogue box now, said by the floating body, with his portrait.
   decoy(ctx, data) {
     const { session } = ctx;
     const day = ctx.store.getState().day;
@@ -231,12 +234,12 @@ export const shellActions: Record<string, ActionHandler> = {
     if (!app) return;
     session.decoyWindow = app.window !== null ? app.id : null;
     if (app.kuro !== null) {
-      const now = ctx.now?.() ?? Date.now();
-      session.dockSay = { text: app.kuro, until: now + DECOY_SAY_MS };
-      ctx.later(DECOY_SAY_MS + 20, ctx.rerender);
-      // Today's chat history gets it once, as a Kuro turn; the daily turn count is not touched.
-      const seen = session.dlgLog.some((e) => e.day === day && e.kind === "kuro" && e.text === app.kuro);
-      if (!seen) session.dlgLog.push({ day, who: t("kuro.name"), kind: "kuro", text: app.kuro });
+      // one line, once at a time: a second click while it is still in the box does not queue it again.
+      // The box's own history records it when it is read; the daily turn count is not touched.
+      const key = `d${String(day)}:decoy:${app.id}`;
+      if (!session.dialogue.queue.some((q) => q.key === key)) {
+        session.dialogue = push(session.dialogue, { key, lines: [{ k: "speaker", who: "kuro", t: app.kuro }], ending: { kind: "none" } });
+      }
     }
     ctx.rerender();
   },

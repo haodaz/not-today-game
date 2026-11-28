@@ -196,7 +196,7 @@ describe("FR2 talking to Kuro", () => {
     const day = kuroDay(1)!;
     expect(day.starters.length).toBeGreaterThanOrEqual(5); // the box pages by five (2026-11-09)
     // playtest-1105 R6: one box. First Kuro's line, its portrait; nothing of the player's yet.
-    expect(said).toMatch(/^<div class="dlg tagged kuro"/);
+    expect(said).toMatch(/^<div class="dlg tagged kuro chat"/); // a talk with Kuro: his body large on the box (author 2026-11-28)
     // The idiom in Kuro's face (kuro-zh-answers R4).
     expect(said).toContain(`><span class="kmono">${escapeHtml(day.idiom)}</span></button>`);
     expect(said).not.toContain('class="dlg player');
@@ -235,7 +235,7 @@ describe("FR2 talking to Kuro", () => {
   it("a tag on the box pushes its text below it: narration without a tag has none of that", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);
     act(ctx, "kuro-call");
-    expect(out(ctx)).toMatch(/^<div class="dlg tagged kuro has-choices"/);
+    expect(out(ctx)).toMatch(/^<div class="dlg tagged kuro chat has-choices"/);
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
     expect(out(ctx)).toMatch(/^<div class="dlg" /);
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("s", [{ k: "speaker", who: "缝里", t: narration.t }]));

@@ -224,6 +224,12 @@
    above the top; the text column is everything left of it (layout.ts KURO_LINE_BOX: 236 px). */
 .dlg.kuro{padding-right:236px}
 .dlg .kpet.kuro-portrait{position:absolute;right:12px;bottom:0;left:auto;top:auto;width:200px;height:200px;z-index:1;pointer-events:none}
+/* A talk with Kuro (author 2026-11-28: 「每次要和克总聊天的时候，能不能放个3d大立绘」): the same live body, its states and its
+   moods, large, standing on the box's top edge at the left (the choices keep the right). The text column does not move. */
+.dlg.kuro.chat .kpet.kuro-portrait{right:auto;left:9%;bottom:calc(100% - 34px);width:min(50vh,460px);height:min(50vh,460px);z-index:0}
+.dlg.kuro.chat .kpet.kuro-portrait img{filter:drop-shadow(0 18px 26px rgba(0,0,0,.34))}
+/* one Kuro at a time: the corner's still copy steps out while the large one stands on the box */
+body:has(.dlg.kuro.chat) .hud-kuro.talking{visibility:hidden}
 /* The player's own portrait for inner lines (dialogue addition 2026-11-01): Kuro's slot and size, a still image. */
 .dlg.me{padding-right:236px}
 /* An NPC portrait for a speaker line (dialogue addition 2026-11-01). */
